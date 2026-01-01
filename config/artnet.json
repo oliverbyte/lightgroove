@@ -5,6 +5,7 @@
       "name": "Main ArtNet Node",
       "ip": "127.0.0.1",
       "port": 6454,
+      "broadcast": false,
       "universes": [0, 1],
       "enabled": true,
       "description": "Primary ArtNet node for universes 1-2"

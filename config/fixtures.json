@@ -28,5 +28,19 @@
         "range": [0, 255]
       }
     ]
+  },
+  "rgbw_dimmer_shutter_macro": {
+    "name": "Generic PAR (RGBW + Dimmer/Shutter/Macro)",
+    "manufacturer": "Generic",
+    "channels": [
+      { "index": 0, "name": "dimmer", "type": "dimmer", "range": [0, 255] },
+      { "index": 1, "name": "red",    "type": "color",  "range": [0, 255] },
+      { "index": 2, "name": "green",  "type": "color",  "range": [0, 255] },
+      { "index": 3, "name": "blue",   "type": "color",  "range": [0, 255] },
+      { "index": 4, "name": "white",  "type": "color",  "range": [0, 255] },
+      { "index": 5, "name": "shutter", "type": "other", "range": [0, 255] },
+      { "index": 6, "name": "macro", "type": "other", "range": [0, 255] },
+      { "index": 7, "name": "macro_speed", "type": "other", "range": [0, 255] }
+    ]
   }
 }

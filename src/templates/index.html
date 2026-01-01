@@ -37,7 +37,6 @@
   <div class="container">
     <div class="actions">
       <button id="btn-blackout">Blackout</button>
-      <button class="secondary" id="btn-reload">Reload fixtures</button>
     </div>
     <div id="grid" class="grid"></div>
   </div>
@@ -51,6 +50,10 @@
       blue: '#3b82f6',
       white: '#e5e7eb',
       dimmer: '#f59e0b',
+      shutter: '#94a3b8',
+      macro: '#7c3aed',
+      macro_speed: '#22d3ee',
+      other: '#38bdf8',
     };
 
     async function post(url, body) {
@@ -83,6 +86,10 @@
       return col;
     }
 
+    function toLabel(name) {
+      return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
     function renderFixtures(fixtures) {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
@@ -94,19 +101,19 @@
         card.appendChild(h3);
 
         const channels = fx.channels || [];
-        const has = name => channels.some(ch => ch.name === name);
-        const others = channels.filter(ch => !['red','green','blue','white','dimmer'].includes(ch.name));
+        const ordered = [...channels].sort((a, b) => (a.index ?? 0) - (b.index ?? 0) || a.name.localeCompare(b.name));
 
         const slots = document.createElement('div');
         slots.className = 'sliders';
 
-        if (has('red')) slots.appendChild(makeSlider('Red', 0, colors.red, v => post(`${apiBase}/api/fixture/${fx.id}/channel/red`, { value: v })));
-        if (has('green')) slots.appendChild(makeSlider('Green', 0, colors.green, v => post(`${apiBase}/api/fixture/${fx.id}/channel/green`, { value: v })));
-        if (has('blue')) slots.appendChild(makeSlider('Blue', 0, colors.blue, v => post(`${apiBase}/api/fixture/${fx.id}/channel/blue`, { value: v })));
-        if (has('white')) slots.appendChild(makeSlider('White', 0, colors.white, v => post(`${apiBase}/api/fixture/${fx.id}/channel/white`, { value: v })));
-        if (has('dimmer')) slots.appendChild(makeSlider('Dimmer', 1, colors.dimmer, v => post(`${apiBase}/api/fixture/${fx.id}/dimmer`, { value: v })));
-        others.forEach(ch => {
-          slots.appendChild(makeSlider(ch.name, 0, null, v => post(`${apiBase}/api/fixture/${fx.id}/channel/${ch.name}`, { value: v })));
+        ordered.forEach(ch => {
+          const accent = colors[ch.name] || colors[ch.type] || colors.other;
+          const target = ch.name === 'dimmer'
+            ? `${apiBase}/api/fixture/${fx.id}/dimmer`
+            : `${apiBase}/api/fixture/${fx.id}/channel/${ch.name}`;
+          slots.appendChild(
+            makeSlider(toLabel(ch.name), 0, accent, v => post(target, { value: v }))
+          );
         });
 
         card.appendChild(slots);
@@ -120,8 +127,18 @@
       renderFixtures(data.fixtures || []);
     }
 
-    document.getElementById('btn-blackout').addEventListener('click', () => post(`${apiBase}/api/blackout`));
-    document.getElementById('btn-reload').addEventListener('click', loadFixtures);
+    function zeroAllSliders() {
+      document.querySelectorAll('.slider-col input[type=range]').forEach(input => {
+        input.value = '0';
+        const out = input.parentElement?.querySelector('output');
+        if (out) out.textContent = '0';
+      });
+    }
+
+    document.getElementById('btn-blackout').addEventListener('click', async () => {
+      await post(`${apiBase}/api/blackout`);
+      zeroAllSliders();
+    });
 
     loadFixtures();
   </script>

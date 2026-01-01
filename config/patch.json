@@ -4,15 +4,15 @@
       "fixtures": [
         {
           "id": "par1",
-          "type": "rgbw_par",
+          "type": "rgbw_dimmer_shutter_macro",
           "start_address": 1,
-          "description": "1st RGBW PAR"
+          "description": "1st Generic PAR"
         },
         {
           "id": "par2",
-          "type": "rgbw_par",
-          "start_address": 5,
-          "description": "2nd RGBW PAR"
+          "type": "rgbw_dimmer_shutter_macro",
+          "start_address": 9,
+          "description": "2nd Generic PAR"
         }
       ]
     }
