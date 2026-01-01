@@ -1,0 +1,32 @@
+{
+  "rgbw_par": {
+    "name": "RGBW PAR",
+    "manufacturer": "Generic",
+    "channels": [
+      {
+        "index": 0,
+        "name": "red",
+        "type": "color",
+        "range": [0, 255]
+      },
+      {
+        "index": 1,
+        "name": "green",
+        "type": "color",
+        "range": [0, 255]
+      },
+      {
+        "index": 2,
+        "name": "blue",
+        "type": "color",
+        "range": [0, 255]
+      },
+      {
+        "index": 3,
+        "name": "white",
+        "type": "color",
+        "range": [0, 255]
+      }
+    ]
+  }
+}

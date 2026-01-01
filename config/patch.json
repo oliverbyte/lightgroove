@@ -1,0 +1,20 @@
+{
+  "universes": {
+    "1": {
+      "fixtures": [
+        {
+          "id": "par1",
+          "type": "rgbw_par",
+          "start_address": 1,
+          "description": "1st RGBW PAR"
+        },
+        {
+          "id": "par2",
+          "type": "rgbw_par",
+          "start_address": 5,
+          "description": "2nd RGBW PAR"
+        }
+      ]
+    }
+  }
+}

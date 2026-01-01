@@ -1,0 +1,23 @@
+{
+  "nodes": [
+    {
+      "id": "node1",
+      "name": "Main ArtNet Node",
+      "ip": "127.0.0.1",
+      "port": 6454,
+      "universes": [0, 1],
+      "enabled": true,
+      "description": "Primary ArtNet node for universes 1-2"
+    }
+  ],
+  "universe_mapping": {
+    "1": {
+      "node_id": "node1",
+      "artnet_universe": 0,
+      "output_mode": "artnet"
+    }
+  },
+  "default_output_mode": "virtual",
+  "fps": 44,
+  "serial_port": null
+}

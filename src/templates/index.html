@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LightGroove</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --border: #1f2937;
+      --text: #e2e8f0;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .actions { margin: 0 0 16px 0; display: flex; gap: 10px; flex-wrap: wrap; }
+    button { background: var(--accent); color: #0b1220; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    button.secondary { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+    .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #f8fafc; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--border); font-size: 11px; color: var(--muted); margin-right: 6px; }
+    .sliders { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+    .slider-col { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 72px; padding: 6px 8px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); }
+    .slider-col label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
+    .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
+    .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>LightGroove
+  </header>
+  <div class="container">
+    <div class="actions">
+      <button id="btn-blackout">Blackout</button>
+      <button class="secondary" id="btn-reload">Reload fixtures</button>
+    </div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <script>
+    const apiBase = "__API_BASE__" || ""; // relative by default
+
+    const colors = {
+      red: '#ef4444',
+      green: '#22c55e',
+      blue: '#3b82f6',
+      white: '#e5e7eb',
+      dimmer: '#f59e0b',
+    };
+
+    async function post(url, body) {
+      await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body || {}) });
+    }
+
+    function makeSlider(label, value, color, onChange) {
+      const col = document.createElement('div');
+      col.className = 'slider-col';
+      const lab = document.createElement('label');
+      lab.textContent = label;
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.min = '0';
+      input.max = '255';
+      input.step = '1';
+      const initial = Math.round((value || 0) * 255);
+      input.value = initial;
+      if (color) input.style.accentColor = color;
+      const out = document.createElement('output');
+      out.textContent = initial.toString();
+      input.addEventListener('input', () => {
+        const dmx = Number(input.value);
+        out.textContent = dmx.toString();
+        onChange(dmx / 255);
+      });
+      col.appendChild(lab);
+      col.appendChild(input);
+      col.appendChild(out);
+      return col;
+    }
+
+    function renderFixtures(fixtures) {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      fixtures.forEach(fx => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const h3 = document.createElement('h3');
+        h3.innerHTML = `${fx.id} <span class="pill">${fx.type}</span> <span class="pill">U${fx.universe} @ ${fx.start_address}</span>`;
+        card.appendChild(h3);
+
+        const channels = fx.channels || [];
+        const has = name => channels.some(ch => ch.name === name);
+        const others = channels.filter(ch => !['red','green','blue','white','dimmer'].includes(ch.name));
+
+        const slots = document.createElement('div');
+        slots.className = 'sliders';
+
+        if (has('red')) slots.appendChild(makeSlider('Red', 0, colors.red, v => post(`${apiBase}/api/fixture/${fx.id}/channel/red`, { value: v })));
+        if (has('green')) slots.appendChild(makeSlider('Green', 0, colors.green, v => post(`${apiBase}/api/fixture/${fx.id}/channel/green`, { value: v })));
+        if (has('blue')) slots.appendChild(makeSlider('Blue', 0, colors.blue, v => post(`${apiBase}/api/fixture/${fx.id}/channel/blue`, { value: v })));
+        if (has('white')) slots.appendChild(makeSlider('White', 0, colors.white, v => post(`${apiBase}/api/fixture/${fx.id}/channel/white`, { value: v })));
+        if (has('dimmer')) slots.appendChild(makeSlider('Dimmer', 1, colors.dimmer, v => post(`${apiBase}/api/fixture/${fx.id}/dimmer`, { value: v })));
+        others.forEach(ch => {
+          slots.appendChild(makeSlider(ch.name, 0, null, v => post(`${apiBase}/api/fixture/${fx.id}/channel/${ch.name}`, { value: v })));
+        });
+
+        card.appendChild(slots);
+        grid.appendChild(card);
+      });
+    }
+
+    async function loadFixtures() {
+      const res = await fetch(`${apiBase}/api/fixtures`);
+      const data = await res.json();
+      renderFixtures(data.fixtures || []);
+    }
+
+    document.getElementById('btn-blackout').addEventListener('click', () => post(`${apiBase}/api/blackout`));
+    document.getElementById('btn-reload').addEventListener('click', loadFixtures);
+
+    loadFixtures();
+  </script>
+</body>
+</html>
