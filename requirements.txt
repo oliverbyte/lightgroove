@@ -1,3 +1,2 @@
-python-osc==1.8.3
 pyserial==3.5
 stupidArtnet==1.4.0

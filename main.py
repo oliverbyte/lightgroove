@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LightGroove - OSC to DMX RGBW PAR Controller
+LightGroove - DMX RGBW PAR Controller (HTTP/Web UI only)
 Main entry point
 Author: https://github.com/oliverbyte
 """
@@ -22,7 +22,7 @@ from http_api import HttpApiServer
 def main():
     """Main application"""
     print("=" * 60)
-    print("LightGroove - OSC to DMX RGBW PAR Controller")
+    print("LightGroove - DMX RGBW PAR Controller (HTTP/Web UI)")
     print("=" * 60)
     
     # Configuration paths
