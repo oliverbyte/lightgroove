@@ -12,9 +12,15 @@ jobs:
     env:
       TAG: build-${{ github.run_number }}
       RELEASE_NAME: LightGroove build ${{ github.run_number }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set build timestamp
+        run: |
+          echo "BUILD_TIMESTAMP=$(date -u +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+          echo "ZIP_NAME=LightGroove-macOS-${BUILD_TIMESTAMP}.zip" >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -45,13 +51,13 @@ jobs:
       - name: Package artifact
         run: |
           cd dist
-          zip -r LightGroove-macOS.zip LightGroove
+          zip -r "$ZIP_NAME" LightGroove
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LightGroove-macOS
-          path: dist/LightGroove-macOS.zip
+          name: LightGroove-macOS-${{ env.BUILD_TIMESTAMP }}
+          path: dist/${{ env.ZIP_NAME }}
       - name: Publish GitHub Release
         uses: ncipollo/release-action@v1
         env:
@@ -61,5 +67,5 @@ jobs:
           name: ${{ env.RELEASE_NAME }}
           draft: false
           prerelease: false
-          artifacts: dist/LightGroove-macOS.zip
+          artifacts: dist/${{ env.ZIP_NAME }}
           artifactContentType: application/zip
