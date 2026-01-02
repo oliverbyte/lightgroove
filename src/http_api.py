@@ -8,17 +8,15 @@ import json
 import threading
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 
 class HttpApiServer:
     """Threaded HTTP server exposing a JSON API and serving the generated UI."""
 
-    def __init__(self, fixture_manager, ui_dir: Path, config_paths: Dict[str, Path], dmx_controller=None, host: str = "0.0.0.0", port: int = 5000):
+    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000):
         self.fixture_manager = fixture_manager
         self.ui_dir = ui_dir
-        self.config_paths = config_paths
-        self.dmx_controller = dmx_controller
         self.host = host
         self.port = port
         self._server = None
@@ -42,8 +40,6 @@ class HttpApiServer:
     def _make_handler(self):
         fixture_manager = self.fixture_manager
         ui_dir = self.ui_dir
-        config_paths = self.config_paths
-        dmx_controller = self.dmx_controller
 
         class Handler(BaseHTTPRequestHandler):
             def _set_headers(self, status: int = 200, content_type: str = "application/json"):
@@ -51,16 +47,6 @@ class HttpApiServer:
                 self.send_header("Content-Type", content_type)
                 self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
-
-            def _load_config_content(self, name: str) -> Optional[Dict[str, Any]]:
-                cfg_path = config_paths.get(name) if config_paths else None
-                if not cfg_path:
-                    return None
-                try:
-                    with open(cfg_path, "r") as f:
-                        return json.load(f)
-                except Exception:
-                    return None
 
             def _read_json(self) -> Dict[str, Any]:
                 length = int(self.headers.get("Content-Length", "0"))
@@ -80,17 +66,6 @@ class HttpApiServer:
                 self.end_headers()
 
             def do_GET(self):
-                if self.path.startswith("/api/config/"):
-                    name = self.path.split("/")[3] if len(self.path.split("/")) > 3 else ""
-                    content = self._load_config_content(name)
-                    if content is None:
-                        self._set_headers(404)
-                        self.wfile.write(json.dumps({"error": "config not found"}).encode("utf-8"))
-                        return
-                    self._set_headers()
-                    self.wfile.write(json.dumps(content).encode("utf-8"))
-                    return
-
                 if self.path.startswith("/api/fixtures"):
                     fixtures = []
                     for fid, data in fixture_manager.fixtures.items():
@@ -179,32 +154,6 @@ class HttpApiServer:
                         self._set_headers()
                         self.wfile.write(b"{}")
                         return
-
-                        if path.startswith("/api/config/"):
-                            name = path.split("/")[3] if len(path.split("/")) > 3 else ""
-                            content = payload.get("data", payload)
-                            if not isinstance(content, dict):
-                                self._set_headers(400)
-                                self.wfile.write(json.dumps({"error": "invalid payload"}).encode("utf-8"))
-                                return
-                            try:
-                                if name == "fixtures":
-                                    fixture_manager.reload_configs(fixtures_data=content)
-                                elif name == "patch":
-                                    fixture_manager.reload_configs(patch_data=content)
-                                elif name == "artnet" and dmx_controller:
-                                    cfg_path = config_paths.get("artnet") if config_paths else None
-                                    dmx_controller.reload_config(cfg_path, content)
-                                else:
-                                    self._set_headers(404)
-                                    self.wfile.write(json.dumps({"error": "config not found"}).encode("utf-8"))
-                                    return
-                                self._set_headers()
-                                self.wfile.write(b"{}")
-                            except Exception as exc:
-                                self._set_headers(400)
-                                self.wfile.write(json.dumps({"error": str(exc)}).encode("utf-8"))
-                            return
                 except Exception as exc:  # keep API resilient
                     self._set_headers(400)
                     self.wfile.write(json.dumps({"error": str(exc)}).encode("utf-8"))

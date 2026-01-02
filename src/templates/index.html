@@ -29,13 +29,6 @@
     .slider-col label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
     .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
-    .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 20px; }
-    .config-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 10px; }
-    .config-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .config-title { font-weight: 600; color: #f8fafc; }
-    .config-actions { display: flex; gap: 8px; }
-    textarea.config-editor { width: 100%; min-height: 240px; background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: 'SFMono-Regular', ui-monospace, monospace; font-size: 13px; }
-    .status { margin-top: 10px; color: var(--muted); font-size: 12px; }
   </style>
 </head>
 <body>
@@ -46,43 +39,6 @@
       <button id="btn-blackout">Blackout</button>
     </div>
     <div id="grid" class="grid"></div>
-
-    <h3 style="margin:24px 0 10px 0;">Config Editor</h3>
-    <div class="config-grid">
-      <div class="config-card">
-        <div class="config-head">
-          <div class="config-title">fixtures.json</div>
-          <div class="config-actions">
-            <button class="secondary" data-load="fixtures">Reload</button>
-            <button data-save="fixtures">Save</button>
-          </div>
-        </div>
-        <textarea id="cfg-fixtures" class="config-editor" spellcheck="false"></textarea>
-        <div class="status" id="status-fixtures"></div>
-      </div>
-      <div class="config-card">
-        <div class="config-head">
-          <div class="config-title">patch.json</div>
-          <div class="config-actions">
-            <button class="secondary" data-load="patch">Reload</button>
-            <button data-save="patch">Save</button>
-          </div>
-        </div>
-        <textarea id="cfg-patch" class="config-editor" spellcheck="false"></textarea>
-        <div class="status" id="status-patch"></div>
-      </div>
-      <div class="config-card">
-        <div class="config-head">
-          <div class="config-title">artnet.json</div>
-          <div class="config-actions">
-            <button class="secondary" data-load="artnet">Reload</button>
-            <button data-save="artnet">Save</button>
-          </div>
-        </div>
-        <textarea id="cfg-artnet" class="config-editor" spellcheck="false"></textarea>
-        <div class="status" id="status-artnet"></div>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -171,44 +127,6 @@
       renderFixtures(data.fixtures || []);
     }
 
-    async function loadConfig(name) {
-      try {
-        const res = await fetch(`${apiBase}/api/config/${name}`);
-        if (!res.ok) throw new Error(await res.text());
-        const data = await res.json();
-        const el = document.getElementById(`cfg-${name}`);
-        if (el) el.value = JSON.stringify(data, null, 2);
-        setStatus(name, 'Loaded');
-      } catch (err) {
-        setStatus(name, `Load failed: ${err}`);
-      }
-    }
-
-    async function saveConfig(name) {
-      const el = document.getElementById(`cfg-${name}`);
-      if (!el) return;
-      try {
-        const parsed = JSON.parse(el.value || '{}');
-        const res = await fetch(`${apiBase}/api/config/${name}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: parsed })
-        });
-        if (!res.ok) throw new Error(await res.text());
-        setStatus(name, 'Saved');
-        if (name === 'fixtures' || name === 'patch') {
-          await loadFixtures();
-        }
-      } catch (err) {
-        setStatus(name, `Save failed: ${err}`);
-      }
-    }
-
-    function setStatus(name, msg) {
-      const statusEl = document.getElementById(`status-${name}`);
-      if (statusEl) statusEl.textContent = msg;
-    }
-
     function zeroAllSliders() {
       document.querySelectorAll('.slider-col input[type=range]').forEach(input => {
         input.value = '0';
@@ -221,17 +139,7 @@
       await post(`${apiBase}/api/blackout`);
       zeroAllSliders();
     });
-    document.querySelectorAll('[data-load]').forEach(btn => {
-      const name = btn.getAttribute('data-load');
-      btn.addEventListener('click', () => loadConfig(name));
-    });
-    document.querySelectorAll('[data-save]').forEach(btn => {
-      const name = btn.getAttribute('data-save');
-      btn.addEventListener('click', () => saveConfig(name));
-    });
-
     loadFixtures();
-    ['fixtures','patch','artnet'].forEach(loadConfig);
   </script>
 </body>
 </html>

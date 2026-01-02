@@ -69,7 +69,6 @@ class DMXController:
         self._thread = None
         self.fps = 44
         self.serial = None
-        self.config_file = config_file
         
         if config_file:
             self._load_config(config_file)
@@ -81,8 +80,6 @@ class DMXController:
                 self.config = json.load(f)
             
             self.fps = self.config.get('fps', 44)
-            self.universes = {}
-            self.artnet_senders = {}
             
             # Initialize universes based on mapping
             for universe_str, mapping in self.config.get('universe_mapping', {}).items():
@@ -114,23 +111,6 @@ class DMXController:
             print(f"DMX Controller: Failed to load config: {e}")
             print("DMX Controller: Running in virtual mode")
 
-    def reload_config(self, config_file: Optional[str] = None, config_data: Optional[Dict] = None):
-        """Reload ArtNet configuration and restart output if running."""
-        was_running = self.running
-        self.stop()
-        if config_file:
-            self.config_file = config_file
-        if config_data is not None and self.config_file:
-            try:
-                with open(self.config_file, 'w') as f:
-                    json.dump(config_data, f, indent=2)
-            except Exception as e:
-                print(f"DMX Controller: Failed to write config: {e}")
-        if self.config_file:
-            self._load_config(self.config_file)
-        if was_running:
-            self.start()
-    
     def _find_node_config(self, node_id: str) -> Optional[dict]:
         for node in self.config.get('nodes', []):
             if node.get('id') == node_id:

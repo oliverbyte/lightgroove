@@ -21,8 +21,6 @@ class FixtureManager:
             patch_file: Path to patch.json
         """
         self.dmx = dmx_controller
-        self.fixtures_file = fixtures_file
-        self.patch_file = patch_file
         self.fixtures_config = self._load_json(fixtures_file)
         self.patch_config = self._load_json(patch_file)
         self.fixtures = {}
@@ -38,14 +36,6 @@ class FixtureManager:
             print(f"Error loading {filepath}: {e}")
             return {}
 
-    def _write_json(self, filepath: str, data: Dict[str, Any]):
-        """Persist JSON configuration file."""
-        try:
-            with open(filepath, 'w') as f:
-                json.dump(data, f, indent=2)
-        except Exception as e:
-            print(f"Error writing {filepath}: {e}")
-    
     def _initialize_fixtures(self):
         """Initialize all patched fixtures"""
         for universe_str, universe_data in self.patch_config.get('universes', {}).items():
@@ -150,17 +140,3 @@ class FixtureManager:
             self.set_fixture_color(fixture_id, 0, 0, 0, 0)
             self.set_fixture_dimmer(fixture_id, 0)
 
-    def reload_configs(self, fixtures_data: Optional[Dict[str, Any]] = None, patch_data: Optional[Dict[str, Any]] = None):
-        """Reload fixtures/patch configurations and rebuild fixtures."""
-        fixtures_content = fixtures_data if fixtures_data is not None else self._load_json(self.fixtures_file)
-        patch_content = patch_data if patch_data is not None else self._load_json(self.patch_file)
-
-        if fixtures_data is not None:
-            self._write_json(self.fixtures_file, fixtures_content)
-        if patch_data is not None:
-            self._write_json(self.patch_file, patch_content)
-
-        self.fixtures_config = fixtures_content
-        self.patch_config = patch_content
-        self.fixtures = {}
-        self._initialize_fixtures()
