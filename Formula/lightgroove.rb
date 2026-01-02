@@ -14,8 +14,9 @@ class Lightgroove < Formula
   def install
     venv = virtualenv_create(libexec, "python3")
 
-    # Install Python deps from requirements.txt (uses PyPI at install time; fine for tap usage).
-    venv.pip_install buildpath/"requirements.txt"
+    # Install Python deps explicitly to avoid requirements.txt path issues.
+    venv.pip_install "pyserial==3.5"
+    venv.pip_install "stupidArtnet==1.4.0"
 
     # Install project files into libexec.
     libexec.install Dir["*"]
