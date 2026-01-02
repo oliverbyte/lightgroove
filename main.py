@@ -30,6 +30,11 @@ def main():
     fixtures_file = base_dir / "config" / "fixtures.json"
     patch_file = base_dir / "config" / "patch.json"
     artnet_file = base_dir / "config" / "artnet.json"
+    config_paths = {
+        "fixtures": fixtures_file,
+        "patch": patch_file,
+        "artnet": artnet_file,
+    }
     ui_dir = base_dir / "ui_dist"
     http_port = int(os.getenv("LIGHTGROOVE_HTTP_PORT", "5555"))
     
@@ -52,7 +57,7 @@ def main():
         
         # Generate UI shell and start HTTP UI/API server
         generate_ui(fixture_mgr, ui_dir, api_base="")
-        http = HttpApiServer(fixture_mgr, ui_dir, host="0.0.0.0", port=http_port)
+        http = HttpApiServer(fixture_mgr, ui_dir, config_paths, dmx_controller=dmx, host="0.0.0.0", port=http_port)
         try:
             http.start()
         except OSError as e:

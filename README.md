@@ -10,6 +10,7 @@ DMX controller with a simple web UI. Outputs ArtNet/virtual DMX and renders per-
 ## UI
 - Per-fixture vertical faders in channel order; values shown as 0–255 DMX.
 - Blackout button sends blackout and zeros UI faders.
+- Built-in config editor to view/save `fixtures.json`, `patch.json`, and `artnet.json` directly in the browser.
 - Screenshot:
 
 ![UI Faders](img/screenshot_faders.png)
