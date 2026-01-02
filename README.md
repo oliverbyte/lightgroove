@@ -14,12 +14,19 @@ DMX controller with a simple web UI. Outputs ArtNet/virtual DMX and renders per-
 
 ![UI Faders](img/screenshot_faders.png)
 
-## Prerequisites
+## Install (macOS via Homebrew)
+```bash
+brew tap oliverbyte/lightgroove https://github.com/oliverbyte/lightgroove.git
+brew install --HEAD oliverbyte/lightgroove/lightgroove
+lightgroove
+```
+Then open the printed UI URL (default http://0.0.0.0:5555). The Homebrew formula installs dependencies in a virtualenv and runs from source (no Gatekeeper prompts).
+
+## Install from source
 - Python 3.9+ (virtualenv recommended)
 - Dependencies: `pip install -r requirements.txt`
 - ArtNet node or monitor (defaults to localhost/unicast on universe 0 mapped from DMX universe 1)
 
-## Run
 ```bash
 source .venv/bin/activate  # if using venv
 python main.py
