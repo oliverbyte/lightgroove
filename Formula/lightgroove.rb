@@ -14,7 +14,7 @@ class Lightgroove < Formula
   def install
     venv = virtualenv_create(libexec, "python3")
 
-    # Install Python deps explicitly to avoid requirements.txt path issues.
+    # Install Python deps (keep in sync with requirements.txt).
     venv.pip_install "pyserial==3.5"
     venv.pip_install "stupidArtnet==1.4.0"
 
