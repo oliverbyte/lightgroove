@@ -1,7 +1,7 @@
 class Lightgroove < Formula
   include Language::Python::Virtualenv
 
-  desc "DMX RGBW PAR controller with web UI"
+  desc "DMX controller with simple web UI"
   homepage "https://github.com/oliverbyte/lightgroove"
   url "https://github.com/oliverbyte/lightgroove/archive/refs/heads/main.tar.gz"
   version "0.0.0-main"
