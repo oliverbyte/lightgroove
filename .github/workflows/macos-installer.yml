@@ -38,6 +38,7 @@ jobs:
             --noconfirm \
             --onedir \
             --name LightGroove \
+            --paths src \
             --add-data "config:config" \
             --add-data "src/templates:src/templates" \
             main.py
