@@ -1,0 +1,44 @@
+name: macos-installer
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build macOS bundle (onedir)
+        run: |
+          pyinstaller \
+            --noconfirm \
+            --onedir \
+            --name LightGroove \
+            --add-data "config:config" \
+            --add-data "src/templates:src/templates" \
+            main.py
+          cp README.md dist/LightGroove/ || true
+
+      - name: Package artifact
+        run: |
+          cd dist
+          zip -r LightGroove-macOS.zip LightGroove
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: LightGroove-macOS
+          path: dist/LightGroove-macOS.zip
