@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    permissions:
+      contents: write
     env:
       TAG: build-${{ github.run_number }}
       RELEASE_NAME: LightGroove build ${{ github.run_number }}
