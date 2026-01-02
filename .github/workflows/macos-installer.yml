@@ -7,6 +7,9 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      TAG: build-${{ github.run_number }}
+      RELEASE_NAME: LightGroove build ${{ github.run_number }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,6 +35,11 @@ jobs:
             main.py
           cp README.md dist/LightGroove/ || true
 
+      - name: Ad-hoc sign and clear quarantine
+        run: |
+          codesign --force --deep --sign - dist/LightGroove/LightGroove || true
+          xattr -cr dist/LightGroove || true
+
       - name: Package artifact
         run: |
           cd dist
@@ -42,3 +50,14 @@ jobs:
         with:
           name: LightGroove-macOS
           path: dist/LightGroove-macOS.zip
+      - name: Publish GitHub Release
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ env.TAG }}
+          name: ${{ env.RELEASE_NAME }}
+          draft: false
+          prerelease: false
+          artifacts: dist/LightGroove-macOS.zip
+          artifactContentType: application/zip
