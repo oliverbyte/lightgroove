@@ -183,14 +183,15 @@
       });
     }
 
-    document.getElementById('btn-blackout').addEventListener('click', async () => {
-      await post(`${apiBase}/api/blackout`);
-      zeroAllSliders();
-    });
-
     // Grandmaster control
     const gmSlider = document.getElementById('grandmaster');
     const gmValue = document.getElementById('gm-value');
+    
+    document.getElementById('btn-blackout').addEventListener('click', () => {
+      gmSlider.value = '0';
+      gmValue.textContent = '0%';
+      gmSlider.dispatchEvent(new Event('input'));
+    });
     gmSlider.addEventListener('input', async () => {
       const value = parseInt(gmSlider.value);
       gmValue.textContent = `${value}%`;
