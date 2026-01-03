@@ -82,6 +82,14 @@ class HttpApiServer:
                     self.wfile.write(json.dumps({"fixtures": fixtures}).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/states"):
+                    states = {}
+                    for fid, data in fixture_manager.fixtures.items():
+                        states[fid] = data.get("state", {})
+                    self._set_headers()
+                    self.wfile.write(json.dumps(states).encode("utf-8"))
+                    return
+
                 # Serve index.html for root
                 if self.path in ["/", "/index.html"]:
                     index_path = ui_dir / "index.html"
@@ -151,6 +159,17 @@ class HttpApiServer:
 
                     if path == "/api/blackout":
                         fixture_manager.blackout_all()
+                        self._set_headers()
+                        self.wfile.write(b"{}")
+                        return
+
+                    if path == "/api/all/color":
+                        r = float(payload.get("r", 0))
+                        g = float(payload.get("g", 0))
+                        b = float(payload.get("b", 0))
+                        w = float(payload.get("w", 0))
+                        for fixture_id in fixture_manager.list_fixtures():
+                            fixture_manager.set_fixture_color(fixture_id, r, g, b, w)
                         self._set_headers()
                         self.wfile.write(b"{}")
                         return

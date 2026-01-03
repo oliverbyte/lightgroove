@@ -17,9 +17,17 @@
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 600; }
     .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .tab { padding: 10px 20px; cursor: pointer; background: transparent; color: var(--muted); border: none; border-bottom: 2px solid transparent; font-weight: 500; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
     .actions { margin: 0 0 16px 0; display: flex; gap: 10px; flex-wrap: wrap; }
     button { background: var(--accent); color: #0b1220; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; }
     button.secondary { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; }
+    .color-btn { padding: 40px; border-radius: 12px; border: 2px solid var(--border); font-size: 14px; font-weight: 600; text-transform: uppercase; transition: all 0.2s; }
+    .color-btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
     .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #f8fafc; }
@@ -35,10 +43,31 @@
   <header>LightGroove
   </header>
   <div class="container">
-    <div class="actions">
-      <button id="btn-blackout">Blackout</button>
+    <div class="tabs">
+      <button class="tab active" data-tab="faders">Faders</button>
+      <button class="tab" data-tab="colors">Colors</button>
     </div>
-    <div id="grid" class="grid"></div>
+    
+    <div id="tab-faders" class="tab-content active">
+      <div class="actions">
+        <button id="btn-blackout">Blackout</button>
+      </div>
+      <div id="grid" class="grid"></div>
+    </div>
+    
+    <div id="tab-colors" class="tab-content">
+      <div class="color-grid">
+        <button class="color-btn" data-color="red" style="background: #ef4444; color: white;">Red</button>
+        <button class="color-btn" data-color="green" style="background: #22c55e; color: white;">Green</button>
+        <button class="color-btn" data-color="blue" style="background: #3b82f6; color: white;">Blue</button>
+        <button class="color-btn" data-color="cyan" style="background: #06b6d4; color: white;">Cyan</button>
+        <button class="color-btn" data-color="magenta" style="background: #d946ef; color: white;">Magenta</button>
+        <button class="color-btn" data-color="yellow" style="background: #eab308; color: #0b1220;">Yellow</button>
+        <button class="color-btn" data-color="white" style="background: #f3f4f6; color: #0b1220;">White</button>
+        <button class="color-btn" data-color="orange" style="background: #f97316; color: white;">Orange</button>
+        <button class="color-btn" data-color="purple" style="background: #a855f7; color: white;">Purple</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -60,9 +89,16 @@
       await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body || {}) });
     }
 
-    function makeSlider(label, value, color, onChange) {
+    async function getStates() {
+      const res = await fetch(`${apiBase}/api/states`);
+      return await res.json();
+    }
+
+    function makeSlider(fixtureId, channelName, label, value, color, onChange) {
       const col = document.createElement('div');
       col.className = 'slider-col';
+      col.dataset.fixtureId = fixtureId;
+      col.dataset.channelName = channelName;
       const lab = document.createElement('label');
       lab.textContent = label;
       const input = document.createElement('input');
@@ -112,7 +148,7 @@
             ? `${apiBase}/api/fixture/${fx.id}/dimmer`
             : `${apiBase}/api/fixture/${fx.id}/channel/${ch.name}`;
           slots.appendChild(
-            makeSlider(toLabel(ch.name), 0, accent, v => post(target, { value: v }))
+            makeSlider(fx.id, ch.name, toLabel(ch.name), 0, accent, v => post(target, { value: v }))
           );
         });
 
@@ -139,7 +175,66 @@
       await post(`${apiBase}/api/blackout`);
       zeroAllSliders();
     });
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`tab-${targetTab}`).classList.add('active');
+      });
+    });
+
+    // Color buttons
+    const colorMap = {
+      red: { r: 1, g: 0, b: 0, w: 0 },
+      green: { r: 0, g: 1, b: 0, w: 0 },
+      blue: { r: 0, g: 0, b: 1, w: 0 },
+      cyan: { r: 0, g: 1, b: 1, w: 0 },
+      magenta: { r: 1, g: 0, b: 1, w: 0 },
+      yellow: { r: 1, g: 1, b: 0, w: 0 },
+      white: { r: 0, g: 0, b: 0, w: 1 },
+      orange: { r: 1, g: 0.5, b: 0, w: 0 },
+      purple: { r: 0.65, g: 0.3, b: 1, w: 0 }
+    };
+
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const colorName = btn.dataset.color;
+        const color = colorMap[colorName];
+        if (color) {
+          await post(`${apiBase}/api/all/color`, color);
+        }
+      });
+    });
+
+    // Live channel value updates
+    async function updateLiveValues() {
+      try {
+        const data = await getStates();
+        document.querySelectorAll('.slider-col').forEach(col => {
+          const fixtureId = col.dataset.fixtureId;
+          const channelName = col.dataset.channelName;
+          if (data[fixtureId] && data[fixtureId][channelName] !== undefined) {
+            const value = data[fixtureId][channelName];
+            const dmxValue = Math.round(value * 255);
+            const input = col.querySelector('input[type=range]');
+            const output = col.querySelector('output');
+            if (input && output && !input.matches(':active')) {
+              input.value = dmxValue;
+              output.textContent = dmxValue.toString();
+            }
+          }
+        });
+      } catch (e) {
+        // Ignore errors during polling
+      }
+    }
+
     loadFixtures();
+    setInterval(updateLiveValues, 500); // Update every 500ms
   </script>
 </body>
 </html>
