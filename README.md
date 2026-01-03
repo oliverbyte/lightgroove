@@ -13,9 +13,10 @@ DMX controller with a simple web UI. Outputs ArtNet/virtual DMX and renders per-
 - **Colors Tab**: Quick color preset buttons (Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple) that apply to all fixtures simultaneously.
 - Tab navigation with styled buttons allows quick switching between fader control and color presets.
 - Left-aligned layout maximizes screen space utilization.
-- Screenshot:
+- Screenshots:
 
 ![UI Faders](img/screenshot_faders.png)
+![UI Colors](img/screenshot_colors.png)
 
 ## Install (macOS via Homebrew)
 ```bash
