@@ -157,6 +157,13 @@ class HttpApiServer:
                         self.wfile.write(b"{}")
                         return
 
+                    if path == "/api/grandmaster":
+                        level = float(payload.get("level", 1.0))
+                        fixture_manager.dmx.set_grandmaster(level)
+                        self._set_headers()
+                        self.wfile.write(b"{}")
+                        return
+
                     if path == "/api/blackout":
                         fixture_manager.blackout_all()
                         self._set_headers()

@@ -69,6 +69,7 @@ class DMXController:
         self._thread = None
         self.fps = 44
         self.serial = None
+        self.grandmaster = 1.0  # 0.0 to 1.0 multiplier
         
         if config_file:
             self._load_config(config_file)
@@ -160,6 +161,16 @@ class DMXController:
             self.universes[universe_id] = DMXUniverse(universe_id, output_mode)
             print(f"DMX Controller: Universe {universe_id} added ({output_mode})")
     
+    def set_grandmaster(self, level: float):
+        """
+        Set grandmaster level (scales all DMX output)
+        
+        Args:
+            level: Grandmaster level 0.0-1.0
+        """
+        self.grandmaster = max(0.0, min(1.0, level))
+        print(f"DMX Controller: Grandmaster set to {int(self.grandmaster * 100)}%")
+    
     def set_channel(self, universe_id: int, channel: int, value: int):
         """
         Set a single DMX channel in a specific universe
@@ -172,7 +183,9 @@ class DMXController:
         if universe_id not in self.universes:
             self.add_universe(universe_id)
         
-        self.universes[universe_id].set_channel(channel, value)
+        # Apply grandmaster scaling
+        scaled_value = int(value * self.grandmaster)
+        self.universes[universe_id].set_channel(channel, scaled_value)
     
     def set_channels(self, universe_id: int, start_channel: int, values: list):
         """Set multiple DMX channels in a specific universe"""
