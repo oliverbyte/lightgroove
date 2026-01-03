@@ -37,7 +37,7 @@
     .slider-col label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
     .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
-    .grandmaster { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 72px; padding: 6px 8px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); }
+    .grandmaster { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 72px; padding: 6px 8px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); margin-bottom: 20px; }
     .grandmaster label { font-size: 16px; color: #f8fafc; text-align: center; margin: 0 0 4px 0; }
     .grandmaster input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .grandmaster output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
@@ -54,7 +54,7 @@
     
     <div id="tab-faders" class="tab-content active">
       <div class="grandmaster">
-        <label>Grandmaster</label>
+        <label>Master</label>
         <input type="range" id="grandmaster" min="0" max="100" value="100" step="1" />
         <output id="gm-value">100%</output>
       </div>
