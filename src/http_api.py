@@ -160,6 +160,7 @@ class HttpApiServer:
                     if path == "/api/grandmaster":
                         level = float(payload.get("level", 1.0))
                         fixture_manager.dmx.set_grandmaster(level)
+                        fixture_manager.reapply_all_states()
                         self._set_headers()
                         self.wfile.write(b"{}")
                         return

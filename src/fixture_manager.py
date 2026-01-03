@@ -139,4 +139,11 @@ class FixtureManager:
         for fixture_id in self.fixtures:
             self.set_fixture_color(fixture_id, 0, 0, 0, 0)
             self.set_fixture_dimmer(fixture_id, 0)
+    
+    def reapply_all_states(self):
+        """Reapply all current fixture states (useful after grandmaster change)"""
+        for fixture_id, fixture_data in self.fixtures.items():
+            state = fixture_data.get('state', {})
+            for channel_name, value in state.items():
+                self.set_fixture_channel(fixture_id, channel_name, value)
 
