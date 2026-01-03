@@ -8,10 +8,11 @@ DMX controller with a simple web UI. Outputs ArtNet/virtual DMX and renders per-
 - Universe mapping is set in `config/artnet.json` (DMX universe 1 maps to ArtNet universe 0 by default).
 
 ## UI
-- **Master Fader**: Global intensity control (0-100%) that scales all DMX output in real-time. Set to 0 for instant blackout without losing individual fader positions.
-- **Faders Tab**: Per-fixture vertical faders in channel order with live real-time DMX values (0–255) displayed continuously.
+- **Globals Section**: Contains the Master fader for global intensity control (0-100%) that scales all DMX output in real-time. Set to 0 for instant blackout without losing individual fader positions.
+- **Faders Tab**: Compact fixture cards with vertical faders in channel order, displaying live real-time DMX values (0–255) continuously. Fixtures flow horizontally and wrap to new rows based on available space.
 - **Colors Tab**: Quick color preset buttons (Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple) that apply to all fixtures simultaneously.
-- Tab navigation allows quick switching between fader control and color presets.
+- Tab navigation with styled buttons allows quick switching between fader control and color presets.
+- Left-aligned layout maximizes screen space utilization.
 - Screenshot:
 
 ![UI Faders](img/screenshot_faders.png)

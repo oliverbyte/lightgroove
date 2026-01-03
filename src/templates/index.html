@@ -15,11 +15,11 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-weight: 600; }
-    .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+    header { padding: 16px 20px 16px 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    .container { padding: 20px 20px 20px 10px; }
     .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
-    .tab { padding: 10px 20px; cursor: pointer; background: transparent; color: var(--muted); border: none; border-bottom: 2px solid transparent; font-weight: 500; }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab { padding: 10px 20px; cursor: pointer; background: var(--panel); color: var(--muted); border: 1px solid var(--border); border-bottom: 2px solid transparent; font-weight: 500; border-radius: 8px 8px 0 0; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--bg); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .actions { margin: 0 0 16px 0; display: flex; gap: 10px; flex-wrap: wrap; }
@@ -28,19 +28,16 @@
     .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; }
     .color-btn { padding: 40px; border-radius: 12px; border: 2px solid var(--border); font-size: 14px; font-weight: 600; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .color-btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+    .grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); width: fit-content; }
     .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #f8fafc; }
     .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--border); font-size: 11px; color: var(--muted); margin-right: 6px; }
-    .sliders { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+    .sliders { display: flex; gap: 12px; flex-wrap: nowrap; margin-top: 6px; }
     .slider-col { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 72px; padding: 6px 8px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); }
     .slider-col label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
     .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
-    .grandmaster { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 72px; padding: 6px 8px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); margin-bottom: 20px; }
-    .grandmaster label { font-size: 16px; color: #f8fafc; text-align: center; margin: 0 0 4px 0; }
-    .grandmaster input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
-    .grandmaster output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
+    .globals-card { max-width: 140px; max-height: 300px; }
   </style>
 </head>
 <body>
@@ -53,12 +50,18 @@
     </div>
     
     <div id="tab-faders" class="tab-content active">
-      <div class="grandmaster">
-        <label>Master</label>
-        <input type="range" id="grandmaster" min="0" max="100" value="100" step="1" />
-        <output id="gm-value">100%</output>
+      <div class="grid" id="fixtures-grid">
+        <div class="card globals-card">
+          <h3>Globals</h3>
+          <div class="sliders">
+            <div class="slider-col">
+              <label>Master</label>
+              <input type="range" id="grandmaster" min="0" max="100" value="100" step="1" />
+              <output id="gm-value">100%</output>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="grid" class="grid"></div>
     </div>
     
     <div id="tab-colors" class="tab-content">
@@ -133,8 +136,7 @@
     }
 
     function renderFixtures(fixtures) {
-      const grid = document.getElementById('grid');
-      grid.innerHTML = '';
+      const grid = document.getElementById('fixtures-grid');
       fixtures.forEach(fx => {
         const card = document.createElement('div');
         card.className = 'card';
