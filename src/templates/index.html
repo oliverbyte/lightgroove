@@ -28,7 +28,7 @@
     .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; }
     .color-btn { padding: 40px; border-radius: 12px; border: 2px solid var(--border); font-size: 14px; font-weight: 600; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .color-btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-    .color-btn.active { border: 4px solid var(--accent); box-shadow: 0 0 0 2px var(--bg), 0 0 20px rgba(56, 189, 248, 0.6); transform: scale(1.02); }
+    .color-btn.active { outline: 3px solid var(--accent); outline-offset: 2px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
     .grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; }
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); width: fit-content; }
     .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #f8fafc; }
