@@ -37,7 +37,7 @@
     .slider-col label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
     .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
-    .globals-card { max-width: 140px; max-height: 300px; }
+    .globals-card { max-height: 300px; }
   </style>
 </head>
 <body>
@@ -59,22 +59,31 @@
               <input type="range" id="grandmaster" min="0" max="100" value="100" step="1" />
               <output id="gm-value">100%</output>
             </div>
+            <div class="slider-col">
+              <label>FX BPM</label>
+              <input type="range" id="fx-bpm" min="30" max="240" value="120" step="1" />
+              <output id="bpm-value">120</output>
+            </div>
           </div>
         </div>
       </div>
     </div>
     
     <div id="tab-colors" class="tab-content">
-      <div class="color-grid">
-        <button class="color-btn" data-color="red" style="background: #ef4444; color: white;">Red</button>
-        <button class="color-btn" data-color="green" style="background: #22c55e; color: white;">Green</button>
-        <button class="color-btn" data-color="blue" style="background: #3b82f6; color: white;">Blue</button>
-        <button class="color-btn" data-color="cyan" style="background: #06b6d4; color: white;">Cyan</button>
-        <button class="color-btn" data-color="magenta" style="background: #d946ef; color: white;">Magenta</button>
-        <button class="color-btn" data-color="yellow" style="background: #eab308; color: #0b1220;">Yellow</button>
-        <button class="color-btn" data-color="white" style="background: #f3f4f6; color: #0b1220;">White</button>
-        <button class="color-btn" data-color="orange" style="background: #f97316; color: white;">Orange</button>
-        <button class="color-btn" data-color="purple" style="background: #a855f7; color: white;">Purple</button>
+      <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+        <div class="card">
+          <h3>Static Colors</h3>
+          <div class="color-grid" id="static-colors">
+            <!-- Colors will be loaded from server -->
+          </div>
+        </div>
+        <div class="card">
+          <h3>Color FX</h3>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="color-btn" id="fx-random" style="background: linear-gradient(90deg, #ef4444, #22c55e, #3b82f6, #d946ef); color: white;">Random</button>
+            <button class="color-btn secondary" id="fx-stop">Stop FX</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -189,6 +198,16 @@
       await post(`${apiBase}/api/grandmaster`, { level: value / 100 });
     });
 
+    // FX BPM control
+    const bpmSlider = document.getElementById('fx-bpm');
+    const bpmValue = document.getElementById('bpm-value');
+    
+    bpmSlider.addEventListener('input', async () => {
+      const value = parseInt(bpmSlider.value);
+      bpmValue.textContent = value.toString();
+      await post(`${apiBase}/api/fx/bpm`, { bpm: value });
+    });
+
     // Tab switching
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -200,27 +219,53 @@
       });
     });
 
-    // Color buttons
-    const colorMap = {
-      red: { r: 1, g: 0, b: 0, w: 0 },
-      green: { r: 0, g: 1, b: 0, w: 0 },
-      blue: { r: 0, g: 0, b: 1, w: 0 },
-      cyan: { r: 0, g: 1, b: 1, w: 0 },
-      magenta: { r: 1, g: 0, b: 1, w: 0 },
-      yellow: { r: 1, g: 1, b: 0, w: 0 },
-      white: { r: 0, g: 0, b: 0, w: 1 },
-      orange: { r: 1, g: 0.5, b: 0, w: 0 },
-      purple: { r: 0.65, g: 0.3, b: 1, w: 0 }
-    };
+    // Color buttons - fetch colors from server
+    async function loadStaticColors() {
+      try {
+        const res = await fetch(`${apiBase}/api/colors`);
+        const serverColors = await res.json();
+        const grid = document.getElementById('static-colors');
+        
+        // Color name to hex for button styling
+        const colorHex = {
+          red: '#ef4444',
+          green: '#22c55e',
+          blue: '#3b82f6',
+          cyan: '#06b6d4',
+          magenta: '#d946ef',
+          yellow: '#eab308',
+          white: '#f3f4f6',
+          orange: '#f97316',
+          purple: '#a855f7'
+        };
+        
+        Object.keys(serverColors).forEach(colorName => {
+          const color = serverColors[colorName];
+          const btn = document.createElement('button');
+          btn.className = 'color-btn';
+          btn.dataset.color = colorName;
+          btn.style.background = colorHex[colorName] || '#38bdf8';
+          btn.style.color = (colorName === 'yellow' || colorName === 'white') ? '#0b1220' : 'white';
+          btn.textContent = colorName.charAt(0).toUpperCase() + colorName.slice(1);
+          
+          btn.addEventListener('click', async () => {
+            await post(`${apiBase}/api/all/color`, color);
+          });
+          
+          grid.appendChild(btn);
+        });
+      } catch (e) {
+        console.error('Failed to load colors:', e);
+      }
+    }
 
-    document.querySelectorAll('.color-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const colorName = btn.dataset.color;
-        const color = colorMap[colorName];
-        if (color) {
-          await post(`${apiBase}/api/all/color`, color);
-        }
-      });
+    // Color FX controls
+    document.getElementById('fx-random').addEventListener('click', async () => {
+      await post(`${apiBase}/api/fx/start`, { fx: 'random' });
+    });
+
+    document.getElementById('fx-stop').addEventListener('click', async () => {
+      await post(`${apiBase}/api/fx/stop`, {});
     });
 
     // Live channel value updates
@@ -247,6 +292,7 @@
     }
 
     loadFixtures();
+    loadStaticColors();
     setInterval(updateLiveValues, 500); // Update every 500ms
   </script>
 </body>

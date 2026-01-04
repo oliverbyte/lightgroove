@@ -8,17 +8,18 @@ import json
 import threading
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 class HttpApiServer:
     """Threaded HTTP server exposing a JSON API and serving the generated UI."""
 
-    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000):
+    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000, color_fx=None):
         self.fixture_manager = fixture_manager
         self.ui_dir = ui_dir
         self.host = host
         self.port = port
+        self.color_fx = color_fx
         self._server = None
         self._thread = None
 
@@ -40,6 +41,7 @@ class HttpApiServer:
     def _make_handler(self):
         fixture_manager = self.fixture_manager
         ui_dir = self.ui_dir
+        color_fx = self.color_fx
 
         class Handler(BaseHTTPRequestHandler):
             def _set_headers(self, status: int = 200, content_type: str = "application/json"):
@@ -88,6 +90,17 @@ class HttpApiServer:
                         states[fid] = data.get("state", {})
                     self._set_headers()
                     self.wfile.write(json.dumps(states).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/colors"):
+                    from color_manager import COLORS
+                    self._set_headers()
+                    self.wfile.write(json.dumps(COLORS).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/fx/status") and color_fx:
+                    self._set_headers()
+                    self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
                     return
 
                 # Serve index.html for root
@@ -180,6 +193,26 @@ class HttpApiServer:
                             fixture_manager.set_fixture_color(fixture_id, r, g, b, w)
                         self._set_headers()
                         self.wfile.write(b"{}")
+                        return
+
+                    if path == "/api/fx/start" and color_fx:
+                        fx_name = payload.get("fx", "random")
+                        color_fx.start_fx(fx_name)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
+                        return
+
+                    if path == "/api/fx/stop" and color_fx:
+                        color_fx.stop_fx()
+                        self._set_headers()
+                        self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
+                        return
+
+                    if path == "/api/fx/bpm" and color_fx:
+                        bpm = int(payload.get("bpm", 120))
+                        color_fx.set_bpm(bpm)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
                         return
                 except Exception as exc:  # keep API resilient
                     self._set_headers(400)
