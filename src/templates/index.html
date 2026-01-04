@@ -257,8 +257,9 @@
             // Highlight this button
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            // Store active color
+            // Store active color and mark as manually selected
             window.activeColor = colorName;
+            window.manuallySelected = true;
           });
           
           grid.appendChild(btn);
@@ -270,11 +271,15 @@
 
     // Color FX controls
     document.getElementById('fx-random').addEventListener('click', async () => {
+      window.manuallySelected = false;
       await post(`${apiBase}/api/fx/start`, { fx: 'random' });
     });
 
     document.getElementById('fx-stop').addEventListener('click', async () => {
       await post(`${apiBase}/api/fx/stop`, {});
+      document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+      window.activeColor = null;
+      window.manuallySelected = false;
     });
 
     // Update active color indicator from FX status
@@ -285,14 +290,15 @@
         
         if (status.running && status.current_color) {
           // FX is running, highlight the current color
+          window.manuallySelected = false;
           if (window.activeColor !== status.current_color) {
             window.activeColor = status.current_color;
             document.querySelectorAll('.color-btn').forEach(btn => {
               btn.classList.toggle('active', btn.dataset.color === status.current_color);
             });
           }
-        } else if (!status.running && window.fxWasRunning) {
-          // FX just stopped, clear highlights
+        } else if (!status.running && window.fxWasRunning && !window.manuallySelected) {
+          // FX just stopped (not by manual selection), clear highlights
           document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
           window.activeColor = null;
         }
