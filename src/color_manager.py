@@ -4,21 +4,31 @@ Color definitions and color FX engine for LightGroove.
 import threading
 import time
 import random
+import json
+import os
 from typing import Dict, List, Optional
 
 
+def load_colors() -> Dict:
+    """Load color definitions from config/colors.json"""
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'colors.json')
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+            return config.get('colors', {})
+    except Exception as e:
+        print(f"Warning: Could not load colors from config: {e}")
+        # Fallback to default colors if config fails to load
+        return {
+            'red': {'r': 1.0, 'g': 0.0, 'b': 0.0, 'w': 0.0},
+            'green': {'r': 0.0, 'g': 1.0, 'b': 0.0, 'w': 0.0},
+            'blue': {'r': 0.0, 'g': 0.0, 'b': 1.0, 'w': 0.0},
+            'white': {'r': 0.0, 'g': 0.0, 'b': 0.0, 'w': 1.0}
+        }
+
+
 # Static color definitions (normalized 0.0-1.0 values)
-COLORS = {
-    'red': {'r': 1.0, 'g': 0.0, 'b': 0.0, 'w': 0.0},
-    'green': {'r': 0.0, 'g': 1.0, 'b': 0.0, 'w': 0.0},
-    'blue': {'r': 0.0, 'g': 0.0, 'b': 1.0, 'w': 0.0},
-    'cyan': {'r': 0.0, 'g': 1.0, 'b': 1.0, 'w': 0.0},
-    'magenta': {'r': 1.0, 'g': 0.0, 'b': 1.0, 'w': 0.0},
-    'yellow': {'r': 1.0, 'g': 1.0, 'b': 0.0, 'w': 0.0},
-    'white': {'r': 0.0, 'g': 0.0, 'b': 0.0, 'w': 1.0},
-    'orange': {'r': 1.0, 'g': 0.5, 'b': 0.0, 'w': 0.0},
-    'purple': {'r': 0.65, 'g': 0.3, 'b': 1.0, 'w': 0.0}
-}
+COLORS = load_colors()
 
 
 class ColorFXEngine:
