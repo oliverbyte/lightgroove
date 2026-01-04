@@ -49,7 +49,6 @@
       <button class="tab" data-tab="colors">Colors</button>
     </div>
     
-    {GLOBALS_SECTION}
     {TAB_FADERS}
     {TAB_COLORS}
   </div>
@@ -242,9 +241,7 @@
 
     document.getElementById('fx-stop').addEventListener('click', async () => {
       await post(`${apiBase}/api/fx/stop`, {});
-      document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
-      window.activeColor = null;
-      window.manuallySelected = false;
+      // Keep highlighting - server preserves current_color
     });
 
     // Update active color indicator from FX status
@@ -253,21 +250,13 @@
         const res = await fetch(`${apiBase}/api/fx/status`);
         const status = await res.json();
         
-        if (status.running && status.current_color) {
-          // FX is running, highlight the current color
-          window.manuallySelected = false;
-          if (window.activeColor !== status.current_color) {
-            window.activeColor = status.current_color;
-            document.querySelectorAll('.color-btn').forEach(btn => {
-              btn.classList.toggle('active', btn.dataset.color === status.current_color);
-            });
-          }
-        } else if (!status.running && window.fxWasRunning && !window.manuallySelected) {
-          // FX just stopped (not by manual selection), clear highlights
-          document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
-          window.activeColor = null;
+        // Always highlight current_color if set, regardless of running state
+        if (status.current_color && window.activeColor !== status.current_color) {
+          window.activeColor = status.current_color;
+          document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.color === status.current_color);
+          });
         }
-        window.fxWasRunning = status.running;
       } catch (e) {
         // Ignore errors
       }

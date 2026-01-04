@@ -80,8 +80,7 @@ class ColorFXEngine:
             if self.fx_thread and self.fx_thread.is_alive():
                 self.fx_thread.join(timeout=2.0)
             self.current_fx = None
-            self.current_color = None  # Clear current color on stop
-            self.current_color = None  # Clear current color on stop
+            # Keep current_color to preserve highlighted state
             
     def _run_random_fx(self):
         """Random color cycling effect."""

@@ -28,7 +28,6 @@ def generate_ui(fixture_manager, output_dir: Path, api_base: str = "") -> Path:
     # Combine all templates
     rendered = (
         base_template
-        .replace("{GLOBALS_SECTION}", globals_section)
         .replace("{TAB_FADERS}", tab_faders)
         .replace("{TAB_COLORS}", tab_colors)
         .replace("__API_BASE__", api_base or "")
