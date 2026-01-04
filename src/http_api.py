@@ -103,6 +103,16 @@ class HttpApiServer:
                     self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/grandmaster"):
+                    self._set_headers()
+                    self.wfile.write(json.dumps({"level": fixture_manager.dmx.grandmaster}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/fx/bpm") and color_fx:
+                    self._set_headers()
+                    self.wfile.write(json.dumps({"bpm": color_fx.bpm}).encode("utf-8"))
+                    return
+
                 # Serve index.html for root
                 if self.path in ["/", "/index.html"]:
                     index_path = ui_dir / "index.html"

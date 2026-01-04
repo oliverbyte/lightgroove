@@ -293,6 +293,35 @@
 
     loadFixtures();
     loadStaticColors();
+    
+    // Load current grandmaster value
+    async function loadGrandmaster() {
+      try {
+        const res = await fetch(`${apiBase}/api/grandmaster`);
+        const data = await res.json();
+        const level = Math.round(data.level * 100);
+        gmSlider.value = level;
+        gmValue.textContent = `${level}%`;
+      } catch (e) {
+        console.error('Failed to load grandmaster:', e);
+      }
+    }
+    
+    // Load current BPM value
+    async function loadBPM() {
+      try {
+        const res = await fetch(`${apiBase}/api/fx/bpm`);
+        const data = await res.json();
+        const bpm = data.bpm;
+        bpmSlider.value = bpm;
+        bpmValue.textContent = bpm.toString();
+      } catch (e) {
+        console.error('Failed to load BPM:', e);
+      }
+    }
+    
+    loadGrandmaster();
+    loadBPM();
     setInterval(updateLiveValues, 500); // Update every 500ms
   </script>
 </body>
