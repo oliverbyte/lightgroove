@@ -28,6 +28,7 @@
     .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 16px; }
     .color-btn { padding: 40px; border-radius: 12px; border: 2px solid var(--border); font-size: 14px; font-weight: 600; text-transform: uppercase; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .color-btn:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .color-btn.active { border: 4px solid var(--accent); box-shadow: 0 0 0 2px var(--bg), 0 0 20px rgba(56, 189, 248, 0.6); transform: scale(1.02); }
     .grid { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; }
     .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); width: fit-content; }
     .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #f8fafc; }
@@ -249,7 +250,15 @@
           btn.textContent = colorName.charAt(0).toUpperCase() + colorName.slice(1);
           
           btn.addEventListener('click', async () => {
+            // Stop any running FX first
+            await post(`${apiBase}/api/fx/stop`, {});
+            // Apply the color
             await post(`${apiBase}/api/all/color`, color);
+            // Highlight this button
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // Store active color
+            window.activeColor = colorName;
           });
           
           grid.appendChild(btn);
@@ -267,6 +276,31 @@
     document.getElementById('fx-stop').addEventListener('click', async () => {
       await post(`${apiBase}/api/fx/stop`, {});
     });
+
+    // Update active color indicator from FX status
+    async function updateActiveColor() {
+      try {
+        const res = await fetch(`${apiBase}/api/fx/status`);
+        const status = await res.json();
+        
+        if (status.running && status.current_color) {
+          // FX is running, highlight the current color
+          if (window.activeColor !== status.current_color) {
+            window.activeColor = status.current_color;
+            document.querySelectorAll('.color-btn').forEach(btn => {
+              btn.classList.toggle('active', btn.dataset.color === status.current_color);
+            });
+          }
+        } else if (!status.running && window.fxWasRunning) {
+          // FX just stopped, clear highlights
+          document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+          window.activeColor = null;
+        }
+        window.fxWasRunning = status.running;
+      } catch (e) {
+        // Ignore errors
+      }
+    }
 
     // Live channel value updates
     async function updateLiveValues() {
@@ -323,6 +357,7 @@
     loadGrandmaster();
     loadBPM();
     setInterval(updateLiveValues, 500); // Update every 500ms
+    setInterval(updateActiveColor, 500); // Update active color indicator every 500ms
   </script>
 </body>
 </html>

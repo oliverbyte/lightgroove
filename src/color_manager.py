@@ -31,6 +31,7 @@ class ColorFXEngine:
         self.bpm = 120  # Default 120 BPM
         self.running = False
         self.current_fx = None
+        self.current_color = None  # Track currently displayed color
         self.fx_thread = None
         self.stop_event = threading.Event()
         
@@ -69,6 +70,8 @@ class ColorFXEngine:
             if self.fx_thread and self.fx_thread.is_alive():
                 self.fx_thread.join(timeout=2.0)
             self.current_fx = None
+            self.current_color = None  # Clear current color on stop
+            self.current_color = None  # Clear current color on stop
             
     def _run_random_fx(self):
         """Random color cycling effect."""
@@ -79,6 +82,7 @@ class ColorFXEngine:
         while self.running:
             # Pick random color
             color_name = random.choice(color_names)
+            self.current_color = color_name  # Track current color
             color_values = COLORS[color_name]
             
             # Apply to all fixtures
@@ -104,5 +108,6 @@ class ColorFXEngine:
         return {
             'running': self.running,
             'current_fx': self.current_fx,
+            'current_color': self.current_color,
             'bpm': self.bpm
         }
