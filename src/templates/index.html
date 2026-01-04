@@ -70,14 +70,14 @@
     </div>
     
     <div id="tab-colors" class="tab-content">
-      <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-        <div class="card">
+      <div class="grid">
+        <div class="card" style="flex: 1; min-width: 300px;">
           <h3>Static Colors</h3>
           <div class="color-grid" id="static-colors">
             <!-- Colors will be loaded from server -->
           </div>
         </div>
-        <div class="card">
+        <div class="card" style="width: fit-content;">
           <h3>Color FX</h3>
           <div style="display: flex; flex-direction: column; gap: 10px;">
             <button class="color-btn" id="fx-random" style="background: linear-gradient(90deg, #ef4444, #22c55e, #3b82f6, #d946ef); color: white;">Random</button>
