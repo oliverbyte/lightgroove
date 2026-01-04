@@ -1,46 +1,73 @@
 # LightGroove
 
-DMX controller with a simple web UI. Outputs ArtNet/virtual DMX and renders per-fixture faders based on your patch and fixture definitions.
+DMX lighting controller with web-based UI featuring real-time fader control and color effects. Outputs ArtNet/virtual DMX with per-fixture control based on your patch and fixture definitions.
 
-## DMX / ArtNet
-- LightGroove sends ArtNet by default; use a monitor or an ArtNet node to receive it.
-- Any ArtNet-to-DMX interface (e.g., Enttec ODE or similar) can translate the ArtNet stream to a physical DMX line for standard DMX fixtures.
-- Universe mapping is set in `config/artnet.json` (DMX universe 1 maps to ArtNet universe 0 by default).
+## Features
 
-## UI
-- **Globals Section**: Contains the Master fader for global intensity control (0-100%) that scales all DMX output in real-time. Set to 0 for instant blackout without losing individual fader positions.
-- **Faders Tab**: Compact fixture cards with vertical faders in channel order, displaying live real-time DMX values (0–255) continuously. Fixtures flow horizontally and wrap to new rows based on available space.
-- **Colors Tab**: Quick color preset buttons (Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple) that apply to all fixtures simultaneously.
-- Tab navigation with styled buttons allows quick switching between fader control and color presets.
-- Left-aligned layout maximizes screen space utilization.
-- Screenshots:
+### DMX / ArtNet Output
+- Sends ArtNet by default (monitor or ArtNet node required)
+- Works with any ArtNet-to-DMX interface (e.g., Enttec ODE)
+- Universe mapping in `config/artnet.json` (DMX universe 1 → ArtNet universe 0)
+
+### Web UI
+
+**Globals Section** (available in Faders tab):
+- **Master**: Global intensity control (0-100%) that scales all DMX output in real-time
+- **FX BPM**: Control speed of color effects (30-240 BPM)
+
+**Faders Tab**:
+- Compact fixture cards with vertical faders in channel order
+- Real-time DMX values (0-255) with live updates
+- Responsive layout that adapts to screen width
+
+**Colors Tab**:
+- **Static Colors**: 9 preset buttons (Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple)
+- **Color FX**: Server-side effects that run independently
+  - Random: Cycles through all colors at BPM speed
+- Active color highlighting persists across FX stop and page reloads
 
 ![UI Faders](img/screenshot_faders.png)
 ![UI Colors](img/screenshot_colors.png)
 
-## Install (macOS via Homebrew)
+## Installation
+
+### macOS via Homebrew
 ```bash
 brew tap oliverbyte/lightgroove https://github.com/oliverbyte/lightgroove.git
 brew install --HEAD oliverbyte/lightgroove/lightgroove
 lightgroove
 ```
-Then open the printed UI URL (default http://0.0.0.0:5555). The Homebrew formula installs dependencies in a virtualenv and runs from source (no Gatekeeper prompts).
 
-## Install from source
-- Python 3.9+ (virtualenv recommended)
-- Dependencies: `pip install -r requirements.txt`
-- ArtNet node or monitor (defaults to localhost/unicast on universe 0 mapped from DMX universe 1)
+### From Source
+Requirements: Python 3.9+, virtualenv recommended
 
 ```bash
-source .venv/bin/activate  # if using venv
+git clone https://github.com/oliverbyte/lightgroove.git
+cd lightgroove
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 python main.py
 ```
-Then open the printed UI URL (default http://0.0.0.0:5555).
+
+Then open http://localhost:5555 in your browser.
 
 ## Configuration
-- `config/fixtures.json`: Fixture profiles (channel order defines fader order in UI).
-- `config/patch.json`: Patched fixtures per universe (DMX addresses).
-- `config/artnet.json`: ArtNet targets and universe mapping (set `ip` and `broadcast`).
 
-## Notes
-- If you change fixtures/patch, restart `python main.py` to regenerate the UI.
+- **`config/fixtures.json`**: Fixture profiles with channel definitions
+- **`config/patch.json`**: Patched fixtures per universe with DMX addresses
+- **`config/artnet.json`**: ArtNet targets and universe mapping
+- **`config/colors.json`**: Color definitions for static colors and FX (RGBW values 0.0-1.0)
+
+Restart after configuration changes to regenerate the UI.
+
+## Development
+
+The project uses modular HTML templates:
+- `src/templates/base.html`: Main structure
+- `src/templates/section_globals.html`: Globals controls
+- `src/templates/tab_faders.html`: Faders tab
+- `src/templates/tab_colors.html`: Colors tab
+
+Templates are combined by `src/ui_generator.py` during startup.
+
