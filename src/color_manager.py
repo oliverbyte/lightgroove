@@ -73,6 +73,8 @@ class ColorFXEngine:
     def _run_random_fx(self):
         """Random color cycling effect."""
         color_names = list(COLORS.keys())
+        # Map short keys to actual fixture channel names
+        channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
         
         while self.running:
             # Pick random color
@@ -82,9 +84,10 @@ class ColorFXEngine:
             # Apply to all fixtures
             fixtures = self.fixture_manager.list_fixtures()
             for fixture_id in fixtures:
-                for channel, value in color_values.items():
+                for short_key, value in color_values.items():
+                    channel_name = channel_map.get(short_key, short_key)
                     try:
-                        self.fixture_manager.set_fixture_channel(fixture_id, channel, value)
+                        self.fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
                     except:
                         pass  # Ignore fixtures without this channel
                         
