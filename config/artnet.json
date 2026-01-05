@@ -3,12 +3,12 @@
     {
       "id": "node1",
       "name": "Main ArtNet Node",
-      "ip": "127.0.0.1",
+      "ip": "10.10.10.3",
       "port": 6454,
       "broadcast": false,
       "universes": [0, 1],
       "enabled": true,
-      "description": "Primary ArtNet node for universes 1-2"
+      "description": "Primary ArtNet node for universe 1"
     }
   ],
   "universe_mapping": {

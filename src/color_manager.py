@@ -46,8 +46,8 @@ class ColorFXEngine:
         self.stop_event = threading.Event()
         
     def set_bpm(self, bpm: int):
-        """Set FX speed in beats per minute (30-240 range)."""
-        self.bpm = max(30, min(240, bpm))
+        """Set FX speed in beats per minute (1-480 range)."""
+        self.bpm = max(1, min(480, bpm))
         print(f"Color FX: BPM set to {self.bpm}")
         
     def get_interval(self) -> float:
@@ -89,8 +89,11 @@ class ColorFXEngine:
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
         
         while self.running:
-            # Pick random color
-            color_name = random.choice(color_names)
+            # Pick random color (avoid repeating the same color)
+            available_colors = [c for c in color_names if c != self.current_color]
+            if not available_colors:  # Fallback if only one color defined
+                available_colors = color_names
+            color_name = random.choice(available_colors)
             self.current_color = color_name  # Track current color
             color_values = COLORS[color_name]
             
