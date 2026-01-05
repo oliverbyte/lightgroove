@@ -71,9 +71,10 @@ class ColorFXEngine:
                 except:
                     pass
         else:
-            # Smooth fade
-            steps = max(10, int(self.fade_time * 20))  # 20 steps per second
-            step_time = self.fade_time / steps
+            # Smooth fade - cap fade time to beat interval
+            actual_fade_time = min(self.fade_time, self.get_interval())
+            steps = max(10, int(actual_fade_time * 20))  # 20 steps per second
+            step_time = actual_fade_time / steps
             
             # Get current values
             current_values = {}
