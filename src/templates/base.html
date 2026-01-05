@@ -238,6 +238,8 @@
           btn.addEventListener('click', async () => {
             // Stop any running FX first
             await post(`${apiBase}/api/fx/stop`, {});
+            // Remove FX button highlighting when stopping via static color
+            document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
             // Apply the color
             await post(`${apiBase}/api/all/color`, color);
             // Highlight this button
@@ -300,6 +302,13 @@
             btn.classList.toggle('active', btn.dataset.color === status.current_color);
           });
         }
+        
+        // Sync FX button highlighting based on server state
+        const activeFx = status.running ? status.current_fx : null;
+        document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => {
+          const fxName = btn.id.replace('fx-', '');
+          btn.classList.toggle('active', fxName === activeFx);
+        });
         
         // Update fade time slider if different
         if (status.fade_percentage !== undefined) {
