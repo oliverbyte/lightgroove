@@ -262,6 +262,11 @@
       await post(`${apiBase}/api/fx/start`, { fx: 'random_2' });
     });
 
+    document.getElementById('fx-random-3').addEventListener('click', async () => {
+      window.manuallySelected = false;
+      await post(`${apiBase}/api/fx/start`, { fx: 'random_3' });
+    });
+
     document.getElementById('fx-stop').addEventListener('click', async () => {
       await post(`${apiBase}/api/fx/stop`, {});
       // Keep highlighting - server preserves current_color

@@ -139,6 +139,10 @@ class ColorFXEngine:
             self.fx_thread = threading.Thread(target=self._run_random_2_fx, daemon=True)
             self.fx_thread.start()
             print(f"Color FX: Started 'random_2' effect at {self.bpm} BPM")
+        elif fx_name == 'random_3':
+            self.fx_thread = threading.Thread(target=self._run_random_3_fx, daemon=True)
+            self.fx_thread.start()
+            print(f"Color FX: Started 'random_3' effect at {self.bpm} BPM")
         else:
             print(f"Color FX: Unknown effect '{fx_name}'")
             self.running = False
@@ -207,6 +211,50 @@ class ColorFXEngine:
             # Track first fixture's color for UI display
             if fixtures:
                 self.current_color = fixture_last_colors.get(fixtures[0])
+                        
+            # Wait for remaining time in beat (beat_interval - fade_time)
+            remaining_time = max(0.0, self.get_interval() - fade_time_used)
+            if self.stop_event.wait(remaining_time):
+                break
+    
+    def _run_random_3_fx(self):
+        """Random color cycling effect - alternates between even/odd patches."""
+        # Exclude 'black' from random color selection
+        color_names = [c for c in COLORS.keys() if c != 'black']
+        black_values = COLORS['black']
+        # Map short keys to actual fixture channel names
+        channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
+        last_color = None
+        even_turn = True  # Start with even patches lit
+        
+        while self.running:
+            fixtures = self.fixture_manager.list_fixtures()
+            
+            # Pick random color (avoid repeating)
+            available_colors = [c for c in color_names if c != last_color]
+            if not available_colors:
+                available_colors = color_names
+            color_name = random.choice(available_colors)
+            last_color = color_name
+            color_values = COLORS[color_name]
+            
+            # Alternate between even and odd patches
+            fixture_colors = {}
+            for idx, fixture_id in enumerate(fixtures):
+                is_even = (idx % 2 == 0)
+                if (even_turn and is_even) or (not even_turn and not is_even):
+                    fixture_colors[fixture_id] = color_values
+                else:
+                    fixture_colors[fixture_id] = black_values
+            
+            # Apply all fixtures simultaneously with fade
+            fade_time_used = self._apply_colors_with_fade(fixture_colors, channel_map)
+            
+            # Track current color for UI display
+            self.current_color = color_name
+            
+            # Toggle for next beat
+            even_turn = not even_turn
                         
             # Wait for remaining time in beat (beat_interval - fade_time)
             remaining_time = max(0.0, self.get_interval() - fade_time_used)
