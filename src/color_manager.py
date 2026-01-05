@@ -49,6 +49,11 @@ class ColorFXEngine:
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
         self.bpm = max(1, min(480, bpm))
+        # Cap fade time to new beat interval if needed
+        max_fade = self.get_interval()
+        if self.fade_time > max_fade:
+            self.fade_time = max_fade
+            print(f"Color FX: Fade time auto-adjusted to {self.fade_time:.3f}s (beat interval)")
         print(f"Color FX: BPM set to {self.bpm}")
     
     def set_fade_time(self, fade_time: float):
