@@ -234,9 +234,14 @@
     }
 
     // Color FX controls
-    document.getElementById('fx-random').addEventListener('click', async () => {
+    document.getElementById('fx-random-1').addEventListener('click', async () => {
       window.manuallySelected = false;
-      await post(`${apiBase}/api/fx/start`, { fx: 'random' });
+      await post(`${apiBase}/api/fx/start`, { fx: 'random_1' });
+    });
+
+    document.getElementById('fx-random-2').addEventListener('click', async () => {
+      window.manuallySelected = false;
+      await post(`${apiBase}/api/fx/start`, { fx: 'random_2' });
     });
 
     document.getElementById('fx-stop').addEventListener('click', async () => {

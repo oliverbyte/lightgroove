@@ -63,10 +63,14 @@ class ColorFXEngine:
         self.running = True
         self.stop_event.clear()
         
-        if fx_name == 'random':
+        if fx_name == 'random' or fx_name == 'random_1':
             self.fx_thread = threading.Thread(target=self._run_random_fx, daemon=True)
             self.fx_thread.start()
-            print(f"Color FX: Started 'random' effect at {self.bpm} BPM")
+            print(f"Color FX: Started 'random_1' effect at {self.bpm} BPM")
+        elif fx_name == 'random_2':
+            self.fx_thread = threading.Thread(target=self._run_random_2_fx, daemon=True)
+            self.fx_thread.start()
+            print(f"Color FX: Started 'random_2' effect at {self.bpm} BPM")
         else:
             print(f"Color FX: Unknown effect '{fx_name}'")
             self.running = False
@@ -83,7 +87,7 @@ class ColorFXEngine:
             # Keep current_color to preserve highlighted state
             
     def _run_random_fx(self):
-        """Random color cycling effect."""
+        """Random color cycling effect - all fixtures same color."""
         color_names = list(COLORS.keys())
         # Map short keys to actual fixture channel names
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
@@ -106,6 +110,42 @@ class ColorFXEngine:
                         self.fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
                     except:
                         pass  # Ignore fixtures without this channel
+                        
+            # Wait for next beat
+            if self.stop_event.wait(self.get_interval()):
+                break
+    
+    def _run_random_2_fx(self):
+        """Random color cycling effect - each fixture gets different color."""
+        color_names = list(COLORS.keys())
+        # Map short keys to actual fixture channel names
+        channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
+        fixture_last_colors = {}  # Track last color per fixture
+        
+        while self.running:
+            fixtures = self.fixture_manager.list_fixtures()
+            
+            # Apply different random color to each fixture
+            for fixture_id in fixtures:
+                # Pick random color for this fixture (avoid repeating)
+                last_color = fixture_last_colors.get(fixture_id)
+                available_colors = [c for c in color_names if c != last_color]
+                if not available_colors:
+                    available_colors = color_names
+                color_name = random.choice(available_colors)
+                fixture_last_colors[fixture_id] = color_name
+                
+                color_values = COLORS[color_name]
+                for short_key, value in color_values.items():
+                    channel_name = channel_map.get(short_key, short_key)
+                    try:
+                        self.fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
+                    except:
+                        pass  # Ignore fixtures without this channel
+            
+            # Track first fixture's color for UI display
+            if fixtures:
+                self.current_color = fixture_last_colors.get(fixtures[0])
                         
             # Wait for next beat
             if self.stop_event.wait(self.get_interval()):
