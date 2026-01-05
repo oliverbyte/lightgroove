@@ -245,9 +245,6 @@
             // Highlight this button
             document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            // Store active color and mark as manually selected
-            window.activeColor = colorName;
-            window.manuallySelected = true;
           });
           
           grid.appendChild(btn);
@@ -259,7 +256,6 @@
 
     // Color FX controls
     document.getElementById('fx-random-1').addEventListener('click', async () => {
-      window.manuallySelected = false;
       await post(`${apiBase}/api/fx/start`, { fx: 'random_1' });
       // Highlight this FX button
       document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
@@ -267,7 +263,6 @@
     });
 
     document.getElementById('fx-random-2').addEventListener('click', async () => {
-      window.manuallySelected = false;
       await post(`${apiBase}/api/fx/start`, { fx: 'random_2' });
       // Highlight this FX button
       document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
@@ -275,7 +270,6 @@
     });
 
     document.getElementById('fx-random-3').addEventListener('click', async () => {
-      window.manuallySelected = false;
       await post(`${apiBase}/api/fx/start`, { fx: 'random_3' });
       // Highlight this FX button
       document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
@@ -295,11 +289,10 @@
         const res = await fetch(`${apiBase}/api/fx/status`);
         const status = await res.json();
         
-        // Always highlight current_color if set, regardless of running state
-        if (status.current_color && window.activeColor !== status.current_color) {
-          window.activeColor = status.current_color;
+        // Highlight all current_colors if set (handles multi-color FX)
+        if (status.current_colors && status.current_colors.length > 0) {
           document.querySelectorAll('.color-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.color === status.current_color);
+            btn.classList.toggle('active', status.current_colors.includes(btn.dataset.color));
           });
         }
         

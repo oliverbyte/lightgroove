@@ -42,7 +42,7 @@ class ColorFXEngine:
         self.fade_percentage = 0.0  # Fade time as percentage of beat interval (0.0-1.0)
         self.running = False
         self.current_fx = None
-        self.current_color = None  # Track currently displayed color
+        self.current_colors = []  # Track currently displayed colors (list for multi-color FX)
         self.fx_thread = None
         self.stop_event = threading.Event()
         
@@ -167,11 +167,12 @@ class ColorFXEngine:
         
         while self.running:
             # Pick random color (avoid repeating the same color)
-            available_colors = [c for c in color_names if c != self.current_color]
+            last_color = self.current_colors[0] if self.current_colors else None
+            available_colors = [c for c in color_names if c != last_color]
             if not available_colors:  # Fallback if only one color defined
                 available_colors = color_names
             color_name = random.choice(available_colors)
-            self.current_color = color_name  # Track current color
+            self.current_colors = [color_name]  # Track current color
             color_values = COLORS[color_name]
             
             # Apply to all fixtures simultaneously with fade
@@ -210,9 +211,8 @@ class ColorFXEngine:
             # Apply all fixtures simultaneously with fade
             fade_time_used = self._apply_colors_with_fade(fixture_colors, channel_map)
             
-            # Track first fixture's color for UI display
-            if fixtures:
-                self.current_color = fixture_last_colors.get(fixtures[0])
+            # Track all active colors for UI display
+            self.current_colors = list(set(fixture_last_colors.values()))
                         
             # Wait for remaining time in beat (beat_interval - fade_time)
             remaining_time = max(0.0, self.get_interval() - fade_time_used)
@@ -249,6 +249,9 @@ class ColorFXEngine:
                 else:
                     fixture_colors[fixture_id] = black_values
             
+            # Track active color (black is not highlighted)
+            self.current_colors = [color_name]
+            
             # Apply all fixtures simultaneously with fade
             fade_time_used = self._apply_colors_with_fade(fixture_colors, channel_map)
             
@@ -272,7 +275,7 @@ class ColorFXEngine:
         return {
             'running': self.running,
             'current_fx': self.current_fx,
-            'current_color': self.current_color,
+            'current_colors': self.current_colors,
             'bpm': self.bpm,
             'fade_percentage': self.fade_percentage
         }
