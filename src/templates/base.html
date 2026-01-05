@@ -180,17 +180,15 @@
     const fadeValue = document.getElementById('fade-value');
     
     function updateFadeDisplay() {
-      const bpm = parseInt(bpmSlider.value);
-      const beatInterval = 60.0 / bpm;
       const percentage = parseInt(fadeSlider.value);
-      const fadeSeconds = (percentage / 100) * beatInterval;
       fadeValue.textContent = `${percentage}%`;
-      return fadeSeconds;
     }
     
     fadeSlider.addEventListener('input', async () => {
-      const fadeSeconds = updateFadeDisplay();
-      await post(`${apiBase}/api/fx/fadetime`, { fade_time: fadeSeconds });
+      updateFadeDisplay();
+      const percentage = parseInt(fadeSlider.value);
+      // Send as 0.0-1.0 to backend
+      await post(`${apiBase}/api/fx/fadetime`, { fade_percentage: percentage / 100.0 });
     });
 
     // Tab switching
@@ -284,12 +282,11 @@
         }
         
         // Update fade time slider if different
-        if (status.fade_time !== undefined && status.bpm !== undefined) {
+        if (status.fade_percentage !== undefined) {
           const fadeSlider = document.getElementById('fx-fade');
           const fadeValue = document.getElementById('fade-value');
           if (fadeSlider) {
-            const beatInterval = 60.0 / status.bpm;
-            const percentage = Math.round((status.fade_time / beatInterval) * 100);
+            const percentage = Math.round(status.fade_percentage * 100);
             if (parseInt(fadeSlider.value) !== percentage) {
               fadeSlider.value = percentage;
               fadeValue.textContent = `${percentage}%`;

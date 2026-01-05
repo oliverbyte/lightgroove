@@ -115,7 +115,7 @@ class HttpApiServer:
 
                 if self.path.startswith("/api/fx/fadetime") and color_fx:
                     self._set_headers()
-                    self.wfile.write(json.dumps({"fade_time": color_fx.fade_time}).encode("utf-8"))
+                    self.wfile.write(json.dumps({"fade_percentage": color_fx.fade_percentage}).encode("utf-8"))
                     return
 
                 # Serve index.html for root
@@ -244,8 +244,9 @@ class HttpApiServer:
                         return
 
                     if path == "/api/fx/fadetime" and color_fx:
-                        fade_time = float(payload.get("fade_time", 0.0))
-                        color_fx.set_fade_time(fade_time)
+                        # Receive percentage from frontend (0.0-1.0)
+                        fade_percentage = float(payload.get("fade_percentage", 0.0))
+                        color_fx.set_fade_percentage(fade_percentage)
                         self._set_headers()
                         self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
                         return

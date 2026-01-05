@@ -39,7 +39,7 @@ class ColorFXEngine:
     def __init__(self, fixture_manager):
         self.fixture_manager = fixture_manager
         self.bpm = 120  # Default 120 BPM
-        self.fade_time = 0.0  # Fade time in seconds (0 = instant)
+        self.fade_percentage = 0.0  # Fade time as percentage of beat interval (0.0-1.0)
         self.running = False
         self.current_fx = None
         self.current_color = None  # Track currently displayed color
@@ -49,17 +49,13 @@ class ColorFXEngine:
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
         self.bpm = max(1, min(480, bpm))
-        # Cap fade time to new beat interval if needed
-        max_fade = self.get_interval()
-        if self.fade_time > max_fade:
-            self.fade_time = max_fade
-            print(f"Color FX: Fade time auto-adjusted to {self.fade_time:.3f}s (beat interval)")
         print(f"Color FX: BPM set to {self.bpm}")
     
-    def set_fade_time(self, fade_time: float):
-        """Set fade time in seconds (0-10 range)."""
-        self.fade_time = max(0.0, min(10.0, fade_time))
-        print(f"Color FX: Fade time set to {self.fade_time}s")
+    def set_fade_percentage(self, percentage: float):
+        """Set fade time as percentage of beat interval (0.0-1.0 range)."""
+        self.fade_percentage = max(0.0, min(1.0, percentage))
+        actual_time = self.fade_percentage * self.get_interval()
+        print(f"Color FX: Fade set to {self.fade_percentage*100:.0f}% ({actual_time:.3f}s at {self.bpm} BPM)")
         
     def get_interval(self) -> float:
         """Calculate interval in seconds based on BPM."""
@@ -81,13 +77,13 @@ class ColorFXEngine:
             fixture_colors: Dict mapping fixture_id to color_values dict
             channel_map: Dict mapping short keys to channel names
         """
-        if self.fade_time <= 0:
+        if self.fade_percentage <= 0:
             # Instant color change for all fixtures
             for fixture_id, color_values in fixture_colors.items():
                 self._apply_color_instant(fixture_id, color_values, channel_map)
         else:
-            # Smooth fade - cap fade time to beat interval
-            actual_fade_time = min(self.fade_time, self.get_interval())
+            # Smooth fade - calculate actual time from percentage of beat interval
+            actual_fade_time = self.fade_percentage * self.get_interval()
             steps = max(10, int(actual_fade_time * 20))  # 20 steps per second
             step_time = actual_fade_time / steps
             
@@ -220,5 +216,5 @@ class ColorFXEngine:
             'current_fx': self.current_fx,
             'current_color': self.current_color,
             'bpm': self.bpm,
-            'fade_time': self.fade_time
+            'fade_percentage': self.fade_percentage
         }
