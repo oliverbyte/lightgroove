@@ -70,17 +70,21 @@ class ColorFXEngine:
             except:
                 pass
     
-    def _apply_colors_with_fade(self, fixture_colors: dict, channel_map: dict):
+    def _apply_colors_with_fade(self, fixture_colors: dict, channel_map: dict) -> float:
         """Apply colors to multiple fixtures simultaneously with fade.
         
         Args:
             fixture_colors: Dict mapping fixture_id to color_values dict
             channel_map: Dict mapping short keys to channel names
+            
+        Returns:
+            Actual fade time used in seconds
         """
         if self.fade_percentage <= 0:
             # Instant color change for all fixtures
             for fixture_id, color_values in fixture_colors.items():
                 self._apply_color_instant(fixture_id, color_values, channel_map)
+            return 0.0
         else:
             # Smooth fade - calculate actual time from percentage of beat interval
             actual_fade_time = self.fade_percentage * self.get_interval()
@@ -115,6 +119,8 @@ class ColorFXEngine:
                         except:
                             pass
                 time.sleep(step_time)
+            
+            return actual_fade_time
         
     def start_fx(self, fx_name: str):
         """Start a color effect by name."""
@@ -166,10 +172,11 @@ class ColorFXEngine:
             # Apply to all fixtures simultaneously with fade
             fixtures = self.fixture_manager.list_fixtures()
             fixture_colors = {fixture_id: color_values for fixture_id in fixtures}
-            self._apply_colors_with_fade(fixture_colors, channel_map)
+            fade_time_used = self._apply_colors_with_fade(fixture_colors, channel_map)
                         
-            # Wait for next beat
-            if self.stop_event.wait(self.get_interval()):
+            # Wait for remaining time in beat (beat_interval - fade_time)
+            remaining_time = max(0.0, self.get_interval() - fade_time_used)
+            if self.stop_event.wait(remaining_time):
                 break
     
     def _run_random_2_fx(self):
@@ -195,14 +202,15 @@ class ColorFXEngine:
                 fixture_colors[fixture_id] = COLORS[color_name]
             
             # Apply all fixtures simultaneously with fade
-            self._apply_colors_with_fade(fixture_colors, channel_map)
+            fade_time_used = self._apply_colors_with_fade(fixture_colors, channel_map)
             
             # Track first fixture's color for UI display
             if fixtures:
                 self.current_color = fixture_last_colors.get(fixtures[0])
                         
-            # Wait for next beat
-            if self.stop_event.wait(self.get_interval()):
+            # Wait for remaining time in beat (beat_interval - fade_time)
+            remaining_time = max(0.0, self.get_interval() - fade_time_used)
+            if self.stop_event.wait(remaining_time):
                 break
                 
     def is_running(self) -> bool:
