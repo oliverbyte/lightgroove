@@ -13,7 +13,8 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
 
 **Globals Section** (available in Faders tab):
 - **Master**: Global intensity control (0-100%) that scales all DMX output in real-time
-- **FX BPM**: Control speed of color effects (30-240 BPM)
+- **FX BPM**: Control speed of color effects (1-480 BPM)
+- **FX Fade**: Smooth color transitions (0-100% of beat interval)
 
 **Faders Tab**:
 - Compact fixture cards with vertical faders in channel order
@@ -23,7 +24,9 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
 **Colors Tab**:
 - **Static Colors**: 9 preset buttons (Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple)
 - **Color FX**: Server-side effects that run independently
-  - Random: Cycles through all colors at BPM speed
+  - Random 1: All fixtures display same color, cycles at BPM speed
+  - Random 2: Each fixture gets different random color at each beat
+  - Smooth fade transitions blend colors over the beat interval (adjustable via FX Fade)
 - Active color highlighting persists across FX stop and page reloads
 
 ![UI Faders](img/screenshot_faders.png)
