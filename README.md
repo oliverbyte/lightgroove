@@ -22,12 +22,13 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
 - Responsive layout that adapts to screen width
 
 **Colors Tab**:
-- **Static Colors**: 9 preset buttons (Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple)
+- **Static Colors**: 10 preset buttons (Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple, Black)
 - **Color FX**: Server-side effects that run independently
   - Random 1: All fixtures display same color, cycles at BPM speed
   - Random 2: Each fixture gets different random color at each beat
+  - Random 3: Alternates between even/odd patches with black (strobe effect)
   - Smooth fade transitions blend colors over the beat interval (adjustable via FX Fade)
-- Active color highlighting persists across FX stop and page reloads
+- Active color and FX button highlighting with multi-color support for Random 2/3
 
 ![UI Faders](img/screenshot_faders.png)
 ![UI Colors](img/screenshot_colors.png)
