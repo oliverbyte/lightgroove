@@ -207,7 +207,7 @@ class HttpApiServer:
                         for fixture_id in fixture_manager.list_fixtures():
                             fixture_manager.set_fixture_color(fixture_id, r, g, b, w)
                         
-                        # Update color_fx current_color to match the applied color
+                        # Update color_fx current_colors to match the applied color (single color)
                         if color_fx:
                             from src.color_manager import COLORS
                             # Find matching color name
@@ -216,7 +216,7 @@ class HttpApiServer:
                                     abs(color_vals.get('g', 0) - g) < 0.01 and
                                     abs(color_vals.get('b', 0) - b) < 0.01 and
                                     abs(color_vals.get('w', 0) - w) < 0.01):
-                                    color_fx.current_color = color_name
+                                    color_fx.current_colors = [color_name]
                                     break
                         
                         self._set_headers()
