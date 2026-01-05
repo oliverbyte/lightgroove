@@ -160,7 +160,8 @@ class ColorFXEngine:
             
     def _run_random_fx(self):
         """Random color cycling effect - all fixtures same color."""
-        color_names = list(COLORS.keys())
+        # Exclude 'black' from random color selection
+        color_names = [c for c in COLORS.keys() if c != 'black']
         # Map short keys to actual fixture channel names
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
         
@@ -185,7 +186,8 @@ class ColorFXEngine:
     
     def _run_random_2_fx(self):
         """Random color cycling effect - each fixture gets different color."""
-        color_names = list(COLORS.keys())
+        # Exclude 'black' from random color selection
+        color_names = [c for c in COLORS.keys() if c != 'black']
         # Map short keys to actual fixture channel names
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
         fixture_last_colors = {}  # Track last color per fixture

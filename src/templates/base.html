@@ -219,7 +219,8 @@
           yellow: '#eab308',
           white: '#f3f4f6',
           orange: '#f97316',
-          purple: '#a855f7'
+          purple: '#a855f7',
+          black: '#000000'
         };
         
         Object.keys(serverColors).forEach(colorName => {
@@ -229,6 +230,9 @@
           btn.dataset.color = colorName;
           btn.style.background = colorHex[colorName] || '#38bdf8';
           btn.style.color = (colorName === 'yellow' || colorName === 'white') ? '#0b1220' : 'white';
+          if (colorName === 'black') {
+            btn.style.border = '2px solid #4b5563';
+          }
           btn.textContent = colorName.charAt(0).toUpperCase() + colorName.slice(1);
           
           btn.addEventListener('click', async () => {
@@ -255,20 +259,31 @@
     document.getElementById('fx-random-1').addEventListener('click', async () => {
       window.manuallySelected = false;
       await post(`${apiBase}/api/fx/start`, { fx: 'random_1' });
+      // Highlight this FX button
+      document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-random-1').classList.add('active');
     });
 
     document.getElementById('fx-random-2').addEventListener('click', async () => {
       window.manuallySelected = false;
       await post(`${apiBase}/api/fx/start`, { fx: 'random_2' });
+      // Highlight this FX button
+      document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-random-2').classList.add('active');
     });
 
     document.getElementById('fx-random-3').addEventListener('click', async () => {
       window.manuallySelected = false;
       await post(`${apiBase}/api/fx/start`, { fx: 'random_3' });
+      // Highlight this FX button
+      document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-random-3').classList.add('active');
     });
 
     document.getElementById('fx-stop').addEventListener('click', async () => {
       await post(`${apiBase}/api/fx/stop`, {});
+      // Remove FX button highlighting when stopped
+      document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => btn.classList.remove('active'));
       // Keep highlighting - server preserves current_color
     });
 
