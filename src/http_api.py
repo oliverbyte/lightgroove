@@ -113,6 +113,11 @@ class HttpApiServer:
                     self.wfile.write(json.dumps({"bpm": color_fx.bpm}).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/fx/fadetime") and color_fx:
+                    self._set_headers()
+                    self.wfile.write(json.dumps({"fade_time": color_fx.fade_time}).encode("utf-8"))
+                    return
+
                 # Serve index.html for root
                 if self.path in ["/", "/index.html"]:
                     index_path = ui_dir / "index.html"
@@ -234,6 +239,13 @@ class HttpApiServer:
                     if path == "/api/fx/bpm" and color_fx:
                         bpm = int(payload.get("bpm", 120))
                         color_fx.set_bpm(bpm)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
+                        return
+
+                    if path == "/api/fx/fadetime" and color_fx:
+                        fade_time = float(payload.get("fade_time", 0.0))
+                        color_fx.set_fade_time(fade_time)
                         self._set_headers()
                         self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
                         return

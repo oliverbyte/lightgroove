@@ -173,6 +173,16 @@
       await post(`${apiBase}/api/fx/bpm`, { bpm: value });
     });
 
+    // FX Fade control
+    const fadeSlider = document.getElementById('fx-fade');
+    const fadeValue = document.getElementById('fade-value');
+    
+    fadeSlider.addEventListener('input', async () => {
+      const value = parseFloat(fadeSlider.value);
+      fadeValue.textContent = `${value.toFixed(1)}s`;
+      await post(`${apiBase}/api/fx/fadetime`, { fade_time: value });
+    });
+
     // Tab switching
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -261,6 +271,16 @@
           document.querySelectorAll('.color-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.color === status.current_color);
           });
+        }
+        
+        // Update fade time slider if different
+        if (status.fade_time !== undefined) {
+          const fadeSlider = document.getElementById('fx-fade');
+          const fadeValue = document.getElementById('fade-value');
+          if (fadeSlider && parseFloat(fadeSlider.value) !== status.fade_time) {
+            fadeSlider.value = status.fade_time;
+            fadeValue.textContent = `${status.fade_time.toFixed(1)}s`;
+          }
         }
       } catch (e) {
         // Ignore errors

@@ -98,6 +98,23 @@ class FixtureManager:
         # Update state
         fixture['state'][channel_name] = value
     
+    def get_fixture_channel(self, fixture_id: str, channel_name: str) -> float:
+        """
+        Get the current value of a specific channel of a fixture
+        
+        Args:
+            fixture_id: ID of the fixture (e.g., 'par1')
+            channel_name: Name of the channel (e.g., 'red', 'dimmer')
+        
+        Returns:
+            Current channel value 0.0-1.0, or 0.0 if not found
+        """
+        if fixture_id not in self.fixtures:
+            return 0.0
+        
+        fixture = self.fixtures[fixture_id]
+        return fixture['state'].get(channel_name, 0.0)
+    
     def set_fixture_color(self, fixture_id: str, red: float, green: float, blue: float, white: float = 0.0):
         """
         Set RGBW color of a fixture

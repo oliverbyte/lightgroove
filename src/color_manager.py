@@ -39,6 +39,7 @@ class ColorFXEngine:
     def __init__(self, fixture_manager):
         self.fixture_manager = fixture_manager
         self.bpm = 120  # Default 120 BPM
+        self.fade_time = 0.0  # Fade time in seconds (0 = instant)
         self.running = False
         self.current_fx = None
         self.current_color = None  # Track currently displayed color
@@ -49,10 +50,54 @@ class ColorFXEngine:
         """Set FX speed in beats per minute (1-480 range)."""
         self.bpm = max(1, min(480, bpm))
         print(f"Color FX: BPM set to {self.bpm}")
+    
+    def set_fade_time(self, fade_time: float):
+        """Set fade time in seconds (0-10 range)."""
+        self.fade_time = max(0.0, min(10.0, fade_time))
+        print(f"Color FX: Fade time set to {self.fade_time}s")
         
     def get_interval(self) -> float:
         """Calculate interval in seconds based on BPM."""
         return 60.0 / self.bpm
+    
+    def _apply_color_with_fade(self, fixture_id: str, color_values: dict, channel_map: dict):
+        """Apply color to fixture with optional fade."""
+        if self.fade_time <= 0:
+            # Instant color change
+            for short_key, target_value in color_values.items():
+                channel_name = channel_map.get(short_key, short_key)
+                try:
+                    self.fixture_manager.set_fixture_channel(fixture_id, channel_name, target_value)
+                except:
+                    pass
+        else:
+            # Smooth fade
+            steps = max(10, int(self.fade_time * 20))  # 20 steps per second
+            step_time = self.fade_time / steps
+            
+            # Get current values
+            current_values = {}
+            for short_key in color_values.keys():
+                channel_name = channel_map.get(short_key, short_key)
+                try:
+                    current_values[short_key] = self.fixture_manager.get_fixture_channel(fixture_id, channel_name)
+                except:
+                    current_values[short_key] = 0.0
+            
+            # Fade through steps
+            for step in range(1, steps + 1):
+                if not self.running:
+                    break
+                progress = step / steps
+                for short_key, target_value in color_values.items():
+                    channel_name = channel_map.get(short_key, short_key)
+                    current = current_values.get(short_key, 0.0)
+                    value = current + (target_value - current) * progress
+                    try:
+                        self.fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
+                    except:
+                        pass
+                time.sleep(step_time)
         
     def start_fx(self, fx_name: str):
         """Start a color effect by name."""
@@ -101,15 +146,10 @@ class ColorFXEngine:
             self.current_color = color_name  # Track current color
             color_values = COLORS[color_name]
             
-            # Apply to all fixtures
+            # Apply to all fixtures with fade
             fixtures = self.fixture_manager.list_fixtures()
             for fixture_id in fixtures:
-                for short_key, value in color_values.items():
-                    channel_name = channel_map.get(short_key, short_key)
-                    try:
-                        self.fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
-                    except:
-                        pass  # Ignore fixtures without this channel
+                self._apply_color_with_fade(fixture_id, color_values, channel_map)
                         
             # Wait for next beat
             if self.stop_event.wait(self.get_interval()):
@@ -136,12 +176,7 @@ class ColorFXEngine:
                 fixture_last_colors[fixture_id] = color_name
                 
                 color_values = COLORS[color_name]
-                for short_key, value in color_values.items():
-                    channel_name = channel_map.get(short_key, short_key)
-                    try:
-                        self.fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
-                    except:
-                        pass  # Ignore fixtures without this channel
+                self._apply_color_with_fade(fixture_id, color_values, channel_map)
             
             # Track first fixture's color for UI display
             if fixtures:
@@ -161,5 +196,6 @@ class ColorFXEngine:
             'running': self.running,
             'current_fx': self.current_fx,
             'current_color': self.current_color,
-            'bpm': self.bpm
+            'bpm': self.bpm,
+            'fade_time': self.fade_time
         }
