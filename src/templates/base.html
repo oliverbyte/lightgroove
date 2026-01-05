@@ -171,16 +171,26 @@
       const value = parseInt(bpmSlider.value);
       bpmValue.textContent = value.toString();
       await post(`${apiBase}/api/fx/bpm`, { bpm: value });
+      // Update fade display after BPM change
+      updateFadeDisplay();
     });
 
     // FX Fade control
     const fadeSlider = document.getElementById('fx-fade');
     const fadeValue = document.getElementById('fade-value');
     
+    function updateFadeDisplay() {
+      const bpm = parseInt(bpmSlider.value);
+      const beatInterval = 60.0 / bpm;
+      const percentage = parseInt(fadeSlider.value);
+      const fadeSeconds = (percentage / 100) * beatInterval;
+      fadeValue.textContent = `${percentage}%`;
+      return fadeSeconds;
+    }
+    
     fadeSlider.addEventListener('input', async () => {
-      const value = parseFloat(fadeSlider.value);
-      fadeValue.textContent = `${value.toFixed(1)}s`;
-      await post(`${apiBase}/api/fx/fadetime`, { fade_time: value });
+      const fadeSeconds = updateFadeDisplay();
+      await post(`${apiBase}/api/fx/fadetime`, { fade_time: fadeSeconds });
     });
 
     // Tab switching
@@ -274,12 +284,16 @@
         }
         
         // Update fade time slider if different
-        if (status.fade_time !== undefined) {
+        if (status.fade_time !== undefined && status.bpm !== undefined) {
           const fadeSlider = document.getElementById('fx-fade');
           const fadeValue = document.getElementById('fade-value');
-          if (fadeSlider && parseFloat(fadeSlider.value) !== status.fade_time) {
-            fadeSlider.value = status.fade_time;
-            fadeValue.textContent = `${status.fade_time.toFixed(1)}s`;
+          if (fadeSlider) {
+            const beatInterval = 60.0 / status.bpm;
+            const percentage = Math.round((status.fade_time / beatInterval) * 100);
+            if (parseInt(fadeSlider.value) !== percentage) {
+              fadeSlider.value = percentage;
+              fadeValue.textContent = `${percentage}%`;
+            }
           }
         }
       } catch (e) {
