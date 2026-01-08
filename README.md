@@ -36,6 +36,11 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
 
 ## Installation
 
+### Windows Installer (Recommended)
+Download the latest `LightGrooveSetup.exe` from the [Releases](https://github.com/oliverbyte/lightgroove/releases) page. The installer is automatically built and published whenever changes are pushed to the main branch.
+
+After installation, launch LightGroove from the Start Menu or Desktop shortcut. The web UI will automatically open at http://localhost:5555.
+
 ### macOS via Homebrew
 ```bash
 brew tap oliverbyte/lightgroove https://github.com/oliverbyte/lightgroove.git
