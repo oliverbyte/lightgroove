@@ -11,7 +11,7 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
 
 ### Web UI
 
-**Globals Section** (available in Faders tab):
+**Globals Tab**:
 - **Master**: Global intensity control (0-100%) that scales all DMX output in real-time
 - **FX BPM**: Control speed of color effects (1-480 BPM)
 - **FX Fade**: Smooth color transitions (0-100% of beat interval)
@@ -30,6 +30,7 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
   - Smooth fade transitions blend colors over the beat interval (adjustable via FX Fade)
 - Active color and FX button highlighting with multi-color support for Random 2/3
 
+![UI Globals](img/screenshot_globals.png)
 ![UI Faders](img/screenshot_faders.png)
 ![UI Colors](img/screenshot_colors.png)
 
@@ -70,6 +71,7 @@ Restart after configuration changes to regenerate the UI.
 The project uses modular HTML templates:
 - `src/templates/base.html`: Main structure
 - `src/templates/section_globals.html`: Globals controls
+- `src/templates/tab_globals.html`: Globals tab
 - `src/templates/tab_faders.html`: Faders tab
 - `src/templates/tab_colors.html`: Colors tab
 

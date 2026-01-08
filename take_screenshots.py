@@ -42,7 +42,16 @@ def take_screenshots():
             page.wait_for_selector(".tab", timeout=5000)
             time.sleep(2)  # Extra time for fixtures to render
             
-            # Screenshot 1: Faders tab (default)
+            # Screenshot 1: Globals tab (default)
+            print("Capturing Globals tab...")
+            page.screenshot(path="img/screenshot_globals.png", full_page=False)
+            
+            # Click Faders tab
+            print("Switching to Faders tab...")
+            page.click("button[data-tab='faders']")
+            time.sleep(1)  # Wait for tab transition
+            
+            # Screenshot 2: Faders tab
             print("Capturing Faders tab...")
             page.screenshot(path="img/screenshot_faders.png", full_page=False)
             
@@ -51,7 +60,7 @@ def take_screenshots():
             page.click("button[data-tab='colors']")
             time.sleep(1)  # Wait for tab transition
             
-            # Screenshot 2: Colors tab
+            # Screenshot 3: Colors tab
             print("Capturing Colors tab...")
             page.screenshot(path="img/screenshot_colors.png", full_page=False)
             
