@@ -40,10 +40,19 @@ jobs:
         path: Output/LightGrooveSetup.exe
         retention-days: 90
     
-    - name: Create Release (on tag)
-      if: startsWith(github.ref, 'refs/tags/')
+    - name: Get short SHA
+      id: slug
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+    
+    - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: build-${{ steps.slug.outputs.sha_short }}
+        name: LightGroove Build ${{ steps.slug.outputs.sha_short }}
         files: Output/LightGrooveSetup.exe
+        body: |
+          Automated build from commit ${{ github.sha }}
+          
+          Download `LightGrooveSetup.exe` to install LightGroove on Windows.
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
