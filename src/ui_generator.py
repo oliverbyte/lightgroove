@@ -19,15 +19,17 @@ def generate_ui(fixture_manager, output_dir: Path, api_base: str = "") -> Path:
     
     # Load section templates
     globals_section = _load_template(template_dir / "section_globals.html")
+    tab_globals = _load_template(template_dir / "tab_globals.html")
     tab_faders = _load_template(template_dir / "tab_faders.html")
     tab_colors = _load_template(template_dir / "tab_colors.html")
     
-    # Insert globals section into faders tab
-    tab_faders = tab_faders.replace("{GLOBALS_SECTION}", globals_section)
+    # Insert globals section into globals tab
+    tab_globals = tab_globals.replace("{GLOBALS_SECTION}", globals_section)
     
     # Combine all templates
     rendered = (
         base_template
+        .replace("{TAB_GLOBALS}", tab_globals)
         .replace("{TAB_FADERS}", tab_faders)
         .replace("{TAB_COLORS}", tab_colors)
         .replace("__API_BASE__", api_base or "")
