@@ -2,9 +2,8 @@ name: Build Windows Installer
 
 on:
   push:
-    branches: 
-      - main
-      - feature/windows-installer  # Test on feature branch
+    branches:
+      - main# Test on feature branch
   workflow_dispatch:
 
 jobs:
