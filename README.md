@@ -71,14 +71,7 @@ Then open http://localhost:5555 in your browser.
 
 Restart after configuration changes to regenerate the UI.
 
-## Development
+## Contributing
 
-The project uses modular HTML templates:
-- `src/templates/base.html`: Main structure
-- `src/templates/section_globals.html`: Globals controls
-- `src/templates/tab_globals.html`: Globals tab
-- `src/templates/tab_faders.html`: Faders tab
-- `src/templates/tab_colors.html`: Colors tab
-
-Templates are combined by `src/ui_generator.py` during startup.
+For development setup, architecture details, and contribution guidelines, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
