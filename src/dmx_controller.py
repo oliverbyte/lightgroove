@@ -126,14 +126,15 @@ class DMXController:
             from stupidArtnet import StupidArtnet
 
             ip = node_config.get('ip', '255.255.255.255')
-            port = node_config.get('port', 6454)
+            port = node_config.get('port', 6454)  # Read port from config (for display only, StupidArtnet uses fixed 6454)
             broadcast = bool(node_config.get('broadcast', False))
             target_ip = '255.255.255.255' if broadcast else ip
-            sender = StupidArtnet(target_ip, artnet_universe, packet_size=512, fps=self.fps, broadcast=broadcast, port=port)
+            sender = StupidArtnet(target_ip, artnet_universe, packet_size=512, fps=self.fps, broadcast=broadcast)
             sender.start()
             self.artnet_senders[key] = sender
             mode = "broadcast" if broadcast else "unicast"
-            print(f"DMX Controller: ArtNet sender for node '{node_config['id']}' universe {artnet_universe} connected to {target_ip}:{port} ({mode})")
+            # Note: StupidArtnet always uses port 6454 (standard ArtNet port) - custom ports not supported
+            print(f"DMX Controller: ArtNet sender for node '{node_config['id']}' universe {artnet_universe} connected to {target_ip}:6454 ({mode})")
             return sender
         except ImportError:
             print("DMX Controller: stupidArtnet not installed. Install with: pip install stupidArtnet")
