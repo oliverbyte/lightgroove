@@ -3,4 +3,3 @@ ui_dist
 __pycache__/
 *.pyc
 src/__pycache__/
-.copilot-instructions.md
