@@ -86,18 +86,12 @@ All configuration can be edited via the **Config tab** in the web UI. Changes ar
 - **Config UI**: Full web-based configuration editor for ArtNet nodes, universe mapping, colors, and global settings with auto-reload
 - **Dynamic Color Buttons**: Static color buttons automatically display actual RGBW values from color definitions
 - **Color Editor**: Add, edit, and delete colors with RGBW sliders and live preview
-
-### December 2025
 - **Random 4 FX**: Chaser effect that lights one fixture at a time in sequence with random colors
 - **Active Color Indication**: Color and FX buttons highlight to show what's currently active
 - **Multi-Color Highlighting**: Support for displaying multiple active colors in Random 2/3/4 effects
-
-### November 2025
-- **Color FX Engine**: Server-side color effects (Random 1-3) with BPM sync and smooth fade transitions
+- **Color FX Engine**: Server-side color effects (Random 1-4) with BPM sync and smooth fade transitions
 - **Fade Control**: Adjustable fade time (0-100%) for smooth color transitions
 - **FX BPM Control**: Set effect speed from 1-480 BPM
-
-### October 2025
 - **Web UI**: Initial release with Globals, Faders, and Colors tabs
 - **Real-time Faders**: Per-fixture channel control with live DMX value display
 - **Master Control**: Global intensity scaling for all DMX output
