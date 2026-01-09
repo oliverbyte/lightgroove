@@ -27,8 +27,9 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
   - Random 1: All fixtures display same color, cycles at BPM speed
   - Random 2: Each fixture gets different random color at each beat
   - Random 3: Alternates between even/odd patches with black (strobe effect)
+  - Random 4: Chaser effect - one fixture at a time in sequence with random colors
   - Smooth fade transitions blend colors over the beat interval (adjustable via FX Fade)
-- Active color and FX button highlighting with multi-color support for Random 2/3
+- Active color and FX button highlighting with multi-color support for Random 2/3/4
 
 **Config Tab**:
 - **ArtNet Nodes**: Add, edit, and delete ArtNet output nodes with IP addresses and universes
