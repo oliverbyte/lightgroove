@@ -2,14 +2,14 @@
   "nodes": [
     {
       "id": "node1",
-      "name": "Main ArtNet Node",
+      "name": "Main ArtNet Node2",
       "ip": "10.10.10.3",
       "port": 6454,
-      "broadcast": false,
       "universes": [
         0,
         1
       ],
+      "broadcast": false,
       "enabled": true,
       "description": "Primary ArtNet node for universe 1"
     }

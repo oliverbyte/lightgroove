@@ -255,7 +255,7 @@ class DMXController:
         # Store current channel values from all universes
         current_values = {}
         for universe_id, universe in self.universes.items():
-            current_values[universe_id] = universe.data.copy()
+            current_values[universe_id] = universe.dmx_data.copy()
         
         # Stop output temporarily
         was_running = self.running
@@ -279,7 +279,7 @@ class DMXController:
         # Restore channel values where universes still exist
         for universe_id, values in current_values.items():
             if universe_id in self.universes:
-                self.universes[universe_id].data = values
+                self.universes[universe_id].dmx_data = values
                 print(f"DMX Controller: Restored values for Universe {universe_id}")
         
         # Restart output if it was running
