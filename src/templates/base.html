@@ -39,9 +39,21 @@
     .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
     .globals-card { max-height: 300px; }
+    
+    /* Toast Notifications */
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; min-width: 250px; max-width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); animation: slideIn 0.3s ease-out; display: flex; align-items: center; gap: 10px; }
+    .toast.success { border-left: 4px solid #10b981; }
+    .toast.error { border-left: 4px solid #ef4444; }
+    .toast.warning { border-left: 4px solid #f59e0b; }
+    .toast.info { border-left: 4px solid var(--accent); }
+    @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+    .toast.removing { animation: slideOut 0.3s ease-out forwards; }
   </style>
 </head>
 <body>
+  <div class="toast-container" id="toast-container"></div>
   <header>LightGroove</header>
   <div class="container">
     <div class="tabs">
@@ -75,6 +87,19 @@
     async function post(url, body) {
       const res = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body || {}) });
       return await res.json();
+    }
+
+    function showToast(message, type = 'info', duration = 3000) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
     }
 
     async function getStates() {

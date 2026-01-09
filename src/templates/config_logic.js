@@ -17,13 +17,13 @@ async function saveArtNetConfig() {
   try {
     const response = await post(`${apiBase}/api/config/artnet`, artnetConfig);
     if (response && response.reloaded) {
-      alert('Configuration saved and reloaded successfully!');
+      showToast('Configuration saved and reloaded successfully!', 'success');
     } else {
-      alert('Configuration saved! Restart the application for changes to take effect.');
+      showToast('Configuration saved! Restart the application for changes to take effect.', 'warning');
     }
   } catch (e) {
     console.error('Failed to save ArtNet config:', e);
-    alert('Failed to save configuration: ' + e.message);
+    showToast('Failed to save configuration: ' + e.message, 'error');
   }
 }
 
@@ -200,7 +200,7 @@ function initConfigEventListeners() {
       const nodeId = document.getElementById('node-id').value.trim();
       
       if (!nodeId) {
-        alert('Node ID is required');
+        showToast('Node ID is required', 'warning');
         return;
       }
       
@@ -222,7 +222,7 @@ function initConfigEventListeners() {
         }
       } else {
         if (artnetConfig.nodes.some(n => n.id === nodeId)) {
-          alert('Node ID already exists');
+          showToast('Node ID already exists', 'warning');
           return;
         }
         artnetConfig.nodes.push(node);
@@ -264,13 +264,13 @@ function initConfigEventListeners() {
       const dmxUniverse = document.getElementById('mapping-universe').value.trim();
       
       if (!dmxUniverse) {
-        alert('DMX Universe is required');
+        showToast('DMX Universe is required', 'warning');
         return;
       }
       
       const nodeId = document.getElementById('mapping-node').value;
       if (!nodeId) {
-        alert('Please select a node');
+        showToast('Please select a node', 'warning');
         return;
       }
       
@@ -281,7 +281,7 @@ function initConfigEventListeners() {
       };
       
       if (!isEdit && artnetConfig.universe_mapping[dmxUniverse]) {
-        alert('Mapping for this DMX Universe already exists');
+        showToast('Mapping for this DMX Universe already exists', 'warning');
         return;
       }
       

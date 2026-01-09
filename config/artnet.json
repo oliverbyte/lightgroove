@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "node1",
-      "name": "Main ArtNet Node2",
+      "name": "Main ArtNet Node3",
       "ip": "10.10.10.3",
       "port": 6454,
       "universes": [
