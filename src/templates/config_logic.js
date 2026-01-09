@@ -1,5 +1,6 @@
 // Config Tab Logic
 let artnetConfig = null;
+let colorsConfig = null;
 
 async function loadArtNetConfig() {
   try {
@@ -10,6 +11,16 @@ async function loadArtNetConfig() {
     renderGlobalSettings();
   } catch (e) {
     console.error('Failed to load ArtNet config:', e);
+  }
+}
+
+async function loadColorsConfig() {
+  try {
+    const res = await fetch(`${apiBase}/api/config/colors`);
+    colorsConfig = await res.json();
+    renderColors();
+  } catch (e) {
+    console.error('Failed to load colors config:', e);
   }
 }
 
@@ -24,6 +35,16 @@ async function saveArtNetConfig() {
   } catch (e) {
     console.error('Failed to save ArtNet config:', e);
     showToast('Failed to save configuration: ' + e.message, 'error');
+  }
+}
+
+async function saveColorsConfig() {
+  try {
+    const response = await post(`${apiBase}/api/config/colors`, colorsConfig);
+    showToast('Colors saved successfully!', 'success');
+  } catch (e) {
+    console.error('Failed to save colors config:', e);
+    showToast('Failed to save colors: ' + e.message, 'error');
   }
 }
 
@@ -171,6 +192,99 @@ function updateNodeOptions() {
   });
 }
 
+// Color rendering and CRUD
+function renderColors() {
+  const container = document.getElementById('colors-list');
+  if (!container || !colorsConfig) return;
+  
+  container.innerHTML = '';
+  const colors = colorsConfig.colors || {};
+  
+  Object.keys(colors).forEach(colorName => {
+    const color = colors[colorName];
+    const colorCard = document.createElement('div');
+    colorCard.style.cssText = 'border: 1px solid #374151; padding: 10px; margin-bottom: 10px; border-radius: 8px; background: #111827;';
+    
+    // Convert RGBW to RGB for preview
+    const r = Math.round(color.r * 255);
+    const g = Math.round(color.g * 255);
+    const b = Math.round(color.b * 255);
+    const rgbColor = `rgb(${r}, ${g}, ${b})`;
+    
+    colorCard.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="flex: 1;">
+          <div style="font-weight: 600; margin-bottom: 5px;">${colorName}</div>
+          <div style="font-size: 12px; color: #9ca3af;">
+            <div>R: ${color.r.toFixed(2)}, G: ${color.g.toFixed(2)}, B: ${color.b.toFixed(2)}, W: ${color.w.toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid #374151; background: ${rgbColor};"></div>
+          <div>
+            <button class="small" onclick="editColor('${colorName}')">Edit</button>
+            <button class="small danger" onclick="deleteColor('${colorName}')">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(colorCard);
+  });
+}
+
+window.editColor = function(colorName) {
+  const color = colorsConfig.colors[colorName];
+  if (!color) return;
+  
+  document.getElementById('color-modal-title').textContent = 'Edit Color';
+  document.getElementById('color-modal-id').value = colorName;
+  document.getElementById('color-name').value = colorName;
+  document.getElementById('color-name').disabled = true;
+  document.getElementById('color-r').value = color.r;
+  document.getElementById('color-g').value = color.g;
+  document.getElementById('color-b').value = color.b;
+  document.getElementById('color-w').value = color.w;
+  updateColorPreview();
+  
+  document.getElementById('color-modal').style.display = 'flex';
+};
+
+window.deleteColor = function(colorName) {
+  if (confirm('Delete color "' + colorName + '"?')) {
+    delete colorsConfig.colors[colorName];
+    saveColorsConfig();
+    renderColors();
+  }
+};
+
+function updateColorPreview() {
+  const r = parseFloat(document.getElementById('color-r').value) || 0;
+  const g = parseFloat(document.getElementById('color-g').value) || 0;
+  const b = parseFloat(document.getElementById('color-b').value) || 0;
+  const w = parseFloat(document.getElementById('color-w').value) || 0;
+  
+  // Clamp values between 0 and 1
+  const rClamped = Math.max(0, Math.min(1, r));
+  const gClamped = Math.max(0, Math.min(1, g));
+  const bClamped = Math.max(0, Math.min(1, b));
+  const wClamped = Math.max(0, Math.min(1, w));
+  
+  // Convert to 0-255 range and add white channel contribution
+  const rInt = Math.round((rClamped + wClamped) * 255);
+  const gInt = Math.round((gClamped + wClamped) * 255);
+  const bInt = Math.round((bClamped + wClamped) * 255);
+  
+  // Clamp final values to 255
+  const rFinal = Math.min(255, rInt);
+  const gFinal = Math.min(255, gInt);
+  const bFinal = Math.min(255, bInt);
+  
+  const preview = document.getElementById('color-preview');
+  if (preview) {
+    preview.style.background = `rgb(${rFinal}, ${gFinal}, ${bFinal})`;
+  }
+}
+
 // Event listeners
 let eventListenersInitialized = false;
 
@@ -303,6 +417,69 @@ function initConfigEventListeners() {
     });
   }
 
+  const addColorBtn = document.getElementById('add-color-btn');
+  if (addColorBtn) {
+    addColorBtn.addEventListener('click', () => {
+      document.getElementById('color-modal-title').textContent = 'Add Color';
+      document.getElementById('color-modal-id').value = '';
+      document.getElementById('color-name').value = '';
+      document.getElementById('color-name').disabled = false;
+      document.getElementById('color-r').value = '0';
+      document.getElementById('color-g').value = '0';
+      document.getElementById('color-b').value = '0';
+      document.getElementById('color-w').value = '0';
+      updateColorPreview();
+      
+      document.getElementById('color-modal').style.display = 'flex';
+    });
+  }
+
+  const colorSaveBtn = document.getElementById('color-modal-save');
+  if (colorSaveBtn) {
+    colorSaveBtn.addEventListener('click', () => {
+      const isEdit = document.getElementById('color-modal-id').value !== '';
+      const colorName = document.getElementById('color-name').value.trim();
+      
+      if (!colorName) {
+        showToast('Please enter a color name', 'error');
+        return;
+      }
+      
+      const color = {
+        r: parseFloat(document.getElementById('color-r').value) || 0,
+        g: parseFloat(document.getElementById('color-g').value) || 0,
+        b: parseFloat(document.getElementById('color-b').value) || 0,
+        w: parseFloat(document.getElementById('color-w').value) || 0
+      };
+      
+      if (!isEdit && colorsConfig.colors[colorName]) {
+        showToast('Color name already exists', 'error');
+        return;
+      }
+      
+      colorsConfig.colors[colorName] = color;
+      saveColorsConfig();
+      renderColors();
+      document.getElementById('color-modal').style.display = 'none';
+    });
+  }
+
+  const colorCancelBtn = document.getElementById('color-modal-cancel');
+  if (colorCancelBtn) {
+    colorCancelBtn.addEventListener('click', () => {
+      document.getElementById('color-modal').style.display = 'none';
+    });
+  }
+
+  // Color preview update on input change
+  ['color-r', 'color-g', 'color-b', 'color-w'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) {
+      input.addEventListener('input', updateColorPreview);
+      input.addEventListener('change', updateColorPreview);
+    }
+  });
+
   const saveGlobalBtn = document.getElementById('save-global-settings-btn');
   if (saveGlobalBtn) {
     saveGlobalBtn.addEventListener('click', () => {
@@ -316,9 +493,13 @@ function initConfigEventListeners() {
   const tabs = document.querySelectorAll('.tab');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      if (tab.dataset.tab === 'config' && !artnetConfig) {
-        loadArtNetConfig();
-        initConfigEventListeners();
+      if (tab.dataset.tab === 'config') {
+        if (!artnetConfig) {
+          loadArtNetConfig();
+          initConfigEventListeners();
+        }
+        // Always reload colors to pick up manual changes
+        loadColorsConfig();
       }
     });
   });

@@ -229,6 +229,11 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         tab.classList.add('active');
         document.getElementById(`tab-${targetTab}`).classList.add('active');
+        
+        // Reload colors when switching to Colors tab
+        if (targetTab === 'colors') {
+          loadStaticColors();
+        }
       });
     });
 
@@ -239,30 +244,33 @@
         const serverColors = await res.json();
         const grid = document.getElementById('static-colors');
         
-        // Color name to hex for button styling
-        const colorHex = {
-          red: '#ef4444',
-          green: '#22c55e',
-          blue: '#3b82f6',
-          cyan: '#06b6d4',
-          magenta: '#d946ef',
-          yellow: '#eab308',
-          white: '#f3f4f6',
-          orange: '#f97316',
-          purple: '#a855f7',
-          black: '#000000'
-        };
+        // Clear existing buttons
+        grid.innerHTML = '';
         
         Object.keys(serverColors).forEach(colorName => {
           const color = serverColors[colorName];
           const btn = document.createElement('button');
           btn.className = 'color-btn';
           btn.dataset.color = colorName;
-          btn.style.background = colorHex[colorName] || '#38bdf8';
-          btn.style.color = (colorName === 'yellow' || colorName === 'white') ? '#0b1220' : 'white';
-          if (colorName === 'black') {
+          
+          // Calculate RGB from RGBW values (0-1 range)
+          const r = Math.min(255, Math.round((color.r + color.w) * 255));
+          const g = Math.min(255, Math.round((color.g + color.w) * 255));
+          const b = Math.min(255, Math.round((color.b + color.w) * 255));
+          const bgColor = `rgb(${r}, ${g}, ${b})`;
+          
+          // Calculate brightness for text color decision
+          const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+          const textColor = brightness > 128 ? '#0b1220' : 'white';
+          
+          btn.style.background = bgColor;
+          btn.style.color = textColor;
+          
+          // Add border for very dark colors
+          if (brightness < 30) {
             btn.style.border = '2px solid #4b5563';
           }
+          
           btn.textContent = colorName.charAt(0).toUpperCase() + colorName.slice(1);
           
           btn.addEventListener('click', async () => {

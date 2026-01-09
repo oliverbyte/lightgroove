@@ -64,6 +64,15 @@ def take_screenshots():
             print("Capturing Colors tab...")
             page.screenshot(path="img/screenshot_colors.png", full_page=False)
             
+            # Click Config tab
+            print("Switching to Config tab...")
+            page.click("button[data-tab='config']")
+            time.sleep(1)  # Wait for tab transition and config to load
+            
+            # Screenshot 4: Config tab
+            print("Capturing Config tab...")
+            page.screenshot(path="img/screenshot_config.png", full_page=False)
+            
             browser.close()
             print("✓ Screenshots saved to img/")
             

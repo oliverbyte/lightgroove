@@ -30,9 +30,17 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
   - Smooth fade transitions blend colors over the beat interval (adjustable via FX Fade)
 - Active color and FX button highlighting with multi-color support for Random 2/3
 
+**Config Tab**:
+- **ArtNet Nodes**: Add, edit, and delete ArtNet output nodes with IP addresses and universes
+- **Universe Mapping**: Configure which DMX universe maps to which ArtNet node and universe
+- **Colors**: Edit RGBW color definitions (0-1 range) with live preview, add/remove colors
+- **Global Settings**: Configure default output mode and FPS
+- Changes are saved immediately and automatically reload without server restart
+
 ![UI Globals](img/screenshot_globals.png)
 ![UI Faders](img/screenshot_faders.png)
 ![UI Colors](img/screenshot_colors.png)
+![UI Config](img/screenshot_config.png)
 
 ## Installation
 
@@ -69,7 +77,7 @@ Then open http://localhost:5555 in your browser.
 - **`config/artnet.json`**: ArtNet targets and universe mapping
 - **`config/colors.json`**: Color definitions for static colors and FX (RGBW values 0.0-1.0)
 
-Restart after configuration changes to regenerate the UI.
+All configuration can be edited via the **Config tab** in the web UI. Changes are saved immediately and the server reloads automatically without restart.
 
 ## Contributing
 

@@ -31,6 +31,14 @@ def load_colors() -> Dict:
 COLORS = load_colors()
 
 
+def reload_colors():
+    """Reload colors from config file and update the COLORS dictionary"""
+    global COLORS
+    COLORS.clear()
+    COLORS.update(load_colors())
+    print(f"Reloaded {len(COLORS)} colors from config")
+
+
 class ColorFXEngine:
     """
     Manages color effects that run server-side independently of UI.

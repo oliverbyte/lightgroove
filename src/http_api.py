@@ -131,6 +131,18 @@ class HttpApiServer:
                         self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/config/colors"):
+                    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'colors.json')
+                    try:
+                        with open(config_path, 'r') as f:
+                            config = json.load(f)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(config).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
                 # Serve index.html for root
                 if self.path in ["/", "/index.html"]:
                     index_path = ui_dir / "index.html"
@@ -276,6 +288,27 @@ class HttpApiServer:
                                 fixture_manager.dmx.reload_config(config_path)
                             except Exception as reload_error:
                                 print(f"Warning: Failed to reload DMX config: {reload_error}")
+                            
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True, "reloaded": True}).encode("utf-8"))
+                        except Exception as e:
+                            self._set_headers(500)
+                            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                        return
+
+                    if path == "/api/config/colors":
+                        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'colors.json')
+                        try:
+                            # Write the entire config
+                            with open(config_path, 'w') as f:
+                                json.dump(payload, f, indent=2)
+                            
+                            # Reload colors in the color manager
+                            try:
+                                from color_manager import reload_colors
+                                reload_colors()
+                            except Exception as reload_error:
+                                print(f"Warning: Failed to reload colors: {reload_error}")
                             
                             self._set_headers()
                             self.wfile.write(json.dumps({"success": True, "reloaded": True}).encode("utf-8"))
