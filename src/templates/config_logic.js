@@ -173,7 +173,13 @@ function updateNodeOptions() {
 }
 
 // Event listeners
+let eventListenersInitialized = false;
+
 function initConfigEventListeners() {
+  // Prevent duplicate event listener bindings
+  if (eventListenersInitialized) return;
+  eventListenersInitialized = true;
+  
   const addNodeBtn = document.getElementById('add-node-btn');
   if (addNodeBtn) {
     addNodeBtn.addEventListener('click', () => {
