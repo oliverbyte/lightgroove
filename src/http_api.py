@@ -118,6 +118,20 @@ class HttpApiServer:
                     self.wfile.write(json.dumps({"fade_percentage": color_fx.fade_percentage}).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/config/artnet"):
+                    import os
+                    import json
+                    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'artnet.json')
+                    try:
+                        with open(config_path, 'r') as f:
+                            config = json.load(f)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(config).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
                 # Serve index.html for root
                 if self.path in ["/", "/index.html"]:
                     index_path = ui_dir / "index.html"
@@ -249,6 +263,21 @@ class HttpApiServer:
                         color_fx.set_fade_percentage(fade_percentage)
                         self._set_headers()
                         self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
+                        return
+
+                    if path == "/api/config/artnet":
+                        import os
+                        import json
+                        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'artnet.json')
+                        try:
+                            # Write the entire config
+                            with open(config_path, 'w') as f:
+                                json.dump(payload, f, indent=2)
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        except Exception as e:
+                            self._set_headers(500)
+                            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                         return
                 except Exception as exc:  # keep API resilient
                     self._set_headers(400)

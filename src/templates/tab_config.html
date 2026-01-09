@@ -1,0 +1,119 @@
+<div id="tab-config" class="tab-content">
+  <div class="grid">
+    <!-- ArtNet Nodes Section -->
+    <div class="card" style="flex: 1; min-width: 400px;">
+      <h3>ArtNet Nodes</h3>
+      <button class="color-btn" id="add-node-btn" style="margin-bottom: 10px;">+ Add Node</button>
+      <div id="nodes-list"></div>
+    </div>
+    
+    <!-- Universe Mapping Section -->
+    <div class="card" style="flex: 1; min-width: 400px;">
+      <h3>Universe Mapping</h3>
+      <button class="color-btn" id="add-mapping-btn" style="margin-bottom: 10px;">+ Add Mapping</button>
+      <div id="mappings-list"></div>
+    </div>
+    
+    <!-- Global Settings Section -->
+    <div class="card" style="width: 100%;">
+      <h3>Global Settings</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 500;">Default Output Mode</label>
+          <select id="default-output-mode" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #1f2937; color: white;">
+            <option value="virtual">Virtual</option>
+            <option value="artnet">ArtNet</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: 500;">FPS</label>
+          <input type="number" id="fps" min="1" max="100" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #1f2937; color: white;">
+        </div>
+        <div>
+          <button class="color-btn" id="save-global-settings-btn" style="margin-top: 24px;">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Node Edit/Create -->
+<div id="node-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: #1f2937; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%;">
+    <h3 id="node-modal-title" style="margin-top: 0;">Add Node</h3>
+    <input type="hidden" id="node-modal-id">
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Node ID</label>
+        <input type="text" id="node-id" placeholder="e.g., node1" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Name</label>
+        <input type="text" id="node-name" placeholder="e.g., Main ArtNet Node" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">IP Address</label>
+        <input type="text" id="node-ip" placeholder="e.g., 10.10.10.3" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Port</label>
+        <input type="number" id="node-port" value="6454" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Universes (comma-separated)</label>
+        <input type="text" id="node-universes" placeholder="e.g., 0, 1" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Description</label>
+        <textarea id="node-description" rows="2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;"></textarea>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="checkbox" id="node-broadcast" style="width: 20px; height: 20px;">
+        <label for="node-broadcast">Broadcast Mode</label>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="checkbox" id="node-enabled" checked style="width: 20px; height: 20px;">
+        <label for="node-enabled">Enabled</label>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="color-btn" id="node-modal-save">Save</button>
+        <button class="color-btn secondary" id="node-modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Mapping Edit/Create -->
+<div id="mapping-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: #1f2937; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%;">
+    <h3 id="mapping-modal-title" style="margin-top: 0;">Add Universe Mapping</h3>
+    <input type="hidden" id="mapping-modal-universe">
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">DMX Universe</label>
+        <input type="number" id="mapping-universe" min="1" placeholder="e.g., 1" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Node</label>
+        <select id="mapping-node" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+          <option value="">Select a node...</option>
+        </select>
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">ArtNet Universe</label>
+        <input type="number" id="mapping-artnet-universe" min="0" placeholder="e.g., 0" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Output Mode</label>
+        <select id="mapping-output-mode" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+          <option value="artnet">ArtNet</option>
+          <option value="virtual">Virtual</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button class="color-btn" id="mapping-modal-save">Save</button>
+        <button class="color-btn secondary" id="mapping-modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

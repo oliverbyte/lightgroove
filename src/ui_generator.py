@@ -22,6 +22,8 @@ def generate_ui(fixture_manager, output_dir: Path, api_base: str = "") -> Path:
     tab_globals = _load_template(template_dir / "tab_globals.html")
     tab_faders = _load_template(template_dir / "tab_faders.html")
     tab_colors = _load_template(template_dir / "tab_colors.html")
+    tab_config = _load_template(template_dir / "tab_config.html")
+    config_logic = _load_template(template_dir / "config_logic.js")
     
     # Insert globals section into globals tab
     tab_globals = tab_globals.replace("{GLOBALS_SECTION}", globals_section)
@@ -32,6 +34,8 @@ def generate_ui(fixture_manager, output_dir: Path, api_base: str = "") -> Path:
         .replace("{TAB_GLOBALS}", tab_globals)
         .replace("{TAB_FADERS}", tab_faders)
         .replace("{TAB_COLORS}", tab_colors)
+        .replace("{TAB_CONFIG}", tab_config)
+        .replace("{CONFIG_LOGIC}", config_logic)
         .replace("__API_BASE__", api_base or "")
         .replace("__API_BASE_LABEL__", api_base or "(relative)")
     )
