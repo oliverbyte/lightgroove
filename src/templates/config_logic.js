@@ -15,8 +15,12 @@ async function loadArtNetConfig() {
 
 async function saveArtNetConfig() {
   try {
-    await post(`${apiBase}/api/config/artnet`, artnetConfig);
-    alert('Configuration saved! Restart the application for changes to take effect.');
+    const response = await post(`${apiBase}/api/config/artnet`, artnetConfig);
+    if (response && response.reloaded) {
+      alert('Configuration saved and reloaded successfully!');
+    } else {
+      alert('Configuration saved! Restart the application for changes to take effect.');
+    }
   } catch (e) {
     console.error('Failed to save ArtNet config:', e);
     alert('Failed to save configuration: ' + e.message);
@@ -140,11 +144,12 @@ window.editMapping = function(dmxUniverse) {
   document.getElementById('mapping-modal-universe').value = dmxUniverse;
   document.getElementById('mapping-universe').value = dmxUniverse;
   document.getElementById('mapping-universe').disabled = true;
-  document.getElementById('mapping-node').value = mapping.node_id;
   document.getElementById('mapping-artnet-universe').value = mapping.artnet_universe;
   document.getElementById('mapping-output-mode').value = mapping.output_mode;
   
   updateNodeOptions();
+  // Set node value AFTER updating options so the option exists
+  document.getElementById('mapping-node').value = mapping.node_id;
   document.getElementById('mapping-modal').style.display = 'flex';
 };
 

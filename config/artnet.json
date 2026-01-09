@@ -6,7 +6,10 @@
       "ip": "10.10.10.3",
       "port": 6454,
       "broadcast": false,
-      "universes": [0, 1],
+      "universes": [
+        0,
+        1
+      ],
       "enabled": true,
       "description": "Primary ArtNet node for universe 1"
     }

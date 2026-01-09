@@ -242,6 +242,54 @@ class DMXController:
         
         print("DMX Controller: Output stopped")
     
+    def reload_config(self, config_file: str):
+        """
+        Reload configuration from file without stopping the controller.
+        Preserves current channel values where possible.
+        
+        Args:
+            config_file: Path to artnet.json configuration file
+        """
+        print("DMX Controller: Reloading configuration...")
+        
+        # Store current channel values from all universes
+        current_values = {}
+        for universe_id, universe in self.universes.items():
+            current_values[universe_id] = universe.data.copy()
+        
+        # Stop output temporarily
+        was_running = self.running
+        if was_running:
+            self.running = False
+            if self._thread:
+                self._thread.join(timeout=2)
+        
+        # Cleanup old ArtNet senders
+        for sender in self.artnet_senders.values():
+            try:
+                sender.stop()
+            except:
+                pass
+        self.artnet_senders = {}
+        
+        # Reload configuration
+        self.universes = {}
+        self._load_config(config_file)
+        
+        # Restore channel values where universes still exist
+        for universe_id, values in current_values.items():
+            if universe_id in self.universes:
+                self.universes[universe_id].data = values
+                print(f"DMX Controller: Restored values for Universe {universe_id}")
+        
+        # Restart output if it was running
+        if was_running:
+            self.running = True
+            self._thread = threading.Thread(target=self._output_loop, daemon=True)
+            self._thread.start()
+        
+        print("DMX Controller: Configuration reloaded successfully")
+    
     def _output_loop(self):
         """Main output loop - sends DMX data periodically"""
         frame_time = 1.0 / self.fps

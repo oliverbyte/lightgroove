@@ -270,8 +270,15 @@ class HttpApiServer:
                             # Write the entire config
                             with open(config_path, 'w') as f:
                                 json.dump(payload, f, indent=2)
+                            
+                            # Reload DMX controller configuration
+                            try:
+                                fixture_manager.dmx.reload_config(config_path)
+                            except Exception as reload_error:
+                                print(f"Warning: Failed to reload DMX config: {reload_error}")
+                            
                             self._set_headers()
-                            self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                            self.wfile.write(json.dumps({"success": True, "reloaded": True}).encode("utf-8"))
                         except Exception as e:
                             self._set_headers(500)
                             self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
