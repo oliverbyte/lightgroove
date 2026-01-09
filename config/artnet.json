@@ -4,7 +4,6 @@
       "id": "node1",
       "name": "Main ArtNet Node",
       "ip": "10.10.10.3",
-      "port": 6454,
       "universes": [
         0,
         1

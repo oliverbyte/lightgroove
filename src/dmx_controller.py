@@ -126,7 +126,6 @@ class DMXController:
             from stupidArtnet import StupidArtnet
 
             ip = node_config.get('ip', '255.255.255.255')
-            port = node_config.get('port', 6454)  # Read port from config (for display only, StupidArtnet uses fixed 6454)
             broadcast = bool(node_config.get('broadcast', False))
             target_ip = '255.255.255.255' if broadcast else ip
             sender = StupidArtnet(target_ip, artnet_universe, packet_size=512, fps=self.fps, broadcast=broadcast)

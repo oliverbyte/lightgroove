@@ -41,7 +41,7 @@ function renderNodes() {
           <div style="font-weight: 600; margin-bottom: 5px;">${node.name}</div>
           <div style="font-size: 12px; color: #9ca3af;">
             <div>ID: ${node.id}</div>
-            <div>IP: ${node.ip}:${node.port}</div>
+            <div>IP: ${node.ip}</div>
             <div>Universes: ${node.universes.join(', ')}</div>
             ${node.description ? `<div style="margin-top: 5px;">${node.description}</div>` : ''}
             <div style="margin-top: 5px;">
@@ -112,7 +112,6 @@ window.editNode = function(nodeId) {
   document.getElementById('node-id').disabled = true;
   document.getElementById('node-name').value = node.name;
   document.getElementById('node-ip').value = node.ip;
-  document.getElementById('node-port').value = node.port;
   document.getElementById('node-universes').value = node.universes.join(', ');
   document.getElementById('node-description').value = node.description || '';
   document.getElementById('node-broadcast').checked = node.broadcast;
@@ -189,7 +188,6 @@ function initConfigEventListeners() {
       document.getElementById('node-id').disabled = false;
       document.getElementById('node-name').value = '';
       document.getElementById('node-ip').value = '';
-      document.getElementById('node-port').value = '6454';
       document.getElementById('node-universes').value = '';
       document.getElementById('node-description').value = '';
       document.getElementById('node-broadcast').checked = false;
@@ -214,7 +212,6 @@ function initConfigEventListeners() {
         id: nodeId,
         name: document.getElementById('node-name').value.trim() || nodeId,
         ip: document.getElementById('node-ip').value.trim(),
-        port: parseInt(document.getElementById('node-port').value) || 6454,
         universes: document.getElementById('node-universes').value.split(',').map(u => parseInt(u.trim())).filter(u => !isNaN(u)),
         broadcast: document.getElementById('node-broadcast').checked,
         enabled: document.getElementById('node-enabled').checked,
