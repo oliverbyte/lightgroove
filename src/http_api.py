@@ -5,6 +5,7 @@ Author: https://github.com/oliverbyte
 from __future__ import annotations
 
 import json
+import os
 import threading
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
@@ -119,8 +120,6 @@ class HttpApiServer:
                     return
 
                 if self.path.startswith("/api/config/artnet"):
-                    import os
-                    import json
                     config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'artnet.json')
                     try:
                         with open(config_path, 'r') as f:
@@ -266,8 +265,6 @@ class HttpApiServer:
                         return
 
                     if path == "/api/config/artnet":
-                        import os
-                        import json
                         config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'artnet.json')
                         try:
                             # Write the entire config
