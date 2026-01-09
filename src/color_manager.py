@@ -143,6 +143,10 @@ class ColorFXEngine:
             self.fx_thread = threading.Thread(target=self._run_random_3_fx, daemon=True)
             self.fx_thread.start()
             print(f"Color FX: Started 'random_3' effect at {self.bpm} BPM")
+        elif fx_name == 'random_4':
+            self.fx_thread = threading.Thread(target=self._run_random_4_fx, daemon=True)
+            self.fx_thread.start()
+            print(f"Color FX: Started 'random_4' effect at {self.bpm} BPM")
         else:
             print(f"Color FX: Unknown effect '{fx_name}'")
             self.running = False
@@ -265,6 +269,45 @@ class ColorFXEngine:
             remaining_time = max(0.0, self.get_interval() - fade_time_used)
             if self.stop_event.wait(remaining_time):
                 break
+    
+    def _run_random_4_fx(self):
+        """Chaser effect - one fixture at a time from left to right with random colors."""
+        # Exclude 'black' from random color selection
+        color_names = [c for c in COLORS.keys() if c != 'black']
+        black_values = COLORS['black']
+        # Map short keys to actual fixture channel names
+        channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
+        
+        while self.running:
+            fixtures = self.fixture_manager.list_fixtures()
+            
+            # Chase through each fixture
+            for active_idx, active_fixture_id in enumerate(fixtures):
+                if not self.running:
+                    break
+                
+                # Pick random color for this fixture
+                color_name = random.choice(color_names)
+                color_values = COLORS[color_name]
+                
+                # Set active fixture to color, all others to black
+                fixture_colors = {}
+                for fixture_id in fixtures:
+                    if fixture_id == active_fixture_id:
+                        fixture_colors[fixture_id] = color_values
+                    else:
+                        fixture_colors[fixture_id] = black_values
+                
+                # Track active color
+                self.current_colors = [color_name]
+                
+                # Apply all fixtures simultaneously with fade
+                fade_time_used = self._apply_colors_with_fade(fixture_colors, channel_map)
+                
+                # Wait for remaining time in beat (beat_interval - fade_time)
+                remaining_time = max(0.0, self.get_interval() - fade_time_used)
+                if self.stop_event.wait(remaining_time):
+                    break
                 
     def is_running(self) -> bool:
         """Check if an effect is currently running."""
