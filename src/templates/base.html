@@ -307,7 +307,7 @@
         
         // Sync FX button highlighting based on server state
         const activeFx = status.running ? status.current_fx : null;
-        document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3').forEach(btn => {
+        document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3, #fx-random-4').forEach(btn => {
           const fxName = btn.id.replace('fx-', '').replace(/-/g, '_');
           btn.classList.toggle('active', fxName === activeFx);
         });

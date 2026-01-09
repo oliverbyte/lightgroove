@@ -277,6 +277,7 @@ class ColorFXEngine:
         black_values = COLORS['black']
         # Map short keys to actual fixture channel names
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
+        fixture_last_colors = {}  # Track last color per fixture to avoid repeating
         
         while self.running:
             fixtures = self.fixture_manager.list_fixtures()
@@ -286,8 +287,13 @@ class ColorFXEngine:
                 if not self.running:
                     break
                 
-                # Pick random color for this fixture
-                color_name = random.choice(color_names)
+                # Pick random color for this fixture (avoid repeating)
+                last_color = fixture_last_colors.get(active_fixture_id)
+                available_colors = [c for c in color_names if c != last_color]
+                if not available_colors:
+                    available_colors = color_names
+                color_name = random.choice(available_colors)
+                fixture_last_colors[active_fixture_id] = color_name
                 color_values = COLORS[color_name]
                 
                 # Set active fixture to color, all others to black
