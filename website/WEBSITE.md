@@ -16,14 +16,40 @@ This directory contains the Jekyll-based website for LightGroove that automatica
 
 To run the website locally:
 
+### Option 1: Using Docker (Recommended)
 ```bash
-# Install dependencies
-bundle install
+# From the project root
+./run_website.sh
+
+# Or manually:
+cd website
+docker run --rm \
+  --volume="$PWD:/srv/jekyll" \
+  --publish 4000:4000 \
+  jekyll/jekyll:4.3 \
+  jekyll serve --watch --force_polling
+```
+
+### Option 2: Using Ruby/Jekyll
+```bash
+cd website
+
+# Install dependencies (first time only)
+bundle install --path vendor/bundle
 
 # Serve the site locally
 bundle exec jekyll serve
 
 # Visit http://localhost:4000/lightgroove
+```
+
+### Option 3: Simple Preview (No Jekyll Processing)
+```bash
+# From the project root
+python3 preview_website.py
+
+# Visit http://localhost:4000/lightgroove/
+# Note: This won't process Markdown or Liquid templates
 ```
 
 ## Deployment
