@@ -201,6 +201,7 @@ class HttpApiServer:
                 self.wfile.write(b"Not found")
 
             def do_POST(self):
+                global fixture_manager
                 path = self.path
                 payload = self._read_json()
 
@@ -309,7 +310,6 @@ class HttpApiServer:
                             
                             # Reload fixture manager to pick up new patch
                             try:
-                                global fixture_manager
                                 from src.fixture_manager import FixtureManager
                                 fixture_manager = FixtureManager(fixture_manager.dmx)
                             except Exception as reload_error:
