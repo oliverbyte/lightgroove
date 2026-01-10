@@ -1,0 +1,65 @@
+title: LightGroove
+description: Modern DMX lighting controller with web-based UI featuring real-time fader control and color effects. Control your lighting setup with ease.
+author: Oliver Baltz
+url: https://oliverbyte.github.io
+baseurl: /lightgroove
+repository: oliverbyte/lightgroove
+
+# SEO
+lang: en
+locale: en_US
+logo: /img/logo.png
+social:
+  name: LightGroove
+  links:
+    - https://github.com/oliverbyte/lightgroove
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
+
+# Collections
+collections:
+  features:
+    output: false
+
+# Exclude from processing
+exclude:
+  - .venv/
+  - __pycache__/
+  - "*.py"
+  - "*.pyc"
+  - requirements.txt
+  - LICENSE
+  - README.md
+  - DEVELOPMENT.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .git/
+  - .gitignore
+  - installer_script.iss
+  - LightGroove.spec
+  - Formula/
+
+# Include
+include:
+  - _pages
+
+# Permalink structure
+permalink: /:title/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
