@@ -2,6 +2,12 @@
 
 DMX lighting controller with web-based UI featuring real-time fader control and color effects. Outputs ArtNet/virtual DMX with per-fixture control based on your patch and fixture definitions.
 
+## Screenshots
+![UI Globals](img/screenshot_globals.png)
+![UI Faders](img/screenshot_faders.png)
+![UI Colors](img/screenshot_colors.png)
+![UI Config](img/screenshot_config.png)
+
 ## Features
 
 ### DMX / ArtNet Output
@@ -37,11 +43,6 @@ DMX lighting controller with web-based UI featuring real-time fader control and 
 - **Colors**: Edit RGBW color definitions (0-1 range) with live preview, add/remove colors
 - **Global Settings**: Configure default output mode and FPS
 - Changes are saved immediately and automatically reload without server restart
-
-![UI Globals](img/screenshot_globals.png)
-![UI Faders](img/screenshot_faders.png)
-![UI Colors](img/screenshot_colors.png)
-![UI Config](img/screenshot_config.png)
 
 ## Installation
 
