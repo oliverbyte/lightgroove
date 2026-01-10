@@ -1,5 +1,12 @@
 <div id="tab-config" class="tab-content">
   <div class="grid">
+    <!-- Patched Fixtures Section -->
+    <div class="card" style="flex: 1; min-width: 400px; min-height: 300px;">
+      <h3>Patched Fixtures</h3>
+      <button id="add-patch-btn" style="margin-bottom: 10px;">+ Add Fixture</button>
+      <div id="patches-list"></div>
+    </div>
+    
     <!-- ArtNet Nodes Section -->
     <div class="card" style="flex: 1; min-width: 400px; min-height: 300px;">
       <h3>ArtNet Nodes</h3>
@@ -40,6 +47,43 @@
       <h3>Colors</h3>
       <button id="add-color-btn" style="margin-bottom: 10px;">+ Add Color</button>
       <div id="colors-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Patch Edit/Create -->
+<div id="patch-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: #1f2937; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%;">
+    <h3 id="patch-modal-title" style="margin-top: 0;">Add Patched Fixture</h3>
+    <input type="hidden" id="patch-modal-original-universe">
+    <input type="hidden" id="patch-modal-original-id">
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">DMX Universe</label>
+        <input type="number" id="patch-universe" min="1" placeholder="e.g., 1" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Fixture ID</label>
+        <input type="text" id="patch-id" placeholder="e.g., par1" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Fixture Type</label>
+        <select id="patch-type" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+          <option value="">Select fixture type...</option>
+        </select>
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Start Address (1-512)</label>
+        <input type="number" id="patch-address" min="1" max="512" placeholder="e.g., 1" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div>
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Description</label>
+        <input type="text" id="patch-description" placeholder="e.g., 1st Generic PAR" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="patch-modal-save">Save</button>
+        <button class="secondary" id="patch-modal-cancel">Cancel</button>
+      </div>
     </div>
   </div>
 </div>

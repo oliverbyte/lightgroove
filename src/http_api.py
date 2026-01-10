@@ -119,6 +119,30 @@ class HttpApiServer:
                     self.wfile.write(json.dumps({"fade_percentage": color_fx.fade_percentage}).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/config/patch"):
+                    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'patch.json')
+                    try:
+                        with open(config_path, 'r') as f:
+                            config = json.load(f)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(config).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/config/fixtures"):
+                    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'fixtures.json')
+                    try:
+                        with open(config_path, 'r') as f:
+                            config = json.load(f)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(config).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
                 if self.path.startswith("/api/config/artnet"):
                     config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'artnet.json')
                     try:
@@ -274,6 +298,28 @@ class HttpApiServer:
                         color_fx.set_fade_percentage(fade_percentage)
                         self._set_headers()
                         self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
+                        return
+
+                    if path == "/api/config/patch":
+                        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'patch.json')
+                        try:
+                            # Write the entire config
+                            with open(config_path, 'w') as f:
+                                json.dump(payload, f, indent=2)
+                            
+                            # Reload fixture manager to pick up new patch
+                            try:
+                                global fixture_manager
+                                from src.fixture_manager import FixtureManager
+                                fixture_manager = FixtureManager(fixture_manager.dmx)
+                            except Exception as reload_error:
+                                print(f"Warning: Failed to reload patch config: {reload_error}")
+                            
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True, "reloaded": True}).encode("utf-8"))
+                        except Exception as e:
+                            self._set_headers(500)
+                            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                         return
 
                     if path == "/api/config/artnet":

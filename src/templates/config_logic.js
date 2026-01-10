@@ -1,6 +1,45 @@
 // Config Tab Logic
 let artnetConfig = null;
 let colorsConfig = null;
+let patchConfig = null;
+let fixtureTypes = null;
+
+async function loadFixtureTypes() {
+  try {
+    const res = await fetch(`${apiBase}/api/config/fixtures`);
+    fixtureTypes = await res.json();
+  } catch (e) {
+    console.error('Failed to load fixture types:', e);
+  }
+}
+
+async function loadPatchConfig() {
+  try {
+    const res = await fetch(`${apiBase}/api/config/patch`);
+    patchConfig = await res.json();
+    renderPatches();
+  } catch (e) {
+    console.error('Failed to load patch config:', e);
+  }
+}
+
+async function savePatchConfig() {
+  try {
+    const response = await post(`${apiBase}/api/config/patch`, patchConfig);
+    if (response && response.reloaded) {
+      showToast('Patch configuration saved and reloaded successfully!', 'success');
+      // Reload faders to reflect changes
+      if (typeof loadFaders === 'function') {
+        await loadFaders();
+      }
+    } else {
+      showToast('Patch configuration saved!', 'success');
+    }
+  } catch (e) {
+    console.error('Failed to save patch config:', e);
+    showToast('Failed to save patch configuration: ' + e.message, 'error');
+  }
+}
 
 async function loadArtNetConfig() {
   try {
@@ -46,6 +85,47 @@ async function saveColorsConfig() {
     console.error('Failed to save colors config:', e);
     showToast('Failed to save colors: ' + e.message, 'error');
   }
+}
+
+function renderPatches() {
+  const patchesList = document.getElementById('patches-list');
+  if (!patchesList || !patchConfig) return;
+  patchesList.innerHTML = '';
+  
+  if (!patchConfig.universes || Object.keys(patchConfig.universes).length === 0) {
+    patchesList.innerHTML = '<div style="color: #9ca3af; padding: 10px;">No fixtures patched yet.</div>';
+    return;
+  }
+  
+  Object.entries(patchConfig.universes).forEach(([universe, universeData]) => {
+    if (!universeData.fixtures || universeData.fixtures.length === 0) return;
+    
+    universeData.fixtures.forEach(fixture => {
+      const patchCard = document.createElement('div');
+      patchCard.style.cssText = 'border: 1px solid #374151; padding: 10px; margin-bottom: 10px; border-radius: 8px; background: #111827;';
+      
+      const fixtureType = fixtureTypes && fixtureTypes[fixture.type] ? fixtureTypes[fixture.type].name : fixture.type;
+      const channelCount = fixtureTypes && fixtureTypes[fixture.type] ? fixtureTypes[fixture.type].channels.length : '?';
+      
+      patchCard.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 5px;">${fixture.id}</div>
+            <div style="font-size: 12px; color: #9ca3af;">
+              <div>Universe: ${universe} | Address: ${fixture.start_address} (${channelCount} ch)</div>
+              <div>Type: ${fixtureType}</div>
+              ${fixture.description ? `<div style="margin-top: 5px;">${fixture.description}</div>` : ''}
+            </div>
+          </div>
+          <div style="display: flex; gap: 5px;">
+            <button class="color-btn secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editPatch('${universe}', '${fixture.id}')">Edit</button>
+            <button class="color-btn secondary" style="padding: 6px 12px; font-size: 12px; background: #7f1d1d; border-color: #991b1b;" onclick="deletePatch('${universe}', '${fixture.id}')">Delete</button>
+          </div>
+        </div>
+      `;
+      patchesList.appendChild(patchCard);
+    });
+  });
 }
 
 function renderNodes() {
@@ -121,6 +201,52 @@ function renderGlobalSettings() {
   if (defaultMode) defaultMode.value = artnetConfig.default_output_mode;
   if (fps) fps.value = artnetConfig.fps;
 }
+
+// Patch CRUD
+window.editPatch = function(universe, fixtureId) {
+  const fixture = patchConfig.universes[universe]?.fixtures.find(f => f.id === fixtureId);
+  if (!fixture) return;
+  
+  document.getElementById('patch-modal-title').textContent = 'Edit Patched Fixture';
+  document.getElementById('patch-modal-original-universe').value = universe;
+  document.getElementById('patch-modal-original-id').value = fixtureId;
+  document.getElementById('patch-universe').value = universe;
+  document.getElementById('patch-id').value = fixture.id;
+  document.getElementById('patch-id').disabled = true;
+  document.getElementById('patch-address').value = fixture.start_address;
+  document.getElementById('patch-description').value = fixture.description || '';
+  
+  // Populate fixture types dropdown
+  const typeSelect = document.getElementById('patch-type');
+  typeSelect.innerHTML = '<option value="">Select fixture type...</option>';
+  if (fixtureTypes) {
+    Object.entries(fixtureTypes).forEach(([typeId, typeData]) => {
+      const option = document.createElement('option');
+      option.value = typeId;
+      option.textContent = typeData.name || typeId;
+      if (typeId === fixture.type) {
+        option.selected = true;
+      }
+      typeSelect.appendChild(option);
+    });
+  }
+  
+  document.getElementById('patch-modal').style.display = 'flex';
+};
+
+window.deletePatch = function(universe, fixtureId) {
+  if (confirm('Delete fixture "' + fixtureId + '" from universe ' + universe + '?')) {
+    if (patchConfig.universes[universe]) {
+      patchConfig.universes[universe].fixtures = patchConfig.universes[universe].fixtures.filter(f => f.id !== fixtureId);
+      // Clean up empty universes
+      if (patchConfig.universes[universe].fixtures.length === 0) {
+        delete patchConfig.universes[universe];
+      }
+    }
+    savePatchConfig();
+    renderPatches();
+  }
+};
 
 // Node CRUD
 window.editNode = function(nodeId) {
@@ -292,6 +418,109 @@ function initConfigEventListeners() {
   // Prevent duplicate event listener bindings
   if (eventListenersInitialized) return;
   eventListenersInitialized = true;
+  
+  // Patch modal handlers
+  const addPatchBtn = document.getElementById('add-patch-btn');
+  if (addPatchBtn) {
+    addPatchBtn.addEventListener('click', () => {
+      document.getElementById('patch-modal-title').textContent = 'Add Patched Fixture';
+      document.getElementById('patch-modal-original-universe').value = '';
+      document.getElementById('patch-modal-original-id').value = '';
+      document.getElementById('patch-universe').value = '1';
+      document.getElementById('patch-id').value = '';
+      document.getElementById('patch-id').disabled = false;
+      document.getElementById('patch-type').value = '';
+      document.getElementById('patch-address').value = '';
+      document.getElementById('patch-description').value = '';
+      
+      // Populate fixture types dropdown
+      const typeSelect = document.getElementById('patch-type');
+      typeSelect.innerHTML = '<option value="">Select fixture type...</option>';
+      if (fixtureTypes) {
+        Object.entries(fixtureTypes).forEach(([typeId, typeData]) => {
+          const option = document.createElement('option');
+          option.value = typeId;
+          option.textContent = typeData.name || typeId;
+          typeSelect.appendChild(option);
+        });
+      }
+      
+      document.getElementById('patch-modal').style.display = 'flex';
+    });
+  }
+
+  const patchSaveBtn = document.getElementById('patch-modal-save');
+  if (patchSaveBtn) {
+    patchSaveBtn.addEventListener('click', () => {
+      const isEdit = document.getElementById('patch-modal-original-id').value !== '';
+      const universe = document.getElementById('patch-universe').value.trim();
+      const fixtureId = document.getElementById('patch-id').value.trim();
+      const fixtureType = document.getElementById('patch-type').value;
+      const address = parseInt(document.getElementById('patch-address').value);
+      const description = document.getElementById('patch-description').value.trim();
+      
+      if (!universe || !fixtureId || !fixtureType || isNaN(address) || address < 1 || address > 512) {
+        showToast('Please fill all required fields with valid values', 'warning');
+        return;
+      }
+      
+      const fixture = {
+        id: fixtureId,
+        type: fixtureType,
+        start_address: address,
+        description: description
+      };
+      
+      // Initialize universe if it doesn't exist
+      if (!patchConfig.universes) {
+        patchConfig.universes = {};
+      }
+      if (!patchConfig.universes[universe]) {
+        patchConfig.universes[universe] = { fixtures: [] };
+      }
+      
+      if (isEdit) {
+        const origUniverse = document.getElementById('patch-modal-original-universe').value;
+        const origId = document.getElementById('patch-modal-original-id').value;
+        
+        // Remove from old universe if universe changed
+        if (origUniverse !== universe && patchConfig.universes[origUniverse]) {
+          patchConfig.universes[origUniverse].fixtures = patchConfig.universes[origUniverse].fixtures.filter(f => f.id !== origId);
+        }
+        
+        // Find and update or add
+        const existingIndex = patchConfig.universes[universe].fixtures.findIndex(f => f.id === origId);
+        if (existingIndex !== -1) {
+          patchConfig.universes[universe].fixtures[existingIndex] = fixture;
+        } else {
+          // Check for duplicate ID in new universe
+          if (patchConfig.universes[universe].fixtures.some(f => f.id === fixtureId)) {
+            showToast('Fixture ID already exists in this universe', 'warning');
+            return;
+          }
+          patchConfig.universes[universe].fixtures.push(fixture);
+        }
+      } else {
+        // Check for duplicate ID
+        if (patchConfig.universes[universe].fixtures.some(f => f.id === fixtureId)) {
+          showToast('Fixture ID already exists in this universe', 'warning');
+          return;
+        }
+        patchConfig.universes[universe].fixtures.push(fixture);
+      }
+      
+      document.getElementById('patch-modal').style.display = 'none';
+      savePatchConfig();
+      renderPatches();
+    });
+  }
+
+  const patchCancelBtn = document.getElementById('patch-modal-cancel');
+  if (patchCancelBtn) {
+    patchCancelBtn.addEventListener('click', () => {
+      document.getElementById('patch-modal').style.display = 'none';
+    });
+  }
   
   const addNodeBtn = document.getElementById('add-node-btn');
   if (addNodeBtn) {
@@ -497,6 +726,12 @@ function initConfigEventListeners() {
         if (!artnetConfig) {
           loadArtNetConfig();
           initConfigEventListeners();
+        }
+        if (!fixtureTypes) {
+          loadFixtureTypes();
+        }
+        if (!patchConfig) {
+          loadPatchConfig();
         }
         // Always reload colors to pick up manual changes
         loadColorsConfig();
