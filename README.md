@@ -2,6 +2,8 @@
 
 DMX lighting controller with web-based UI featuring real-time fader control and color effects. Outputs ArtNet/virtual DMX with per-fixture control based on your patch and fixture definitions.
 
+🌐 **[Visit Website](https://oliverbyte.github.io/lightgroove/)** | 📖 **[Documentation](https://oliverbyte.github.io/lightgroove/docs)** | ❓ **[FAQ](https://oliverbyte.github.io/lightgroove/faq)** | 📘 **[Glossary](https://oliverbyte.github.io/lightgroove/glossary)**
+
 ## Features
 
 ### DMX / ArtNet Output

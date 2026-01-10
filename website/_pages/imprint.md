@@ -1,42 +1,42 @@
 ---
 layout: default
-title: Impressum
+title: Legal Notice
 permalink: /imprint/
 ---
 
-# Impressum
+# Legal Notice (Impressum)
 
-## Angaben gemäß § 5 TMG
+## Information pursuant to § 5 TMG (German Telemedia Act)
 
 **Name:**  
-[Ihr vollständiger Name]
+O. Baltz
 
-**Anschrift:**  
-[Straße und Hausnummer]  
-[PLZ und Ort]  
-Deutschland
+**Address:**  
+Sophie-Scholl-Str. 51  
+45721 Haltern am See  
+Germany
 
-**Kontakt:**  
-E-Mail: [ihre.email@example.com]
+**Contact:**  
+Email: info@OliverByte.de (No support!)
 
 ---
 
-## Haftungsausschluss
+## Disclaimer
 
-### Haftung für Inhalte
+### Liability for Content
 
-Die Inhalte dieser Website wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen. Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.
+The contents of this website have been created with the greatest care. However, we cannot guarantee the accuracy, completeness, or timeliness of the content. As a service provider, we are responsible for our own content on these pages according to general laws pursuant to § 7 Para. 1 TMG.
 
-### Haftung für Links
+### Liability for Links
 
-Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
+Our website contains links to external third-party websites over whose content we have no influence. Therefore, we cannot assume any liability for this external content. The respective provider or operator of the linked pages is always responsible for the content of the linked pages.
 
-### Urheberrecht
+### Copyright
 
-Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+The content and works created by the site operators on these pages are subject to German copyright law. The reproduction, editing, distribution, and any kind of use outside the limits of copyright law require the written consent of the respective author or creator.
 
 ---
 
 ## Open Source
 
-Dieses Projekt ist Open Source und unter der AGPL-3.0 Lizenz veröffentlicht. Der Quellcode ist auf [GitHub](https://github.com/{{ site.repository }}) verfügbar.
+This project is open source and released under the AGPL-3.0 License. The source code is available on [GitHub](https://github.com/{{ site.repository }}).

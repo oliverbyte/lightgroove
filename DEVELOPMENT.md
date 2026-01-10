@@ -1,5 +1,9 @@
 # LightGroove Development Guide
 
+This guide covers the development setup, architecture, and contribution guidelines for LightGroove.
+
+🌐 **[Website](https://oliverbyte.github.io/lightgroove/)** | 📖 **[Documentation](https://oliverbyte.github.io/lightgroove/docs)** | ❓ **[FAQ](https://oliverbyte.github.io/lightgroove/faq)**
+
 ## Architecture
 
 ### Project Structure
@@ -41,51 +45,60 @@ Then open http://localhost:5555 in your browser.
 
 ## Automated Screenshot Updates
 
-This project includes a Git pre-push hook that automatically updates UI screenshots before pushing to remote.
+This project includes a Git pre-push hook that automatically updates UI screenshots before pushing to the main branch. Screenshots are only updated when pushing to `main`, not to other branches.
 
 ### Setup
 
-The hook is already installed at `.git/hooks/pre-push` (not tracked in git).
+The hook is installed at `.git/hooks/pre-push`.
 
 To set up on a new clone:
 
 ```bash
-# Copy the pre-push hook
-cat > .git/hooks/pre-push << 'EOF'
-#!/bin/bash
-# Pre-push hook to automatically update screenshots before pushing
-
-echo "🔍 Checking for UI changes..."
-
-# Run screenshot script
-python3.9 take_screenshots.py
-
-# Check if screenshots changed
-if git diff --quiet img/screenshot_faders.png img/screenshot_colors.png; then
-    echo "✓ Screenshots are up to date"
-else
-    echo "📸 Screenshots updated, adding to commit..."
-    git add img/screenshot_faders.png img/screenshot_colors.png
-    git commit --amend --no-edit
-    echo "✓ Screenshots committed"
-fi
-
-exit 0
-EOF
+# Copy the pre-push hook from the repository
+cp .github/hooks/pre-push .git/hooks/pre-push
 
 # Make it executable
 chmod +x .git/hooks/pre-push
 ```
+
+The hook will automatically run screenshots only when pushing to the main branch.
 
 ### Manual Screenshot Update
 
 To manually update screenshots:
 
 ```bash
-python3.9 take_screenshots.py
+python take_screenshots.py
 ```
 
 Requires: `pip install playwright && playwright install chromium`
+
+## Website Development
+
+The project website is built with Jekyll and hosted on GitHub Pages. All website files are in the `website/` directory.
+
+### Local Preview
+
+To preview the website locally:
+
+```bash
+./run_website.sh
+```
+
+This uses Docker to run Jekyll and serves the site at http://localhost:4000/lightgroove/
+
+For more preview options, see [PREVIEW.md](PREVIEW.md).
+
+### Website Structure
+
+- `website/_pages/`: Content pages (features, installation, docs, glossary, FAQ, imprint)
+- `website/_layouts/`: Page templates
+- `website/assets/`: CSS and JavaScript
+- `website/img/`: Screenshot images
+
+### Deployment
+
+The website automatically deploys to GitHub Pages when changes are pushed to the `main` branch. The GitHub Actions workflow is defined in `.github/workflows/pages.yml`.
 
 ## Windows Installer
 
