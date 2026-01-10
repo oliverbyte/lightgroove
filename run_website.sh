@@ -15,8 +15,8 @@ if command -v docker &> /dev/null; then
     docker run --rm \
         --volume="$PWD:/srv/jekyll" \
         --publish 4000:4000 \
-        jekyll/jekyll:4.3 \
-        jekyll serve --watch --force_polling --verbose
+        jekyll/jekyll:latest \
+        jekyll serve --host 0.0.0.0 --watch --force_polling
 else
     echo "Docker not found. Attempting to use local Jekyll..."
     echo ""
