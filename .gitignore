@@ -3,3 +3,7 @@ ui_dist
 __pycache__/
 *.pyc
 src/__pycache__/
+website/vendor/
+website/_site/
+website/Gemfile.lock
+.DS_Store

@@ -1,0 +1,210 @@
+---
+layout: default
+title: Glossary - LightGroove
+description: Comprehensive glossary of DMX lighting, ArtNet, and lighting control terminology
+permalink: /glossary/
+---
+
+<div class="docs-content">
+  <h1>Glossary</h1>
+  
+  <p>A comprehensive guide to lighting control terminology used in LightGroove and the entertainment lighting industry.</p>
+
+  <h2>A</h2>
+  
+  <h3>Address (DMX Address)</h3>
+  <p>A unique number (1-512) assigned to each fixture or channel in a DMX universe that determines which control data it receives. The starting address determines where a fixture begins listening on the DMX line.</p>
+
+  <h3>ArtNet</h3>
+  <p>A network protocol that allows DMX512 data to be transmitted over Ethernet networks. It enables lighting control over standard network infrastructure instead of traditional DMX cables. Developed by Artistic Licence.</p>
+
+  <h3>ArtNet Node</h3>
+  <p>A hardware device that converts ArtNet network data into DMX512 signals that lighting fixtures can understand. Examples include Enttec ODE, DMXking eDMX1.</p>
+
+  <h3>ArtNet Universe</h3>
+  <p>A virtual DMX universe transmitted over a network using the ArtNet protocol. ArtNet supports up to 32,768 universes on a single network.</p>
+
+  <h2>B</h2>
+
+  <h3>BPM (Beats Per Minute)</h3>
+  <p>A tempo measurement used to sync lighting effects to music or set a consistent timing for color changes and chases. In LightGroove, controls the speed of color FX from 1-480 BPM.</p>
+
+  <h2>C</h2>
+
+  <h3>Channel</h3>
+  <p>A single control parameter in a lighting fixture, such as dimmer, red, green, blue, white, pan, tilt, etc. Each channel occupies one DMX address and has a value range of 0-255.</p>
+
+  <h3>Chaser</h3>
+  <p>A lighting effect where fixtures light up in sequence, creating a "chase" pattern. In LightGroove, Random 4 FX is a chaser effect.</p>
+
+  <h3>Color Mixing</h3>
+  <p>The process of combining different color channels (red, green, blue, white, amber, etc.) to create a desired color output. Can be additive (RGB) or subtractive.</p>
+
+  <h3>Color Temperature</h3>
+  <p>The warmth or coolness of white light, measured in Kelvin (K). Lower values (2700K-3200K) are warm/yellow, higher values (5000K-6500K) are cool/blue.</p>
+
+  <h3>CTO (Color Temperature Orange)</h3>
+  <p>A filter or LED channel used to warm up white light, making it appear more orange/amber. Often used to lower color temperature.</p>
+
+  <h2>D</h2>
+
+  <h3>Daisy Chain</h3>
+  <p>A wiring method where DMX fixtures are connected in series, with the output of one fixture connecting to the input of the next. The last fixture in the chain should have a terminator.</p>
+
+  <h3>Dimmer</h3>
+  <p>A channel that controls the overall intensity or brightness of a fixture, typically from 0% (off) to 100% (full brightness). DMX value range: 0-255.</p>
+
+  <h3>DMX512 (Digital Multiplex)</h3>
+  <p>The industry-standard protocol for controlling lighting equipment. Transmits up to 512 channels of data in a single universe at 44 times per second over a serial connection.</p>
+
+  <h3>DMX Cable</h3>
+  <p>Specialized shielded cable used to transmit DMX signals, typically using 5-pin XLR connectors (though 3-pin XLR is also common). Should be rated for DMX/data, not audio cables.</p>
+
+  <h3>DMX Terminator</h3>
+  <p>A 120-ohm resistor placed at the end of a DMX line to prevent signal reflections and ensure reliable communication. Recommended for long cable runs or many fixtures.</p>
+
+  <h2>E</h2>
+
+  <h3>Effect (FX)</h3>
+  <p>An automated lighting pattern or sequence that changes over time, such as color cycling, strobing, or chasing. In LightGroove, includes Random 1-4 color effects.</p>
+
+  <h3>Ethernet</h3>
+  <p>Standard computer networking technology used to transmit ArtNet and other lighting control protocols. Uses CAT5e or CAT6 cables with RJ45 connectors.</p>
+
+  <h2>F</h2>
+
+  <h3>Fade</h3>
+  <p>A smooth transition between two states (colors, intensities, positions) over a period of time. In LightGroove, FX Fade controls the smoothness of color transitions.</p>
+
+  <h3>Fader</h3>
+  <p>A control slider used to adjust the value of a channel or parameter, typically displayed vertically or horizontally. Can control dimmer, color channels, or other attributes.</p>
+
+  <h3>Fixture</h3>
+  <p>A lighting device or instrument that receives DMX control signals. Examples include LED PAR cans, moving heads, wash lights, and effect lights.</p>
+
+  <h3>Fixture Profile</h3>
+  <p>A definition of a fixture's channel layout and capabilities, specifying which channels control which parameters. In LightGroove, defined in <code>fixtures.json</code>.</p>
+
+  <h3>FPS (Frames Per Second)</h3>
+  <p>The rate at which DMX data is transmitted, typically 44 FPS for standard DMX512. Higher rates provide smoother transitions but increase network traffic.</p>
+
+  <h2>G</h2>
+
+  <h3>Gobo</h3>
+  <p>A template placed in front of a light source to create patterns, shapes, or textures. Can be static or rotating, controlled via DMX channels in intelligent fixtures.</p>
+
+  <h2>H</h2>
+
+  <h3>HTP (Highest Takes Precedence)</h3>
+  <p>A merge rule where the highest value from multiple sources controls a channel. Typically used for dimmer/intensity channels.</p>
+
+  <h2>I</h2>
+
+  <h3>Intensity</h3>
+  <p>The brightness level of a light, typically controlled by the dimmer channel. Can be scaled globally using a master fader.</p>
+
+  <h3>IP Address</h3>
+  <p>A unique network address assigned to devices on an Ethernet network. ArtNet nodes require IP addresses for communication with control software.</p>
+
+  <h2>L</h2>
+
+  <h3>LED (Light Emitting Diode)</h3>
+  <p>Semiconductor light source used in modern lighting fixtures. LEDs are energy-efficient, long-lasting, and available in various colors (RGB, RGBW, RGBA, etc.).</p>
+
+  <h3>LTP (Latest Takes Precedence)</h3>
+  <p>A merge rule where the most recent change controls a channel. Typically used for color and position channels.</p>
+
+  <h2>M</h2>
+
+  <h3>Master Fader</h3>
+  <p>A global control that scales all intensity output proportionally. In LightGroove, the Master control (0-100%) affects all fixtures without changing individual fader positions.</p>
+
+  <h3>Moving Head</h3>
+  <p>An intelligent lighting fixture with motorized pan and tilt capabilities, allowing it to move and point in different directions via DMX control.</p>
+
+  <h2>N</h2>
+
+  <h3>Node (Network Node)</h3>
+  <p>See ArtNet Node. A device that interfaces between network protocols (ArtNet, sACN) and physical DMX outputs.</p>
+
+  <h2>P</h2>
+
+  <h3>Pan</h3>
+  <p>Horizontal rotation of a moving light fixture, typically controlled by 8-bit or 16-bit DMX channels for coarse and fine control.</p>
+
+  <h3>PAR (Parabolic Aluminized Reflector)</h3>
+  <p>A common type of lighting fixture with a parabolic reflector. LED PAR cans are popular for color mixing and wash lighting.</p>
+
+  <h3>Patch</h3>
+  <p>The assignment of fixtures to specific DMX addresses and universes. In LightGroove, configured in <code>patch.json</code>.</p>
+
+  <h2>R</h2>
+
+  <h3>RGB (Red, Green, Blue)</h3>
+  <p>A color mixing system using three primary colors of light. By varying the intensity of each color (0-255), millions of colors can be created through additive mixing.</p>
+
+  <h3>RGBA (Red, Green, Blue, Amber)</h3>
+  <p>An extended color mixing system that adds amber to RGB for warmer color tones and improved color rendering.</p>
+
+  <h3>RGBW (Red, Green, Blue, White)</h3>
+  <p>A color mixing system that adds a white LED channel to RGB, allowing for purer white light and pastel colors. Common in modern LED fixtures.</p>
+
+  <h2>S</h2>
+
+  <h3>sACN (Streaming ACN)</h3>
+  <p>Also known as E1.31, a protocol for transmitting DMX512 data over Ethernet networks. An alternative to ArtNet with similar functionality.</p>
+
+  <h3>Scene</h3>
+  <p>A saved lighting state or look that can be recalled instantly. Contains all channel values for all fixtures at a specific moment.</p>
+
+  <h3>Static Color</h3>
+  <p>A fixed color setting that doesn't change over time. In LightGroove, the Colors tab provides 10 preset static colors.</p>
+
+  <h3>Strobe</h3>
+  <p>A rapid on/off flashing effect. Can be achieved through fast intensity changes or dedicated strobe channels in fixtures.</p>
+
+  <h3>Subnet</h3>
+  <p>In ArtNet, a grouping mechanism for organizing universes. ArtNet addresses consist of Net, Subnet, and Universe values.</p>
+
+  <h2>T</h2>
+
+  <h3>Tilt</h3>
+  <p>Vertical rotation of a moving light fixture, typically controlled by 8-bit or 16-bit DMX channels for coarse and fine control.</p>
+
+  <h2>U</h2>
+
+  <h3>UDP (User Datagram Protocol)</h3>
+  <p>A network protocol used by ArtNet and sACN to transmit lighting data over Ethernet. Uses port 6454 for ArtNet.</p>
+
+  <h3>Universe</h3>
+  <p>A collection of 512 DMX channels. Multiple universes can be used to control large lighting setups. Each universe is typically transmitted separately via physical DMX or network protocols.</p>
+
+  <h3>Universe Mapping</h3>
+  <p>The configuration that links logical DMX universes to physical ArtNet nodes and universe numbers. Configured in LightGroove's Config tab.</p>
+
+  <h2>V</h2>
+
+  <h3>Virtual DMX</h3>
+  <p>DMX data generated by software without physical DMX output hardware. Often used for visualization or transmitted via network protocols like ArtNet.</p>
+
+  <h2>W</h2>
+
+  <h3>Wash Light</h3>
+  <p>A fixture designed to provide broad, even illumination over a wide area. Often used for stage lighting and color washing.</p>
+
+  <h3>White Balance</h3>
+  <p>The process of adjusting color channels to achieve accurate white light output from RGB or RGBW fixtures.</p>
+
+  <h2>X</h2>
+
+  <h3>XLR</h3>
+  <p>A type of electrical connector commonly used for DMX cables. DMX typically uses 5-pin XLR (though 3-pin is also common in some applications).</p>
+
+  <h2>Related Resources</h2>
+  <ul>
+    <li><a href="{{ '/docs' | relative_url }}">LightGroove Documentation</a></li>
+    <li><a href="{{ '/faq' | relative_url }}">Frequently Asked Questions</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/DMX512" target="_blank" rel="noopener">DMX512 on Wikipedia</a></li>
+    <li><a href="https://art-net.org.uk/" target="_blank" rel="noopener">Art-Net Official Site</a></li>
+  </ul>
+</div>
