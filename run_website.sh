@@ -13,10 +13,11 @@ cd website
 if command -v docker &> /dev/null; then
     echo "Using Docker to run Jekyll..."
     docker run --rm \
-        --volume="$PWD:/srv/jekyll" \
+        --volume="$PWD:/usr/src/app" \
+        --workdir=/usr/src/app \
         --publish 4000:4000 \
-        jekyll/jekyll:latest \
-        jekyll serve --host 0.0.0.0 --watch --force_polling
+        ruby:3.2-alpine \
+        sh -c "apk add --no-cache build-base && bundle install && bundle exec jekyll serve --host 0.0.0.0"
 else
     echo "Docker not found. Attempting to use local Jekyll..."
     echo ""
