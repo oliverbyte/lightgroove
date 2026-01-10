@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'website/**'
+      - '.github/workflows/jekyll-gh-pages.yml'
+      - '*.md'
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
