@@ -22,24 +22,26 @@ keywords: free dmx controller, open source lighting software, dmx software for d
   </div>
 </section>
 
-<section class="personas-section">
+<section class="features-section">
   <div class="container">
     <h2 class="section-title">Built For You</h2>
-    <div class="persona-grid">
-      <div class="persona-card">
-        <span class="persona-icon">🎧</span>
+    <p class="section-subtitle">Whether you're a mobile DJ, running a small venue, or a tech enthusiast - LightGroove fits your needs</p>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🎧</span>
         <h3>Mobile DJs</h3>
         <p>Lightweight, portable lighting control that runs on any laptop or tablet. Set up your light show in minutes and control it from your device's web browser. No expensive hardware required.</p>
       </div>
       
-      <div class="persona-card">
-        <span class="persona-icon">🏠</span>
+      <div class="feature-card">
+        <span class="feature-icon">🏠</span>
         <h3>Small Venues</h3>
         <p>Professional-grade lighting control without the professional price tag. Perfect for bars, clubs, community theaters, and event spaces. Free means you can invest in better lights instead of software licenses.</p>
       </div>
       
-      <div class="persona-card">
-        <span class="persona-icon">🔧</span>
+      <div class="feature-card">
+        <span class="feature-icon">🔧</span>
         <h3>Technology Enthusiasts</h3>
         <p>Open source architecture you can customize and extend. Full access to the codebase means you can add features, create integrations, and learn how modern lighting control works. Join our community!</p>
       </div>
@@ -47,42 +49,44 @@ keywords: free dmx controller, open source lighting software, dmx software for d
   </div>
 </section>
 
-<section class="usps-section">
+<section class="features-section">
   <div class="container">
     <h2 class="section-title">Why Choose LightGroove?</h2>
-    <div class="usps-grid">
-      <div class="usp-item">
-        <span class="usp-icon">💰</span>
+    <p class="section-subtitle">Professional lighting control that's free, open source, and built by the community</p>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon">💰</span>
         <h3>Completely Free</h3>
         <p>No licensing fees, no subscriptions, no hidden costs. Download and use forever at zero cost.</p>
       </div>
       
-      <div class="usp-item">
-        <span class="usp-icon">📖</span>
+      <div class="feature-card">
+        <span class="feature-icon">📖</span>
         <h3>Open Source</h3>
         <p>MIT licensed with full source code access. Modify, extend, and learn from the codebase. True transparency.</p>
       </div>
       
-      <div class="usp-item">
-        <span class="usp-icon">🤝</span>
+      <div class="feature-card">
+        <span class="feature-icon">🤝</span>
         <h3>Community Driven</h3>
         <p>Development and support powered by the lighting community. Your feedback shapes the future of the software.</p>
       </div>
       
-      <div class="usp-item">
-        <span class="usp-icon">🌐</span>
+      <div class="feature-card">
+        <span class="feature-icon">🌐</span>
         <h3>Cross-Platform</h3>
         <p>Runs on Windows, macOS, and Linux. Access the web UI from any device on your network.</p>
       </div>
       
-      <div class="usp-item">
-        <span class="usp-icon">🚀</span>
+      <div class="feature-card">
+        <span class="feature-icon">🚀</span>
         <h3>Easy Setup</h3>
         <p>Up and running in minutes. Simple installers for Windows and macOS. No complex configuration required.</p>
       </div>
       
-      <div class="usp-item">
-        <span class="usp-icon">⚡</span>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
         <h3>No Compromise</h3>
         <p>Professional features including ArtNet output, real-time control, and dynamic effects. Free doesn't mean limited.</p>
       </div>
