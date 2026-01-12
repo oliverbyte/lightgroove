@@ -6,7 +6,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
 
 ✨ **100% Free & Open Source** | 🤝 **Community Powered Development** | 💪 **Built by Lighting Enthusiasts**
 
-🌐 **[Visit Website](https://oliverbyte.github.io/lightgroove/)** | 📖 **[Documentation](https://oliverbyte.github.io/lightgroove/docs)** | ❓ **[FAQ](https://oliverbyte.github.io/lightgroove/faq)** | 📘 **[Glossary](https://oliverbyte.github.io/lightgroove/glossary)**
+🌐 **[Visit Website](https://oliverbyte.github.io/lightgroove/)** | 📖 **[Documentation](https://oliverbyte.github.io/lightgroove/docs)**
 
 ## Perfect For
 
