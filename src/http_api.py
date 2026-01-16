@@ -333,9 +333,13 @@ class HttpApiServer:
                         # Resume FX engine
                         if color_fx:
                             color_fx.flash_active = False
-                        # Restore saved states
-                        if self.server._flash_saved_states:
+                        # Restore saved states or blackout if no states were saved
+                        if self.server._flash_saved_states and any(self.server._flash_saved_states.values()):
                             fixture_manager.restore_states(self.server._flash_saved_states)
+                            self.server._flash_saved_states = None
+                        else:
+                            # No saved states (fixtures not configured or no previous state) - blackout
+                            fixture_manager.blackout_all()
                             self.server._flash_saved_states = None
                         self._set_headers()
                         self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
