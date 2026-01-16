@@ -1,14 +1,14 @@
 ---
 layout: default
 title: LightGroove - Free Open Source DMX Lighting Controller
-description: Free, open source DMX lighting controller for mobile DJs, small venues, and technology enthusiasts. Community-powered development with professional features. Web-based interface, ArtNet output, real-time control.
-keywords: free dmx controller, open source lighting software, dmx software for djs, small venue lighting control, artnet controller free, community lighting software, mobile dj lighting, free lighting control software
+description: Free, open source DMX lighting controller for mobile DJs, small venues, and technology enthusiasts. Community-powered development with professional features. Web-based interface, ArtNet output, real-time control. Built with Python and Flask.
+keywords: free dmx controller, open source lighting software, dmx software for djs, small venue lighting control, artnet controller free, community lighting software, mobile dj lighting, free lighting control software, python dmx controller
 ---
 
 <section class="hero">
   <div class="container">
     <h1>Professional Lighting Control, Completely Free</h1>
-    <p class="subtitle">Open source DMX controller with web-based UI - Community powered development and support</p>
+    <p class="subtitle">Modern web-based DMX controller with ArtNet output - Community powered development and support</p>
     <div class="hero-badges">
       <span class="badge">✨ 100% Free</span>
       <span class="badge">📖 Open Source</span>
@@ -18,6 +18,7 @@ keywords: free dmx controller, open source lighting software, dmx software for d
     <div class="cta-buttons">
       <a href="https://github.com/{{ site.repository }}/releases" class="btn btn-primary">Download Free</a>
       <a href="{{ '/installation' | relative_url }}" class="btn btn-secondary">Get Started</a>
+      <a href="https://github.com/{{ site.repository }}/discussions" class="btn btn-tertiary">Join Community</a>
     </div>
   </div>
 </section>
@@ -25,25 +26,25 @@ keywords: free dmx controller, open source lighting software, dmx software for d
 <section class="features-section">
   <div class="container">
     <h2 class="section-title">Built For You</h2>
-    <p class="section-subtitle">Whether you're a mobile DJ, running a small venue, or a tech enthusiast - LightGroove fits your needs</p>
+    <p class="section-subtitle">Whether you're a mobile DJ, running a small venue, or a tech enthusiast - LightGroove has you covered</p>
     
     <div class="feature-grid">
       <div class="feature-card">
         <span class="feature-icon">🎧</span>
         <h3>Mobile DJs</h3>
-        <p>Lightweight, portable lighting control that runs on any laptop or tablet. Set up your light show in minutes and control it from your device's web browser. No expensive hardware required.</p>
+        <p>Lightweight, portable lighting control that runs on any laptop or tablet. Set up your light show in minutes and control it from your device's web browser. Control from any device on your network - phone, tablet, or laptop. No expensive dedicated hardware required, just your existing equipment and an ArtNet interface.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🏠</span>
         <h3>Small Venues</h3>
-        <p>Professional-grade lighting control without the professional price tag. Perfect for bars, clubs, community theaters, and event spaces. Free means you can invest in better lights instead of software licenses.</p>
+        <p>Professional-grade lighting control without the professional price tag. Perfect for bars, clubs, community theaters, and event spaces. Free software means you can invest in better lights instead of expensive licenses. Support for multiple universes and unlimited fixtures gives you room to grow.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🔧</span>
         <h3>Technology Enthusiasts</h3>
-        <p>Open source architecture you can customize and extend. Full access to the codebase means you can add features, create integrations, and learn how modern lighting control works. Join our community!</p>
+        <p>Open source architecture you can customize and extend. Full access to the Python codebase means you can add features, create integrations, and learn how modern lighting control works. Built with Flask and modern web technologies. Contribute to the project and help shape its future!</p>
       </div>
     </div>
   </div>
@@ -58,37 +59,37 @@ keywords: free dmx controller, open source lighting software, dmx software for d
       <div class="feature-card">
         <span class="feature-icon">💰</span>
         <h3>Completely Free</h3>
-        <p>No licensing fees, no subscriptions, no hidden costs. Download and use forever at zero cost.</p>
+        <p>No licensing fees, no subscriptions, no hidden costs. Download and use forever at zero cost. No feature limitations or time restrictions.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">📖</span>
         <h3>Open Source</h3>
-        <p>MIT licensed with full source code access. Modify, extend, and learn from the codebase. True transparency.</p>
+        <p>MIT licensed with full source code access. Modify, extend, and learn from the Python codebase. True transparency and community ownership.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🤝</span>
         <h3>Community Driven</h3>
-        <p>Development and support powered by the lighting community. Your feedback shapes the future of the software.</p>
+        <p>Development and support powered by the lighting community. Your feedback directly shapes new features. Active development with regular updates.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🌐</span>
         <h3>Cross-Platform</h3>
-        <p>Runs on Windows, macOS, and Linux. Access the web UI from any device on your network.</p>
+        <p>Runs on Windows, macOS, and Linux. Access the web UI from any device on your network - desktop, tablet, or smartphone. One server, unlimited clients.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🚀</span>
         <h3>Easy Setup</h3>
-        <p>Up and running in minutes. Simple installers for Windows and macOS. No complex configuration required.</p>
+        <p>Up and running in minutes with simple installers for Windows and macOS. Brew installation on macOS or source installation on any platform. No complex configuration required to get started.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">⚡</span>
         <h3>No Compromise</h3>
-        <p>Professional features including ArtNet output, real-time control, and dynamic effects. Free doesn't mean limited.</p>
+        <p>Professional features including ArtNet output, real-time fader control, dynamic color effects, and web-based configuration. Free doesn't mean limited - get everything you need.</p>
       </div>
     </div>
   </div>
@@ -103,37 +104,49 @@ keywords: free dmx controller, open source lighting software, dmx software for d
       <div class="feature-card">
         <span class="feature-icon">🎛️</span>
         <h3>Real-Time Control</h3>
-        <p>Control every fixture with precision using intuitive web-based faders. See DMX values update in real-time as you adjust.</p>
+        <p>Control every fixture with precision using intuitive web-based faders. See DMX values update in real-time (0-255) as you adjust. Responsive layout works on any screen size.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🎨</span>
         <h3>Color Effects</h3>
-        <p>Built-in color effects including static colors and dynamic FX modes. Create stunning light shows with chase effects and smooth transitions.</p>
+        <p>Built-in static colors and 4 dynamic effect modes. Random chase effects, synchronized color changes, and alternating strobe patterns. Smooth fade transitions for professional looks.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🌐</span>
         <h3>ArtNet Output</h3>
-        <p>Send DMX via ArtNet to any compatible interface. Works seamlessly with professional lighting equipment and nodes.</p>
+        <p>Send DMX via ArtNet to any compatible interface. Works with professional lighting equipment like Enttec ODE, DMXking, and other ArtNet nodes. Multiple universe support with flexible mapping.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">⚡</span>
         <h3>Master Control</h3>
-        <p>Global intensity scaling for all fixtures. Perfect for quick brightness adjustments without changing individual fader positions.</p>
+        <p>Global intensity scaling for all fixtures. Perfect for quick brightness adjustments during shows without changing individual fader positions. Real-time response.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">🎵</span>
         <h3>BPM Sync</h3>
-        <p>Sync color effects to your desired tempo from 1-480 BPM. Adjustable fade time for smooth color transitions.</p>
+        <p>Sync color effects to your desired tempo from 1-480 BPM. Adjustable fade time (0-100%) for smooth color transitions. Perfect timing for music-synchronized lighting.</p>
       </div>
       
       <div class="feature-card">
         <span class="feature-icon">⚙️</span>
         <h3>Web Config</h3>
-        <p>Configure everything through the web interface. Edit ArtNet nodes, colors, universe mapping, and more without touching config files.</p>
+        <p>Configure everything through the web interface. Add ArtNet nodes, edit colors with live preview, map universes, and adjust global settings. Changes apply immediately with automatic reload - no manual restart needed.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">💥</span>
+        <h3>Flash Button</h3>
+        <p>Press and hold for instant full white override. Automatically pauses running effects. Perfect for attention-grabbing moments or emergency lighting. Touch-friendly for mobile control.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🔄</span>
+        <h3>Connection Recovery</h3>
+        <p>Real-time connection status monitoring. Automatic UI recovery when server reconnects. Seamless continuation of operations - no manual intervention required.</p>
       </div>
     </div>
     
@@ -146,27 +159,27 @@ keywords: free dmx controller, open source lighting software, dmx software for d
 <section class="screenshots-section">
   <div class="container">
     <h2 class="section-title">Beautiful Interface</h2>
-    <p class="section-subtitle">Clean, modern design that makes lighting control a pleasure</p>
+    <p class="section-subtitle">Clean, modern design that makes lighting control intuitive and enjoyable</p>
     
     <div class="screenshot-grid">
       <div class="screenshot-item">
-        <img src="{{ '/img/screenshot_globals.png' | relative_url }}" alt="Global Controls Interface">
-        <div class="screenshot-caption">Global Controls - Master intensity, BPM, and fade settings</div>
+        <img src="{{ '/img/screenshot_globals.png' | relative_url }}" alt="Global Controls Interface - Master intensity, BPM, fade settings, and flash button">
+        <div class="screenshot-caption">Global Controls - Master intensity, BPM, and fade settings with instant flash button</div>
       </div>
       
       <div class="screenshot-item">
-        <img src="{{ '/img/screenshot_faders.png' | relative_url }}" alt="Faders Interface">
-        <div class="screenshot-caption">Faders - Real-time fixture control with live DMX values</div>
+        <img src="{{ '/img/screenshot_faders.png' | relative_url }}" alt="Faders Interface - Real-time fixture control per channel">
+        <div class="screenshot-caption">Faders - Precision control for each fixture channel with live DMX values (0-255)</div>
       </div>
       
       <div class="screenshot-item">
-        <img src="{{ '/img/screenshot_colors.png' | relative_url }}" alt="Colors Interface">
-        <div class="screenshot-caption">Colors - Static colors and dynamic effects</div>
+        <img src="{{ '/img/screenshot_colors.png' | relative_url }}" alt="Colors Interface - Static colors and dynamic effects">
+        <div class="screenshot-caption">Colors - 10 static color presets plus 4 dynamic effect modes with active indicators</div>
       </div>
       
       <div class="screenshot-item">
-        <img src="{{ '/img/screenshot_config.png' | relative_url }}" alt="Configuration Interface">
-        <div class="screenshot-caption">Config - Web-based configuration editor</div>
+        <img src="{{ '/img/screenshot_config.png' | relative_url }}" alt="Configuration Interface - Web-based settings editor">
+        <div class="screenshot-caption">Config - Complete web-based configuration for ArtNet, colors, and system settings</div>
       </div>
     </div>
   </div>
