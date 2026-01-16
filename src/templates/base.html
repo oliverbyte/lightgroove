@@ -135,9 +135,14 @@
         clearTimeout(timeoutId);
         
         if (response.ok && !isConnected) {
-          // Connection restored
+          // Connection restored - reload UI data
           isConnected = true;
           updateConnectionStatus();
+          // Reload all data to refresh UI
+          loadGrandmaster();
+          loadBPM();
+          loadFixtures();
+          loadStaticColors();
         } else if (!response.ok && isConnected) {
           // Connection lost
           isConnected = false;
