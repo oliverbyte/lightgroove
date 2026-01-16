@@ -39,6 +39,28 @@
     .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
     .globals-card { max-height: 300px; }
+    .flash-btn { 
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
+      color: #0b1220; 
+      font-size: 18px; 
+      font-weight: 700; 
+      padding: 20px 40px; 
+      border-radius: 12px; 
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4); 
+      transition: all 0.1s; 
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      border: 2px solid #f59e0b;
+    }
+    .flash-btn:active { 
+      transform: scale(0.95); 
+      box-shadow: 0 2px 8px rgba(251, 191, 36, 0.6); 
+      background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+    }
+    .flash-btn:hover { 
+      box-shadow: 0 6px 16px rgba(251, 191, 36, 0.5); 
+    }
   </style>
 </head>
 <body>
@@ -65,6 +87,9 @@
               <input type="range" id="fx-bpm" min="1" max="480" value="120" step="1" />
               <output id="bpm-value">120</output>
             </div>
+          </div>
+          <div style="margin-top: 16px;">
+            <button class="flash-btn" id="flash-btn">⚡ FLASH</button>
           </div>
         </div>
       </div>
@@ -207,6 +232,43 @@
       const value = parseInt(bpmSlider.value);
       bpmValue.textContent = value.toString();
       await post(`${apiBase}/api/fx/bpm`, { bpm: value });
+    });
+
+    // Flash button control
+    const flashBtn = document.getElementById('flash-btn');
+    let isFlashing = false;
+    
+    async function activateFlash() {
+      if (!isFlashing) {
+        isFlashing = true;
+        await post(`${apiBase}/api/flash/on`, {});
+      }
+    }
+    
+    async function deactivateFlash() {
+      if (isFlashing) {
+        isFlashing = false;
+        await post(`${apiBase}/api/flash/off`, {});
+      }
+    }
+    
+    // Mouse events
+    flashBtn.addEventListener('mousedown', activateFlash);
+    flashBtn.addEventListener('mouseup', deactivateFlash);
+    flashBtn.addEventListener('mouseleave', deactivateFlash);
+    
+    // Touch events for mobile
+    flashBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      activateFlash();
+    });
+    flashBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      deactivateFlash();
+    });
+    flashBtn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      deactivateFlash();
     });
 
     // Tab switching

@@ -163,4 +163,29 @@ class FixtureManager:
             state = fixture_data.get('state', {})
             for channel_name, value in state.items():
                 self.set_fixture_channel(fixture_id, channel_name, value)
+    
+    def flash_all_white(self):
+        """Set all fixtures to full white for flash effect"""
+        for fixture_id in self.fixtures:
+            # Set to full white (only white channel, no RGB)
+            self.set_fixture_channel(fixture_id, 'white', 1.0)
+            self.set_fixture_channel(fixture_id, 'red', 0.0)
+            self.set_fixture_channel(fixture_id, 'green', 0.0)
+            self.set_fixture_channel(fixture_id, 'blue', 0.0)
+            # Set dimmer to full
+            self.set_fixture_channel(fixture_id, 'dimmer', 1.0)
+    
+    def save_current_states(self) -> Dict[str, Dict[str, float]]:
+        """Save current states of all fixtures for later restoration"""
+        saved_states = {}
+        for fixture_id, fixture_data in self.fixtures.items():
+            saved_states[fixture_id] = fixture_data.get('state', {}).copy()
+        return saved_states
+    
+    def restore_states(self, saved_states: Dict[str, Dict[str, float]]):
+        """Restore previously saved fixture states"""
+        for fixture_id, state in saved_states.items():
+            if fixture_id in self.fixtures:
+                for channel_name, value in state.items():
+                    self.set_fixture_channel(fixture_id, channel_name, value)
 

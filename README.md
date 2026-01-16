@@ -45,6 +45,12 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
 - **FX BPM**: Control speed of color effects (1-480 BPM)
 - **FX Fade**: Smooth color transitions (0-100% of beat interval)
 
+**Buttons Section**:
+- **Flash Button**: Press and hold for instant full white override - releases back to previous state
+  - Pauses any running color effects during flash
+  - Works at startup even without prior configuration (blackout on release)
+  - Touch-friendly for mobile devices
+
 **Faders Tab**:
 - Compact fixture cards with vertical faders in channel order
 - Real-time DMX values (0-255) with live updates
@@ -66,6 +72,11 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
 - **Colors**: Edit RGBW color definitions (0-1 range) with live preview, add/remove colors
 - **Global Settings**: Configure default output mode and FPS
 - Changes are saved immediately and automatically reload without server restart
+
+### Connection Monitoring
+- Real-time connection status indicator in header (green dot = connected, red pulsing dot = offline)
+- Automatic UI recovery when server reconnects
+- Seamless continuation of all operations after connection restore
 
 ## Installation
 

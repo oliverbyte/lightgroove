@@ -53,6 +53,7 @@ class ColorFXEngine:
         self.current_colors = []  # Track currently displayed colors (list for multi-color FX)
         self.fx_thread = None
         self.stop_event = threading.Event()
+        self.flash_active = False  # Flag to pause FX during flash
         
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
@@ -71,6 +72,8 @@ class ColorFXEngine:
     
     def _apply_color_instant(self, fixture_id: str, color_values: dict, channel_map: dict):
         """Apply color to fixture instantly."""
+        if self.flash_active:  # Don't apply colors during flash
+            return
         for short_key, target_value in color_values.items():
             channel_name = channel_map.get(short_key, short_key)
             try:
@@ -88,6 +91,8 @@ class ColorFXEngine:
         Returns:
             Actual fade time used in seconds
         """
+        if self.flash_active:  # Don't apply colors during flash
+            return 0.0
         if self.fade_percentage <= 0:
             # Instant color change for all fixtures
             for fixture_id, color_values in fixture_colors.items():
@@ -113,7 +118,7 @@ class ColorFXEngine:
             
             # Fade through steps for all fixtures simultaneously
             for step in range(1, steps + 1):
-                if not self.running:
+                if not self.running or self.flash_active:
                     break
                 progress = step / steps
                 for fixture_id, color_values in fixture_colors.items():

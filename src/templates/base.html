@@ -15,7 +15,11 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    header { padding: 16px 20px 16px 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    header { padding: 16px 20px 16px 10px; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .connection-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+    .connection-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; transition: background 0.3s; }
+    .connection-dot.offline { background: #ef4444; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     .container { padding: 20px 20px 20px 10px; }
     .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
     .tab { padding: 10px 20px; cursor: pointer; background: var(--panel); color: var(--muted); border: 1px solid var(--border); border-bottom: 2px solid transparent; font-weight: 500; border-radius: 8px 8px 0 0; }
@@ -39,6 +43,30 @@
     .slider-col input[type=range] { width: 26px; height: 170px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; accent-color: var(--accent); }
     .slider-col output { width: 100%; text-align: center; font-variant-numeric: tabular-nums; color: var(--text); font-size: 12px; }
     .globals-card { max-height: 300px; }
+    .flash-card { min-width: 200px; }
+    .flash-btn { 
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
+      color: #0b1220; 
+      font-size: 14px; 
+      font-weight: 700; 
+      padding: 20px 30px; 
+      border-radius: 4px; 
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4); 
+      transition: all 0.1s; 
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      border: 2px solid #f59e0b;
+      width: 100%;
+    }
+    .flash-btn:active { 
+      transform: scale(0.98); 
+      box-shadow: 0 2px 8px rgba(251, 191, 36, 0.6); 
+      background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+    }
+    .flash-btn:hover { 
+      box-shadow: 0 6px 16px rgba(251, 191, 36, 0.5); 
+    }
     
     /* Toast Notifications */
     .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
@@ -54,7 +82,13 @@
 </head>
 <body>
   <div class="toast-container" id="toast-container"></div>
-  <header>LightGroove</header>
+  <header>
+    <span>LightGroove</span>
+    <div class="connection-status">
+      <div class="connection-dot" id="connection-dot"></div>
+      <span id="connection-text">Connected</span>
+    </div>
+  </header>
   <div class="container">
     <div class="tabs">
       <button class="tab active" data-tab="globals">Globals</button>
@@ -88,6 +122,56 @@
       const res = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body || {}) });
       return await res.json();
     }
+
+    // Connection monitoring
+    let isConnected = true;
+    let connectionCheckInterval;
+    
+    async function checkConnection() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const response = await fetch(`${apiBase}/api/grandmaster`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (response.ok && !isConnected) {
+          // Connection restored - reload UI data
+          isConnected = true;
+          updateConnectionStatus();
+          // Reload all data to refresh UI
+          loadGrandmaster();
+          loadBPM();
+          loadFixtures();
+          loadStaticColors();
+        } else if (!response.ok && isConnected) {
+          // Connection lost
+          isConnected = false;
+          updateConnectionStatus();
+        }
+      } catch (e) {
+        // Connection error (timeout or network error)
+        if (isConnected) {
+          isConnected = false;
+          updateConnectionStatus();
+        }
+      }
+    }
+    
+    function updateConnectionStatus() {
+      const dot = document.getElementById('connection-dot');
+      const text = document.getElementById('connection-text');
+      
+      if (isConnected) {
+        dot.classList.remove('offline');
+        text.textContent = 'Connected';
+      } else {
+        dot.classList.add('offline');
+        text.textContent = 'Server Offline';
+      }
+    }
+    
+    // Start connection monitoring
+    connectionCheckInterval = setInterval(checkConnection, 3000);
 
     function showToast(message, type = 'info', duration = 3000) {
       const container = document.getElementById('toast-container');
@@ -141,6 +225,8 @@
 
     function renderFixtures(fixtures) {
       const grid = document.getElementById('fixtures-grid');
+      // Clear existing fixtures before rendering new ones
+      grid.innerHTML = '';
       fixtures.forEach(fx => {
         const card = document.createElement('div');
         card.className = 'card';
@@ -219,6 +305,43 @@
       const percentage = parseInt(fadeSlider.value);
       // Send as 0.0-1.0 to backend
       await post(`${apiBase}/api/fx/fadetime`, { fade_percentage: percentage / 100.0 });
+    });
+
+    // Flash button control
+    const flashBtn = document.getElementById('flash-btn');
+    let isFlashing = false;
+    
+    async function activateFlash() {
+      if (!isFlashing) {
+        isFlashing = true;
+        await post(`${apiBase}/api/flash/on`, {});
+      }
+    }
+    
+    async function deactivateFlash() {
+      if (isFlashing) {
+        isFlashing = false;
+        await post(`${apiBase}/api/flash/off`, {});
+      }
+    }
+    
+    // Mouse events
+    flashBtn.addEventListener('mousedown', activateFlash);
+    flashBtn.addEventListener('mouseup', deactivateFlash);
+    flashBtn.addEventListener('mouseleave', deactivateFlash);
+    
+    // Touch events for mobile
+    flashBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      activateFlash();
+    });
+    flashBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      deactivateFlash();
+    });
+    flashBtn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      deactivateFlash();
     });
 
     // Tab switching
