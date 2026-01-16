@@ -10,7 +10,7 @@ This guide covers the development setup, architecture, and contribution guidelin
 
 The project uses modular HTML templates:
 - `src/templates/base.html`: Main structure with JavaScript
-- `src/templates/section_globals.html`: Globals controls section
+- `src/templates/section_globals.html`: Globals controls and buttons sections
 - `src/templates/tab_globals.html`: Globals tab container
 - `src/templates/tab_faders.html`: Faders tab with fixture cards
 - `src/templates/tab_colors.html`: Colors tab with static colors and FX buttons
@@ -21,10 +21,24 @@ Templates are combined by `src/ui_generator.py` during startup.
 
 - **`main.py`**: Application entry point, starts Flask server and DMX controller
 - **`src/dmx_controller.py`**: Core DMX engine, manages universe buffers and ArtNet output
-- **`src/fixture_manager.py`**: Fixture and patch configuration, channel mapping
-- **`src/color_manager.py`**: Color effects engine (Random 1/2/3) with BPM synchronization
-- **`src/http_api.py`**: Flask REST API for UI interactions
+- **`src/fixture_manager.py`**: Fixture and patch configuration, channel mapping, flash control
+- **`src/color_manager.py`**: Color effects engine (Random 1/2/3/4) with BPM synchronization and flash pause support
+- **`src/http_api.py`**: Flask REST API for UI interactions, connection handling
 - **`src/ui_generator.py`**: Template assembly and HTML generation
+
+### Key Features
+
+**Flash Button** (`/api/flash/on`, `/api/flash/off`):
+- Saves current fixture states before activating
+- Sets all fixtures to full white (white channel only, RGB at 0)
+- Pauses color FX engine during flash
+- Restores previous state or blackout on release
+- Handled server-side with state preservation
+
+**Connection Monitoring**:
+- Frontend polls `/api/grandmaster` every 3 seconds
+- Automatic UI data reload on reconnect
+- Grid clearing prevents fixture duplication
 
 ## Development Setup
 
