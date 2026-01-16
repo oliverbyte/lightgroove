@@ -15,7 +15,11 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    header { padding: 16px 20px 16px 10px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    header { padding: 16px 20px 16px 10px; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .connection-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+    .connection-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; transition: background 0.3s; }
+    .connection-dot.offline { background: #ef4444; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     .container { padding: 20px 20px 20px 10px; }
     .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
     .tab { padding: 10px 20px; cursor: pointer; background: var(--panel); color: var(--muted); border: 1px solid var(--border); border-bottom: 2px solid transparent; font-weight: 500; border-radius: 8px 8px 0 0; }
@@ -78,7 +82,13 @@
 </head>
 <body>
   <div class="toast-container" id="toast-container"></div>
-  <header>LightGroove</header>
+  <header>
+    <span>LightGroove</span>
+    <div class="connection-status">
+      <div class="connection-dot" id="connection-dot"></div>
+      <span id="connection-text">Connected</span>
+    </div>
+  </header>
   <div class="container">
     <div class="tabs">
       <button class="tab active" data-tab="globals">Globals</button>
@@ -112,6 +122,51 @@
       const res = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body || {}) });
       return await res.json();
     }
+
+    // Connection monitoring
+    let isConnected = true;
+    let connectionCheckInterval;
+    
+    async function checkConnection() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000);
+        const response = await fetch(`${apiBase}/api/grandmaster`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (response.ok && !isConnected) {
+          // Connection restored
+          isConnected = true;
+          updateConnectionStatus();
+        } else if (!response.ok && isConnected) {
+          // Connection lost
+          isConnected = false;
+          updateConnectionStatus();
+        }
+      } catch (e) {
+        // Connection error (timeout or network error)
+        if (isConnected) {
+          isConnected = false;
+          updateConnectionStatus();
+        }
+      }
+    }
+    
+    function updateConnectionStatus() {
+      const dot = document.getElementById('connection-dot');
+      const text = document.getElementById('connection-text');
+      
+      if (isConnected) {
+        dot.classList.remove('offline');
+        text.textContent = 'Connected';
+      } else {
+        dot.classList.add('offline');
+        text.textContent = 'Server Offline';
+      }
+    }
+    
+    // Start connection monitoring
+    connectionCheckInterval = setInterval(checkConnection, 3000);
 
     function showToast(message, type = 'info', duration = 3000) {
       const container = document.getElementById('toast-container');
