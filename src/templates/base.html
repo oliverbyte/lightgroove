@@ -225,6 +225,8 @@
 
     function renderFixtures(fixtures) {
       const grid = document.getElementById('fixtures-grid');
+      // Clear existing fixtures before rendering new ones
+      grid.innerHTML = '';
       fixtures.forEach(fx => {
         const card = document.createElement('div');
         card.className = 'card';
