@@ -6,6 +6,7 @@ Requires: pip install playwright && playwright install chromium
 import time
 import subprocess
 import sys
+import shutil
 from pathlib import Path
 
 def take_screenshots():
@@ -75,6 +76,26 @@ def take_screenshots():
             
             browser.close()
             print("✓ Screenshots saved to img/")
+            
+            # Copy screenshots to website folder
+            print("Copying screenshots to website/img/...")
+            website_img = Path("website/img")
+            website_img.mkdir(parents=True, exist_ok=True)
+            
+            screenshots = [
+                "screenshot_globals.png",
+                "screenshot_faders.png",
+                "screenshot_colors.png",
+                "screenshot_config.png"
+            ]
+            
+            for screenshot in screenshots:
+                src = Path("img") / screenshot
+                dst = website_img / screenshot
+                if src.exists():
+                    shutil.copy2(src, dst)
+            
+            print("✓ Screenshots copied to website/img/")
             
     finally:
         # Stop the server
