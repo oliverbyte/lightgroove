@@ -23,6 +23,7 @@ class HttpApiServer:
         self.color_fx = color_fx
         self._server = None
         self._thread = None
+        self._flash_saved_states = None  # Store states before flash
 
     def start(self):
         """Start the HTTP server in a background thread."""
@@ -315,6 +316,23 @@ class HttpApiServer:
                         except Exception as e:
                             self._set_headers(500)
                             self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/flash/on":
+                        # Save current states and activate flash
+                        self.server._flash_saved_states = fixture_manager.save_current_states()
+                        fixture_manager.flash_all_white()
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/flash/off":
+                        # Restore saved states
+                        if self.server._flash_saved_states:
+                            fixture_manager.restore_states(self.server._flash_saved_states)
+                            self.server._flash_saved_states = None
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
                         return
                 except Exception as exc:  # keep API resilient
                     self._set_headers(400)
