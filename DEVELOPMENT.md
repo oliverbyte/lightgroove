@@ -32,9 +32,17 @@ Templates are combined by `src/ui_generator.py` during startup.
 - Automatic RGBW-to-color-wheel conversion for moving heads
 - Fixture-specific `color_wheel_mapping` in `fixtures.json`
 - Maps RGBW colors to DMX values (e.g., white=5, red=15, green=25, etc.)
-- Optional `dimmer_on_black` setting: turns off dimmer when black color sent
 - Seamless integration with color buttons and FX programs
 - Flash button sets color wheel to white position
+
+**Smart Dimmer Management**:
+- Black color (r=0, g=0, b=0, w=0) automatically sets dimmer to 0% for all fixtures
+- Non-black colors restore previous dimmer value (manual or auto-saved)
+- Manual dimmer changes tracked via `manual_dimmer` property (set when user adjusts fader)
+- Auto-saved dimmer tracked via `active_dimmer` property (saved before black, restored after)
+- Priority: `manual_dimmer` > `active_dimmer` > stay at 0
+- Works universally for both RGBW and color wheel fixtures
+- Flash button sets dimmer to 100% temporarily without affecting saved values
 
 **Grandmaster Scaling**:
 - Only affects dimmer-type channels (dimmer, master_dimmer, brightness)
@@ -45,7 +53,7 @@ Templates are combined by `src/ui_generator.py` during startup.
 **Flash Button** (`/api/flash/on`, `/api/flash/off`):
 - Saves current fixture states before activating
 - Sets all fixtures to full white (white channel for RGBW, color wheel white position for moving heads)
-- Forces dimmer to full for all fixture types
+- Forces dimmer to full for all fixture types (marked as non-manual)
 - Pauses color FX engine during flash
 - Restores previous state or blackout on release
 - Handled server-side with state preservation

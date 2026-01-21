@@ -206,7 +206,7 @@ class HttpApiServer:
                     if path.startswith("/api/fixture/") and path.endswith("/dimmer"):
                         fixture_id = path.split("/")[3]
                         value = float(payload.get("value", 0))
-                        fixture_manager.set_fixture_dimmer(fixture_id, value)
+                        fixture_manager.set_fixture_dimmer(fixture_id, value, manual=True)
                         self._set_headers()
                         self.wfile.write(b"{}")
                         return

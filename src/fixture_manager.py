@@ -216,6 +216,7 @@ class FixtureManager:
         """
         Set RGBW color of a fixture (only if it has RGBW channels)
         For fixtures with color wheel, converts RGBW to closest wheel position
+        Black color always sets dimmer to 0, other colors restore previous dimmer
         
         Args:
             fixture_id: ID of the fixture
@@ -227,45 +228,49 @@ class FixtureManager:
         # Check if this is black (all channels off)
         is_black = (red < 0.01 and green < 0.01 and blue < 0.01 and white < 0.01)
         
-        # Check if fixture has color wheel instead of RGBW
-        if self.has_channel(fixture_id, 'color_wheel'):
-            fixture = self.fixtures.get(fixture_id)
-            if fixture:
-                config = fixture.get('config', {})
-                dimmer_on_black = config.get('dimmer_on_black', False)
-                
-                if dimmer_on_black:
-                    if is_black:
-                        # Save current dimmer value before turning off
-                        current_dimmer = self._get_fixture_dimmer(fixture_id)
-                        if current_dimmer > 0:
-                            fixture['saved_dimmer'] = current_dimmer
-                        # Turn off dimmer for black
-                        self.set_fixture_dimmer(fixture_id, 0.0)
-                    else:
-                        # Set color wheel position for non-black colors
-                        wheel_value = self._rgbw_to_color_wheel(fixture_id, red, green, blue, white)
-                        self.set_fixture_channel(fixture_id, 'color_wheel', wheel_value)
-                        # Restore saved dimmer value if it was turned off by black
-                        current_dimmer = self._get_fixture_dimmer(fixture_id)
-                        if current_dimmer < 0.01 and 'saved_dimmer' in fixture:
-                            # Dimmer is off and we have a saved value - restore it
-                            self.set_fixture_dimmer(fixture_id, fixture['saved_dimmer'])
-                else:
-                    # Just set color wheel without affecting dimmer
-                    wheel_value = self._rgbw_to_color_wheel(fixture_id, red, green, blue, white)
-                    self.set_fixture_channel(fixture_id, 'color_wheel', wheel_value)
+        fixture = self.fixtures.get(fixture_id)
+        if not fixture:
             return
         
-        # Only set channels that exist on this fixture (standard RGBW)
-        if self.has_channel(fixture_id, 'red'):
-            self.set_fixture_channel(fixture_id, 'red', red)
-        if self.has_channel(fixture_id, 'green'):
-            self.set_fixture_channel(fixture_id, 'green', green)
-        if self.has_channel(fixture_id, 'blue'):
-            self.set_fixture_channel(fixture_id, 'blue', blue)
-        if self.has_channel(fixture_id, 'white'):
-            self.set_fixture_channel(fixture_id, 'white', white)
+        # Handle black color: save current dimmer and turn off
+        if is_black:
+            current_dimmer = self._get_fixture_dimmer(fixture_id)
+            # Save current dimmer if it's on (but not if it's from flash at 100%)
+            if current_dimmer > 0.01:
+                # Prefer manual_dimmer if set, otherwise save current
+                if 'manual_dimmer' not in fixture:
+                    fixture['active_dimmer'] = current_dimmer
+                else:
+                    fixture['active_dimmer'] = fixture['manual_dimmer']
+            # Set dimmer to 0 for black
+            self.set_fixture_dimmer(fixture_id, 0.0)
+        else:
+            # Non-black color: restore previous dimmer if currently off
+            current_dimmer = self._get_fixture_dimmer(fixture_id)
+            if current_dimmer < 0.01:
+                # Dimmer is off, restore it
+                # Priority: manual_dimmer (user set) > active_dimmer (auto-saved) > keep at 0
+                if 'manual_dimmer' in fixture:
+                    self.set_fixture_dimmer(fixture_id, fixture['manual_dimmer'])
+                elif 'active_dimmer' in fixture:
+                    self.set_fixture_dimmer(fixture_id, fixture['active_dimmer'])
+        
+        # Set color channels
+        if self.has_channel(fixture_id, 'color_wheel'):
+            # Color wheel fixture
+            if not is_black:  # Only set color wheel for non-black
+                wheel_value = self._rgbw_to_color_wheel(fixture_id, red, green, blue, white)
+                self.set_fixture_channel(fixture_id, 'color_wheel', wheel_value)
+        else:
+            # Standard RGBW fixture
+            if self.has_channel(fixture_id, 'red'):
+                self.set_fixture_channel(fixture_id, 'red', red)
+            if self.has_channel(fixture_id, 'green'):
+                self.set_fixture_channel(fixture_id, 'green', green)
+            if self.has_channel(fixture_id, 'blue'):
+                self.set_fixture_channel(fixture_id, 'blue', blue)
+            if self.has_channel(fixture_id, 'white'):
+                self.set_fixture_channel(fixture_id, 'white', white)
     
     def _get_fixture_dimmer(self, fixture_id: str) -> float:
         """
@@ -284,7 +289,7 @@ class FixtureManager:
                 return self.get_fixture_channel(fixture_id, channel_name)
         return 1.0  # Default to full if no dimmer channel
     
-    def set_fixture_dimmer(self, fixture_id: str, intensity: float):
+    def set_fixture_dimmer(self, fixture_id: str, intensity: float, manual: bool = False):
         """
         Set dimmer/intensity of a fixture
         Tries common dimmer channel names: master_dimmer, dimmer, intensity
@@ -292,7 +297,12 @@ class FixtureManager:
         Args:
             fixture_id: ID of the fixture
             intensity: Intensity value 0.0-1.0
+            manual: True if this is a user-initiated change (from faders)
         """
+        # Save manual dimmer changes for later restoration
+        if manual and fixture_id in self.fixtures:
+            self.fixtures[fixture_id]['manual_dimmer'] = intensity
+        
         # Try common dimmer channel names
         dimmer_channels = ['master_dimmer', 'dimmer', 'intensity']
         for channel_name in dimmer_channels:
@@ -330,8 +340,8 @@ class FixtureManager:
             # Use set_fixture_color to handle both RGBW and color wheel fixtures
             # Full white: w=1.0, r=g=b=0
             self.set_fixture_color(fixture_id, 0.0, 0.0, 0.0, 1.0)
-            # Set dimmer to full (try common dimmer channel names)
-            self.set_fixture_dimmer(fixture_id, 1.0)
+            # Set dimmer to full (not manual - don't save this value)
+            self.set_fixture_dimmer(fixture_id, 1.0, manual=False)
     
     def save_current_states(self) -> Dict[str, Dict[str, float]]:
         """Save current states of all fixtures for later restoration"""

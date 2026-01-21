@@ -79,6 +79,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
 - **Responsive Layout** - Automatically adapts to screen width for optimal viewing on any device
 - **Per-Fixture Control** - Independent control of every channel on every fixture
 - **Channel Labels** - Clear channel names (Dimmer, Red, Green, Blue, White, etc.)
+- **Smart Dimmer Behavior** - Manual dimmer settings are remembered and restored when switching between colors
 
 **Colors Tab**:
 - **Static Colors**: 10 preset buttons with instant activation
@@ -86,6 +87,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - Buttons dynamically display actual RGBW color from definitions
   - Colors fully customizable via Config tab
   - Automatic color wheel conversion for moving head fixtures
+  - **Black color automatically dims fixtures to 0%**, other colors restore previous dimmer
 - **Color FX**: Server-side effects that run independently of the UI
   - **Random 1**: All fixtures display same color, cycles at BPM speed - unified color wash
   - **Random 2**: Each fixture gets different random color at each beat - disco ball effect
@@ -94,6 +96,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - Smooth fade transitions blend colors over the beat interval (adjustable via FX Fade)
   - Active effects automatically pause during flash button usage
   - Works seamlessly with both RGBW and color wheel fixtures
+  - **Black beats automatically dim to 0%, color beats restore previous dimmer**
 - **Active Indication**: Visual feedback showing which color/effect is currently active
   - Single color highlighting for static colors and Random 1
   - Multi-color highlighting for Random 2/3/4 showing all active colors
