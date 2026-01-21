@@ -98,6 +98,51 @@ keywords: free dmx controller, open source lighting software, dmx software for d
 <section class="features-section">
   <div class="container">
     <h2 class="section-title">Powerful Features</h2>
+    <p class="section-subtitle">Everything you need for professional lighting control</p>
+    
+    <div class="feature-list">
+      <div class="feature-item">
+        <h4>🌐 Web-Based Interface</h4>
+        <p>Control your lights from any device with a web browser - desktop, laptop, tablet, or smartphone. One server, unlimited clients on your network.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h4>🎨 Real-Time Fader Control</h4>
+        <p>Vertical faders for every channel with live DMX value display (0-255). Compact fixture cards with intuitive channel layout. Responsive design adapts to any screen size.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h4>🎯 Dynamic Color Effects</h4>
+        <p>10 preset color buttons plus 4 programmable effects (Random 1-4) with adjustable BPM and fade times. Server-side effects run independently for rock-solid performance.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h4>🎭 Moving Head Support</h4>
+        <p>Full support for moving heads with color wheels. Automatic RGBW-to-color-wheel conversion with fixture-specific mappings. Seamless integration with color buttons and FX programs.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h4>📡 ArtNet Output</h4>
+        <p>Send DMX via ArtNet protocol to any compatible interface. Support for multiple universes and nodes with flexible universe mapping. Works with Enttec ODE, DMXking, and other ArtNet-to-DMX converters.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h4>⚡ Flash Button</h4>
+        <p>Press and hold for instant full white override. Automatically pauses effects during flash and restores previous state on release. Works with both RGBW and color wheel fixtures.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h4>🎚️ Master Fader</h4>
+        <p>Global intensity control affects only dimmer channels (0-100%). Pan, tilt, and color wheel positions remain unchanged. Perfect for quick room brightness adjustments.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h4>⚙️ Web Configuration</h4>
+        <p>Configure everything through the web interface - no JSON editing required. Manage ArtNet nodes, universe mappings, and custom colors. Changes apply immediately without manual restart.</p>
+      </div>
+    </div>
+  </div>
+</section>
     <p class="section-subtitle">Everything you need to control your lighting setup professionally</p>
     
     <div class="feature-grid">

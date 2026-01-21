@@ -20,17 +20,32 @@ Templates are combined by `src/ui_generator.py` during startup.
 ### Backend Modules
 
 - **`main.py`**: Application entry point, starts Flask server and DMX controller
-- **`src/dmx_controller.py`**: Core DMX engine, manages universe buffers and ArtNet output
-- **`src/fixture_manager.py`**: Fixture and patch configuration, channel mapping, flash control
+- **`src/dmx_controller.py`**: Core DMX engine, manages universe buffers and ArtNet output, grandmaster scaling for dimmer channels only
+- **`src/fixture_manager.py`**: Fixture and patch configuration, channel mapping, flash control, color wheel support
 - **`src/color_manager.py`**: Color effects engine (Random 1/2/3/4) with BPM synchronization and flash pause support
 - **`src/http_api.py`**: Flask REST API for UI interactions, connection handling
 - **`src/ui_generator.py`**: Template assembly and HTML generation
 
 ### Key Features
 
+**Color Wheel Fixture Support**:
+- Automatic RGBW-to-color-wheel conversion for moving heads
+- Fixture-specific `color_wheel_mapping` in `fixtures.json`
+- Maps RGBW colors to DMX values (e.g., white=5, red=15, green=25, etc.)
+- Optional `dimmer_on_black` setting: turns off dimmer when black color sent
+- Seamless integration with color buttons and FX programs
+- Flash button sets color wheel to white position
+
+**Grandmaster Scaling**:
+- Only affects dimmer-type channels (dimmer, master_dimmer, brightness)
+- Pan, tilt, color wheel, and other channels pass through unchanged
+- Channel type determined from fixture definition
+- Allows brightness control without affecting fixture positioning
+
 **Flash Button** (`/api/flash/on`, `/api/flash/off`):
 - Saves current fixture states before activating
-- Sets all fixtures to full white (white channel only, RGB at 0)
+- Sets all fixtures to full white (white channel for RGBW, color wheel white position for moving heads)
+- Forces dimmer to full for all fixture types
 - Pauses color FX engine during flash
 - Restores previous state or blackout on release
 - Handled server-side with state preservation

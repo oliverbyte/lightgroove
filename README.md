@@ -39,13 +39,20 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
 - **Multiple Universes** - Support for multiple DMX universes with independent control
 - **Flexible Universe Mapping** - Configure universe mapping in web UI (e.g., DMX universe 1 → ArtNet universe 0)
 - **Multi-Node Support** - Send to multiple ArtNet nodes simultaneously with different IP addresses
+- **Moving Head Support** - Full support for moving heads with color wheels (e.g., U-King Mini Gobo Moving Head)
+  - Automatic RGBW-to-color-wheel conversion
+  - Fixture-specific color wheel mappings
+  - Seamless integration with color buttons and FX programs
+  - Intelligent dimmer control for blackout effects
 
 ### Web-Based User Interface
 
 **Globals Tab**:
-- **Master Fader**: Global intensity control (0-100%) that scales all DMX output in real-time
-  - Scales all fixtures without changing individual fader positions
+- **Master Fader**: Global intensity control (0-100%) - affects only dimmer channels
+  - Scales dimmer/master_dimmer/brightness channels without changing positions
+  - Does not affect pan, tilt, color wheel, or other channel types
   - Perfect for quick room brightness adjustments
+  - Moving heads maintain their position and color while dimming
 - **FX BPM**: Control speed of color effects (1-480 BPM)
   - Synchronized timing for all color effects
   - Adjustable from slow ambient (1 BPM) to fast strobing (480 BPM)
@@ -53,11 +60,13 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - 0% = instant color changes
   - 100% = smooth fades over entire beat interval
   - Creates professional-looking transitions
+  - Color wheel fixtures change instantly (no fade between wheel positions)
 
 **Buttons Section**:
 - **Flash Button**: Press and hold for instant full white override
   - Automatically pauses any running color effects during flash
-  - Instantly sets all fixtures to full white (via white channel only, RGB at 0)
+  - Instantly sets all fixtures to full white
+  - Works with both RGBW fixtures and color wheel fixtures
   - Releases back to previous state (or blackout if no prior state)
   - Works at startup even without prior configuration
   - Touch-friendly for mobile devices
@@ -76,6 +85,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - Red, Green, Blue, Cyan, Magenta, Yellow, White, Orange, Purple, Black
   - Buttons dynamically display actual RGBW color from definitions
   - Colors fully customizable via Config tab
+  - Automatic color wheel conversion for moving head fixtures
 - **Color FX**: Server-side effects that run independently of the UI
   - **Random 1**: All fixtures display same color, cycles at BPM speed - unified color wash
   - **Random 2**: Each fixture gets different random color at each beat - disco ball effect
@@ -83,6 +93,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - **Random 4**: Chaser effect - one fixture at a time in sequence with random colors
   - Smooth fade transitions blend colors over the beat interval (adjustable via FX Fade)
   - Active effects automatically pause during flash button usage
+  - Works seamlessly with both RGBW and color wheel fixtures
 - **Active Indication**: Visual feedback showing which color/effect is currently active
   - Single color highlighting for static colors and Random 1
   - Multi-color highlighting for Random 2/3/4 showing all active colors

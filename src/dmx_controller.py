@@ -172,7 +172,7 @@ class DMXController:
         self.grandmaster = max(0.0, min(1.0, level))
         print(f"DMX Controller: Grandmaster set to {int(self.grandmaster * 100)}%")
     
-    def set_channel(self, universe_id: int, channel: int, value: int):
+    def set_channel(self, universe_id: int, channel: int, value: int, channel_type: str = 'other'):
         """
         Set a single DMX channel in a specific universe
         
@@ -180,12 +180,16 @@ class DMXController:
             universe_id: Universe ID (1-based)
             channel: DMX channel (1-512)
             value: DMX value (0-255)
+            channel_type: Channel type ('dimmer', 'color', 'pan', 'tilt', 'other')
         """
         if universe_id not in self.universes:
             self.add_universe(universe_id)
         
-        # Apply grandmaster scaling
-        scaled_value = int(value * self.grandmaster)
+        # Apply grandmaster scaling only to dimmer channels
+        if channel_type == 'dimmer':
+            scaled_value = int(value * self.grandmaster)
+        else:
+            scaled_value = value
         self.universes[universe_id].set_channel(channel, scaled_value)
     
     def set_channels(self, universe_id: int, start_channel: int, values: list):

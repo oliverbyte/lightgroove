@@ -19,6 +19,18 @@
           "type": "rgbw_dimmer_shutter_macro",
           "start_address":21,
           "description": "3rd Generic PAR"
+        },
+        {
+          "id": "moving1",
+          "type": "uking_mini_moving_light",
+          "start_address": 31,
+          "description": "U-King Mini Moving Light"
+        },
+        {
+          "id": "moving2",
+          "type": "uking_mini_moving_light",
+          "start_address": 43,
+          "description": "U-King Mini Moving Light"
         }
       ]
     }

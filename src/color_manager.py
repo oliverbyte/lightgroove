@@ -74,12 +74,12 @@ class ColorFXEngine:
         """Apply color to fixture instantly."""
         if self.flash_active:  # Don't apply colors during flash
             return
-        for short_key, target_value in color_values.items():
-            channel_name = channel_map.get(short_key, short_key)
-            try:
-                self.fixture_manager.set_fixture_channel(fixture_id, channel_name, target_value)
-            except:
-                pass
+        # Use set_fixture_color to handle both RGBW and color wheel fixtures
+        r = color_values.get('r', 0.0)
+        g = color_values.get('g', 0.0)
+        b = color_values.get('b', 0.0)
+        w = color_values.get('w', 0.0)
+        self.fixture_manager.set_fixture_color(fixture_id, r, g, b, w)
     
     def _apply_colors_with_fade(self, fixture_colors: dict, channel_map: dict) -> float:
         """Apply colors to multiple fixtures simultaneously with fade.
@@ -104,33 +104,48 @@ class ColorFXEngine:
             steps = max(10, int(actual_fade_time * 20))  # 20 steps per second
             step_time = actual_fade_time / steps
             
-            # Get current values for all fixtures
+            # Get current RGBW values for all fixtures
             fixture_current_values = {}
             for fixture_id, color_values in fixture_colors.items():
-                current_values = {}
-                for short_key in color_values.keys():
-                    channel_name = channel_map.get(short_key, short_key)
-                    try:
-                        current_values[short_key] = self.fixture_manager.get_fixture_channel(fixture_id, channel_name)
-                    except:
-                        current_values[short_key] = 0.0
-                fixture_current_values[fixture_id] = current_values
+                # For fixtures with color wheel, we can't smoothly fade between wheel positions
+                # Just apply the final color instantly
+                if self.fixture_manager.has_channel(fixture_id, 'color_wheel'):
+                    self._apply_color_instant(fixture_id, color_values, channel_map)
+                    fixture_current_values[fixture_id] = None  # Skip fading for this fixture
+                else:
+                    # For RGBW fixtures, get current channel values for smooth fade
+                    current_values = {}
+                    for short_key in ['r', 'g', 'b', 'w']:
+                        channel_name = channel_map.get(short_key, short_key)
+                        try:
+                            current_values[short_key] = self.fixture_manager.get_fixture_channel(fixture_id, channel_name)
+                        except:
+                            current_values[short_key] = 0.0
+                    fixture_current_values[fixture_id] = current_values
             
-            # Fade through steps for all fixtures simultaneously
+            # Fade through steps for RGBW fixtures only
             for step in range(1, steps + 1):
                 if not self.running or self.flash_active:
                     break
                 progress = step / steps
                 for fixture_id, color_values in fixture_colors.items():
                     current_values = fixture_current_values[fixture_id]
-                    for short_key, target_value in color_values.items():
-                        channel_name = channel_map.get(short_key, short_key)
-                        current = current_values.get(short_key, 0.0)
-                        value = current + (target_value - current) * progress
-                        try:
-                            self.fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
-                        except:
-                            pass
+                    if current_values is None:  # Color wheel fixture - already applied
+                        continue
+                    # Interpolate RGBW values
+                    r_curr = current_values.get('r', 0.0)
+                    g_curr = current_values.get('g', 0.0)
+                    b_curr = current_values.get('b', 0.0)
+                    w_curr = current_values.get('w', 0.0)
+                    r_target = color_values.get('r', 0.0)
+                    g_target = color_values.get('g', 0.0)
+                    b_target = color_values.get('b', 0.0)
+                    w_target = color_values.get('w', 0.0)
+                    r = r_curr + (r_target - r_curr) * progress
+                    g = g_curr + (g_target - g_curr) * progress
+                    b = b_curr + (b_target - b_curr) * progress
+                    w = w_curr + (w_target - w_curr) * progress
+                    self.fixture_manager.set_fixture_color(fixture_id, r, g, b, w)
                 time.sleep(step_time)
             
             return actual_fade_time

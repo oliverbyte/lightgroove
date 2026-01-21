@@ -42,5 +42,33 @@
       { "index": 6, "name": "macro", "type": "other", "range": [0, 255] },
       { "index": 7, "name": "macro_speed", "type": "other", "range": [0, 255] }
     ]
+  },
+  "uking_mini_moving_light": {
+    "name": "U-King Mini Gobo Moving Head",
+    "manufacturer": "U-King",
+    "channels": [
+      { "index": 0, "name": "pan", "type": "pan", "range": [0, 255] },
+      { "index": 1, "name": "pan_fine", "type": "pan_fine", "range": [0, 255] },
+      { "index": 2, "name": "tilt", "type": "tilt", "range": [0, 255] },
+      { "index": 3, "name": "tilt_fine", "type": "tilt_fine", "range": [0, 255] },
+      { "index": 4, "name": "color_wheel", "type": "other", "range": [0, 255] },
+      { "index": 5, "name": "gobo_wheel", "type": "other", "range": [0, 255] },
+      { "index": 6, "name": "strobe", "type": "shutter", "range": [0, 255] },
+      { "index": 7, "name": "master_dimmer", "type": "dimmer", "range": [0, 255] },
+      { "index": 8, "name": "pan_tilt_speed", "type": "speed", "range": [0, 255] },
+      { "index": 9, "name": "auto_sound_mode", "type": "other", "range": [0, 255] },
+      { "index": 10, "name": "reset", "type": "other", "range": [0, 255] }
+    ],
+    "color_wheel_mapping": {
+      "white": 5,
+      "red": 15,
+      "green": 25,
+      "blue": 35,
+      "yellow": 45,
+      "orange": 55,
+      "cyan": 65,
+      "magenta": 75
+    },
+    "dimmer_on_black": true
   }
 }

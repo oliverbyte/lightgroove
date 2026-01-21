@@ -182,7 +182,17 @@ class HttpApiServer:
                 payload = self._read_json()
 
                 try:
-                    if path.startswith("/api/fixture/") and "/color" in path:
+                    if path.startswith("/api/fixture/") and "/channel/" in path:
+                        parts = path.split("/")
+                        fixture_id = parts[3]
+                        channel_name = parts[5]
+                        value = float(payload.get("value", 0))
+                        fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
+                        self._set_headers()
+                        self.wfile.write(b"{}")
+                        return
+
+                    if path.startswith("/api/fixture/") and path.endswith("/color"):
                         fixture_id = path.split("/")[3]
                         r = float(payload.get("r", 0))
                         g = float(payload.get("g", 0))
@@ -193,20 +203,10 @@ class HttpApiServer:
                         self.wfile.write(b"{}")
                         return
 
-                    if path.startswith("/api/fixture/") and "/dimmer" in path:
+                    if path.startswith("/api/fixture/") and path.endswith("/dimmer"):
                         fixture_id = path.split("/")[3]
                         value = float(payload.get("value", 0))
                         fixture_manager.set_fixture_dimmer(fixture_id, value)
-                        self._set_headers()
-                        self.wfile.write(b"{}")
-                        return
-
-                    if path.startswith("/api/fixture/") and "/channel/" in path:
-                        parts = path.split("/")
-                        fixture_id = parts[3]
-                        channel_name = parts[5]
-                        value = float(payload.get("value", 0))
-                        fixture_manager.set_fixture_channel(fixture_id, channel_name, value)
                         self._set_headers()
                         self.wfile.write(b"{}")
                         return
