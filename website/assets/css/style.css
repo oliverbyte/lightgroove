@@ -203,6 +203,17 @@ body {
   color: var(--primary-color);
 }
 
+.btn-tertiary {
+  background: transparent;
+  color: white;
+  border-color: white;
+}
+
+.btn-tertiary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
+
 /* Feature Grid */
 .features-section {
   padding: 5rem 0;
