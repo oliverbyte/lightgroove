@@ -4,6 +4,7 @@ title: LightGroove - Free Open Source DMX Lighting Controller
 description: Free, open source DMX lighting controller for mobile DJs, small venues, and technology enthusiasts. Community-powered development with professional features. Web-based interface, ArtNet output, real-time control. Built with Python and Flask.
 keywords: free dmx controller, open source lighting software, dmx software for djs, small venue lighting control, artnet controller free, community lighting software, mobile dj lighting, free lighting control software, python dmx controller
 ---
+<!-- Updated 2026-01-21 -->
 
 <section class="hero">
   <div class="container">
