@@ -373,14 +373,15 @@ class FixtureManager:
         if not self.has_pan_tilt(fixture_id):
             return
         
-        # Position mappings (0.0-1.0) optimized for moving heads
-        # Pan: 0.0=left, 0.5=center, 1.0=right
-        # Tilt: 0.0=down, 0.5=horizontal, 1.0=up
+        # Position mappings (0.0-1.0) based on professional lighting standards
+        # Pan: 0.0=far left, 0.5=center (180°), 1.0=far right
+        # Tilt: 0.0=down, 0.5=horizontal (135°), 1.0=up
         positions = {
-            'front': {'pan': 0.5, 'tilt': 0.65},   # Center pan, angled toward audience
-            'back': {'pan': 0.0, 'tilt': 0.65},    # Rotated back, same tilt angle
-            'up': {'pan': 0.5, 'tilt': 0.85},      # Center pan, pointing up
-            'down': {'pan': 0.5, 'tilt': 0.15}     # Center pan, pointing down
+            'front': {'pan': 0.5, 'tilt': 0.6},    # Center pan, angled toward audience (108°)
+            'back': {'pan': 0.0, 'tilt': 0.6},     # Rotated 180° back, same angle
+            'up': {'pan': 0.5, 'tilt': 0.85},      # Center pan, overhead (229°)
+            'down': {'pan': 0.5, 'tilt': 0.3},     # Center pan, low angle (81°)
+            'home': {'pan': 0.5, 'tilt': 0.5},     # Center/neutral position (180°/135°)
         }
         
         if position in positions:

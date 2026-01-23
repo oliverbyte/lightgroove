@@ -1,6 +1,7 @@
 """
 Move FX engine for LightGroove.
-Manages pan/tilt effects that run server-side independently of UI.
+Professional movement effect engine for fixtures with pan/tilt channels.
+Based on patterns from QLC+ and professional lighting control systems.
 """
 import threading
 import time
@@ -11,6 +12,17 @@ from typing import Dict, List, Optional
 class MoveFXEngine:
     """
     Manages movement effects for fixtures with pan/tilt channels.
+    
+    Implements professional movement patterns including:
+    - Oscillation effects (pan sway, tilt sway)
+    - Geometric patterns (circle, figure-8)
+    - Lissajous curves (complex mathematical patterns)
+    
+    Features:
+    - BPM-based speed control
+    - Continuous smooth motion without restart jumps
+    - Real-time position adaptation
+    - Multi-fixture support
     """
     
     def __init__(self, fixture_manager):
@@ -20,6 +32,8 @@ class MoveFXEngine:
         self.current_fx = None
         self.fx_thread = None
         self.stop_event = threading.Event()
+        self.width = 0.3  # Effect width/amplitude (0.0-1.0)
+        self.height = 0.3  # Effect height/amplitude (0.0-1.0)
         
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
@@ -88,6 +102,14 @@ class MoveFXEngine:
             self.fx_thread = threading.Thread(target=self._run_eight, daemon=True)
             self.fx_thread.start()
             print(f"Move FX: Started 'eight' (figure-8) effect at {self.bpm} BPM")
+        elif fx_name == 'lissajous':
+            self.fx_thread = threading.Thread(target=self._run_lissajous, daemon=True)
+            self.fx_thread.start()
+            print(f"Move FX: Started 'lissajous' effect at {self.bpm} BPM")
+        elif fx_name == 'diamond':
+            self.fx_thread = threading.Thread(target=self._run_diamond, daemon=True)
+            self.fx_thread.start()
+            print(f"Move FX: Started 'diamond' effect at {self.bpm} BPM")
         elif fx_name == 'off':
             self.stop_fx()
             # Return all to front/center position
@@ -208,6 +230,76 @@ class MoveFXEngine:
                 for fixture_id in fixtures:
                     self._set_pan_tilt(fixture_id, pan_value, tilt_value)
                 
+                time.sleep(step_time)
+    
+    def _run_lissajous(self, freq_x=3, freq_y=2, phase_x=0, phase_y=math.pi/2):
+        """
+        Lissajous curve effect - complex mathematical patterns.
+        
+        Args:
+            freq_x: Frequency multiplier for pan (X-axis)
+            freq_y: Frequency multiplier for tilt (Y-axis)
+            phase_x: Phase offset for pan in radians
+            phase_y: Phase offset for tilt in radians
+        
+        Common patterns:
+        - freq_x=3, freq_y=2: Classic 3:2 Lissajous
+        - freq_x=5, freq_y=4: More complex pattern
+        - phase_y=π/2: Creates perpendicular motion
+        """
+        fixtures = self.get_moving_fixtures()
+        steps_per_cycle = 100
+        angle = 0
+        
+        while self.running:
+            interval = self.get_interval()
+            step_time = interval / steps_per_cycle
+            angle_increment = (2 * math.pi) / steps_per_cycle
+            
+            for step in range(steps_per_cycle):
+                if not self.running:
+                    break
+                
+                # Lissajous parametric equations
+                pan_value = 0.5 + self.width * math.sin(freq_x * angle + phase_x)
+                tilt_value = 0.5 + self.height * math.sin(freq_y * angle + phase_y)
+                
+                for fixture_id in fixtures:
+                    self._set_pan_tilt(fixture_id, pan_value, tilt_value)
+                
+                angle += angle_increment
+                time.sleep(step_time)
+    
+    def _run_diamond(self):
+        """
+        Diamond effect - square rotated 45 degrees with sharp corners.
+        Uses power functions for sharp corner transitions.
+        """
+        fixtures = self.get_moving_fixtures()
+        steps_per_cycle = 100
+        angle = 0
+        
+        while self.running:
+            interval = self.get_interval()
+            step_time = interval / steps_per_cycle
+            angle_increment = (2 * math.pi) / steps_per_cycle
+            
+            for step in range(steps_per_cycle):
+                if not self.running:
+                    break
+                
+                # Use cubic power for sharper corners
+                raw_pan = math.cos(angle)
+                raw_tilt = math.sin(angle)
+                
+                # Apply power function for sharpness
+                pan_value = 0.5 + self.width * (raw_pan ** 3)
+                tilt_value = 0.5 + self.height * (raw_tilt ** 3)
+                
+                for fixture_id in fixtures:
+                    self._set_pan_tilt(fixture_id, pan_value, tilt_value)
+                
+                angle += angle_increment
                 time.sleep(step_time)
     
     def get_status(self) -> Dict:
