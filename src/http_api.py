@@ -348,11 +348,9 @@ class HttpApiServer:
                         return
                     
                     if path == "/api/flash/on":
-                        # Pause FX engines if running
+                        # Pause color FX engine if running
                         if color_fx:
                             color_fx.flash_active = True
-                        if move_fx:
-                            move_fx.flash_active = True
                         # Save current states and activate flash
                         self.server._flash_saved_states = fixture_manager.save_current_states()
                         fixture_manager.flash_all_white()
@@ -361,11 +359,9 @@ class HttpApiServer:
                         return
                     
                     if path == "/api/flash/off":
-                        # Resume FX engines
+                        # Resume color FX engine
                         if color_fx:
                             color_fx.flash_active = False
-                        if move_fx:
-                            move_fx.flash_active = False
                         # Restore saved states or blackout if no states were saved
                         if self.server._flash_saved_states and any(self.server._flash_saved_states.values()):
                             fixture_manager.restore_states(self.server._flash_saved_states)
