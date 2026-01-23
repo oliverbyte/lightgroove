@@ -162,10 +162,8 @@ class MoveFXEngine:
                 pan_value = self.center_pan + self.fx_size * math.sin(progress * 2 * math.pi)
                 
                 for fixture_id in fixtures:
-                    # Read current tilt position for each fixture on each iteration
-                    current_tilt = self.fixture_manager.get_fixture_channel(fixture_id, 'tilt')
-                    tilt_value = current_tilt if current_tilt else 0.5
-                    self._set_pan_tilt(fixture_id, pan_value, tilt_value)
+                    # Use center_tilt from X/Y pad for tilt position
+                    self._set_pan_tilt(fixture_id, pan_value, self.center_tilt)
                 
                 time.sleep(step_time)
     
@@ -187,10 +185,8 @@ class MoveFXEngine:
                 tilt_value = self.center_tilt + self.fx_size * 0.7 * math.sin(progress * 2 * math.pi)
                 
                 for fixture_id in fixtures:
-                    # Read current pan position for each fixture on each iteration
-                    current_pan = self.fixture_manager.get_fixture_channel(fixture_id, 'pan')
-                    pan_value = current_pan if current_pan else 0.5
-                    self._set_pan_tilt(fixture_id, pan_value, tilt_value)
+                    # Use center_pan from X/Y pad for pan position
+                    self._set_pan_tilt(fixture_id, self.center_pan, tilt_value)
                 
                 time.sleep(step_time)
     
