@@ -522,7 +522,7 @@
     
     fxSizeSlider?.addEventListener('input', async (e) => {
       const sizePercent = parseInt(e.target.value);
-      const size = sizePercent / 100; // Convert to 0.0-0.5 range
+      const size = sizePercent / 100; // Convert to 0.0-1.0 range
       fxSizeValue.textContent = sizePercent;
       await post(`${apiBase}/api/move/fx_size`, { size });
     });

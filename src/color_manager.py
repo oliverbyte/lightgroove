@@ -46,7 +46,7 @@ class ColorFXEngine:
     
     def __init__(self, fixture_manager):
         self.fixture_manager = fixture_manager
-        self.bpm = 120  # Default 120 BPM
+        self.bpm = 20  # Default 20 BPM
         self.fade_percentage = 0.0  # Fade time as percentage of beat interval (0.0-1.0)
         self.running = False
         self.current_fx = None

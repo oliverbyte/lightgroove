@@ -5,10 +5,10 @@
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <div id="xy-pad" style="width: 200px; height: 200px; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: 2px solid var(--border); border-radius: 8px; position: relative; cursor: crosshair; touch-action: none;">
           <div id="xy-cursor" style="position: absolute; width: 16px; height: 16px; background: #10b981; border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; left: 50%; top: 50%; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);"></div>
-          <div style="position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font-size: 10px; color: rgba(255,255,255,0.5);">▲ Up</div>
-          <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 10px; color: rgba(255,255,255,0.5);">▼ Down</div>
-          <div style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); font-size: 10px; color: rgba(255,255,255,0.5);">◄ Back</div>
-          <div style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); font-size: 10px; color: rgba(255,255,255,0.5);">► Front</div>
+          <div style="position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">▲</div>
+          <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">▼</div>
+          <div style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">◄</div>
+          <div style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">►</div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
           <span>Pan: <span id="xy-pan-value">0.50</span></span>
@@ -31,10 +31,10 @@
     </div>
     <div class="card" style="width: fit-content;">
       <h3>FX Size</h3>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <input type="range" id="fx-size-slider" min="0" max="50" value="30" step="1" style="width: 200px;" />
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
-          <span>Size: <span id="fx-size-value">30</span>%</span>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <input type="range" id="fx-size-slider" min="0" max="100" value="30" step="1" orient="vertical" style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 24px; height: 150px;" />
+        <div style="font-size: 12px; color: var(--text-muted);">
+          <span id="fx-size-value">30</span>%
         </div>
       </div>
     </div>

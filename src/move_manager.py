@@ -27,7 +27,7 @@ class MoveFXEngine:
     
     def __init__(self, fixture_manager):
         self.fixture_manager = fixture_manager
-        self.bpm = 120  # Default 120 BPM
+        self.bpm = 20  # Default 20 BPM
         self.running = False
         self.current_fx = None
         self.fx_thread = None
@@ -38,7 +38,7 @@ class MoveFXEngine:
         self.center_tilt = 0.5  # Tilt center (0.0-1.0)
         
         # Effect size/amplitude control
-        self.fx_size = 0.3  # Size (0.0-0.5) defines min-max range from center
+        self.fx_size = 0.3  # Size (0.0-1.0) defines min-max range from center
         
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
@@ -52,8 +52,8 @@ class MoveFXEngine:
         print(f"Move FX: Center set to pan={self.center_pan:.2f}, tilt={self.center_tilt:.2f}")
     
     def set_fx_size(self, size: float):
-        """Set the effect size/amplitude (0.0-0.5)."""
-        self.fx_size = max(0.0, min(0.5, size))
+        """Set the effect size/amplitude (0.0-1.0)."""
+        self.fx_size = max(0.0, min(1.0, size))
         print(f"Move FX: Size set to {self.fx_size:.2f}")
     
     def get_interval(self) -> float:
