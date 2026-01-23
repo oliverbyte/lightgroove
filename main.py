@@ -18,6 +18,7 @@ from fixture_manager import FixtureManager
 from ui_generator import generate_ui
 from http_api import HttpApiServer
 from color_manager import ColorFXEngine
+from move_manager import MoveFXEngine
 
 
 def main():
@@ -54,9 +55,12 @@ def main():
         # Color FX Engine
         color_fx = ColorFXEngine(fixture_mgr)
         
+        # Move FX Engine
+        move_fx = MoveFXEngine(fixture_mgr)
+        
         # Generate UI shell and start HTTP UI/API server
         generate_ui(fixture_mgr, ui_dir, api_base="")
-        http = HttpApiServer(fixture_mgr, ui_dir, host="0.0.0.0", port=http_port, color_fx=color_fx)
+        http = HttpApiServer(fixture_mgr, ui_dir, host="0.0.0.0", port=http_port, color_fx=color_fx, move_fx=move_fx)
         try:
             http.start()
         except OSError as e:
@@ -72,6 +76,7 @@ def main():
         def signal_handler(sig, frame):
             print("\n\nShutting down...")
             color_fx.stop_fx()  # Stop any running effects
+            move_fx.stop_fx()   # Stop any running move effects
             if http:
                 http.stop()
             dmx.stop()

@@ -478,21 +478,35 @@
     document.getElementById('fx-pan-sway')?.addEventListener('click', async () => {
       await post(`${apiBase}/api/move/fx`, { fx: 'pan_sway' });
       showToast('Move FX: Pan Sway', 'success');
-      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight').forEach(btn => btn.classList.remove('active'));
       document.getElementById('fx-pan-sway').classList.add('active');
     });
 
     document.getElementById('fx-tilt-sway')?.addEventListener('click', async () => {
       await post(`${apiBase}/api/move/fx`, { fx: 'tilt_sway' });
       showToast('Move FX: Tilt Sway', 'success');
-      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight').forEach(btn => btn.classList.remove('active'));
       document.getElementById('fx-tilt-sway').classList.add('active');
+    });
+
+    document.getElementById('fx-circle')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'circle' });
+      showToast('Move FX: Circle', 'success');
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-circle').classList.add('active');
+    });
+
+    document.getElementById('fx-eight')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'eight' });
+      showToast('Move FX: Figure-8', 'success');
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-eight').classList.add('active');
     });
 
     document.getElementById('fx-move-off')?.addEventListener('click', async () => {
       await post(`${apiBase}/api/move/fx`, { fx: 'off' });
       showToast('Move FX: Off', 'info');
-      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight').forEach(btn => btn.classList.remove('active'));
     });
 
     // Update active color indicator from FX status

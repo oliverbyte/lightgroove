@@ -15,12 +15,13 @@ from typing import Any, Dict, Optional
 class HttpApiServer:
     """Threaded HTTP server exposing a JSON API and serving the generated UI."""
 
-    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000, color_fx=None):
+    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000, color_fx=None, move_fx=None):
         self.fixture_manager = fixture_manager
         self.ui_dir = ui_dir
         self.host = host
         self.port = port
         self.color_fx = color_fx
+        self.move_fx = move_fx
         self._server = None
         self._thread = None
         self._flash_saved_states = None  # Store states before flash
@@ -44,6 +45,7 @@ class HttpApiServer:
         fixture_manager = self.fixture_manager
         ui_dir = self.ui_dir
         color_fx = self.color_fx
+        move_fx = self.move_fx
 
         class Handler(BaseHTTPRequestHandler):
             def _set_headers(self, status: int = 200, content_type: str = "application/json"):
@@ -327,31 +329,24 @@ class HttpApiServer:
                     
                     if path == "/api/move/fx":
                         fx_type = payload.get("fx", "off")
-                        # For now, we'll implement simple static position moves
-                        # A full implementation would use a separate MoveFXEngine
-                        if fx_type == "pan_sway":
-                            # Simple pan sway - alternate between left and right
-                            # This is a basic implementation; for smooth effects, use a thread
-                            for fixture_id in fixture_manager.list_fixtures():
-                                if fixture_manager.has_pan_tilt(fixture_id):
-                                    # Set to sway position (will need thread for animation)
-                                    fixture_manager.set_fixture_channel(fixture_id, 'pan', 0.3)
-                        elif fx_type == "tilt_sway":
-                            # Simple tilt sway
-                            for fixture_id in fixture_manager.list_fixtures():
-                                if fixture_manager.has_pan_tilt(fixture_id):
-                                    fixture_manager.set_fixture_channel(fixture_id, 'tilt', 0.3)
-                        elif fx_type == "off":
-                            # Stop any movement by setting to center
-                            fixture_manager.set_all_moving_positions("front")
-                        self._set_headers()
-                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        if move_fx:
+                            move_fx.start_fx(fx_type)
+                            self._set_headers()
+                            self.wfile.write(json.dumps(move_fx.get_status()).encode("utf-8"))
+                        else:
+                            # Fallback if move_fx not initialized
+                            if fx_type == "off":
+                                fixture_manager.set_all_moving_positions("front")
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
                         return
                     
                     if path == "/api/flash/on":
-                        # Pause FX engine if running
+                        # Pause FX engines if running
                         if color_fx:
                             color_fx.flash_active = True
+                        if move_fx:
+                            move_fx.flash_active = True
                         # Save current states and activate flash
                         self.server._flash_saved_states = fixture_manager.save_current_states()
                         fixture_manager.flash_all_white()
@@ -360,9 +355,11 @@ class HttpApiServer:
                         return
                     
                     if path == "/api/flash/off":
-                        # Resume FX engine
+                        # Resume FX engines
                         if color_fx:
                             color_fx.flash_active = False
+                        if move_fx:
+                            move_fx.flash_active = False
                         # Restore saved states or blackout if no states were saved
                         if self.server._flash_saved_states and any(self.server._flash_saved_states.values()):
                             fixture_manager.restore_states(self.server._flash_saved_states)
