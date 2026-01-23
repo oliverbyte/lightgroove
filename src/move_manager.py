@@ -32,13 +32,29 @@ class MoveFXEngine:
         self.current_fx = None
         self.fx_thread = None
         self.stop_event = threading.Event()
-        self.width = 0.3  # Effect width/amplitude (0.0-1.0)
-        self.height = 0.3  # Effect height/amplitude (0.0-1.0)
+        
+        # Effect center position (X/Y pad controls)
+        self.center_pan = 0.5  # Pan center (0.0-1.0)
+        self.center_tilt = 0.5  # Tilt center (0.0-1.0)
+        
+        # Effect size/amplitude control
+        self.fx_size = 0.3  # Size (0.0-0.5) defines min-max range from center
         
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
         self.bpm = max(1, min(480, bpm))
         print(f"Move FX: BPM set to {self.bpm}")
+    
+    def set_center(self, pan: float, tilt: float):
+        """Set the center position for effects (X/Y pad control)."""
+        self.center_pan = max(0.0, min(1.0, pan))
+        self.center_tilt = max(0.0, min(1.0, tilt))
+        print(f"Move FX: Center set to pan={self.center_pan:.2f}, tilt={self.center_tilt:.2f}")
+    
+    def set_fx_size(self, size: float):
+        """Set the effect size/amplitude (0.0-0.5)."""
+        self.fx_size = max(0.0, min(0.5, size))
+        print(f"Move FX: Size set to {self.fx_size:.2f}")
     
     def get_interval(self) -> float:
         """Calculate interval in seconds based on BPM."""
@@ -141,9 +157,9 @@ class MoveFXEngine:
                 if not self.running:
                     break
                 
-                # Sine wave for smooth oscillation (0.2 to 0.8 range)
+                # Sine wave for smooth oscillation around center position
                 progress = step / steps_per_cycle
-                pan_value = 0.5 + 0.3 * math.sin(progress * 2 * math.pi)
+                pan_value = self.center_pan + self.fx_size * math.sin(progress * 2 * math.pi)
                 
                 for fixture_id in fixtures:
                     # Read current tilt position for each fixture on each iteration
@@ -166,9 +182,9 @@ class MoveFXEngine:
                 if not self.running:
                     break
                 
-                # Sine wave for smooth oscillation (0.3 to 0.7 range)
+                # Sine wave for smooth oscillation around center position
                 progress = step / steps_per_cycle
-                tilt_value = 0.5 + 0.2 * math.sin(progress * 2 * math.pi)
+                tilt_value = self.center_tilt + self.fx_size * 0.7 * math.sin(progress * 2 * math.pi)
                 
                 for fixture_id in fixtures:
                     # Read current pan position for each fixture on each iteration
@@ -193,10 +209,10 @@ class MoveFXEngine:
                 if not self.running:
                     break
                 
-                # Circle with radius 0.25 centered at (0.5, 0.5)
+                # Circle with size as radius, centered at user-defined position
                 # Use continuously incrementing angle for smooth motion
-                pan_value = 0.5 + 0.25 * math.cos(angle)
-                tilt_value = 0.5 + 0.25 * math.sin(angle)
+                pan_value = self.center_pan + self.fx_size * math.cos(angle)
+                tilt_value = self.center_tilt + self.fx_size * math.sin(angle)
                 
                 for fixture_id in fixtures:
                     self._set_pan_tilt(fixture_id, pan_value, tilt_value)
@@ -221,11 +237,10 @@ class MoveFXEngine:
                 progress = step / steps_per_cycle
                 t = progress * 2 * math.pi
                 
-                # Lemniscate formula with scaling
-                scale = 0.25
+                # Lemniscate formula with user-controlled size and center
                 denominator = 1 + math.sin(t) ** 2
-                pan_value = 0.5 + scale * math.cos(t) / denominator
-                tilt_value = 0.5 + scale * math.sin(t) * math.cos(t) / denominator
+                pan_value = self.center_pan + self.fx_size * math.cos(t) / denominator
+                tilt_value = self.center_tilt + self.fx_size * math.sin(t) * math.cos(t) / denominator
                 
                 for fixture_id in fixtures:
                     self._set_pan_tilt(fixture_id, pan_value, tilt_value)
@@ -260,9 +275,9 @@ class MoveFXEngine:
                 if not self.running:
                     break
                 
-                # Lissajous parametric equations
-                pan_value = 0.5 + self.width * math.sin(freq_x * angle + phase_x)
-                tilt_value = 0.5 + self.height * math.sin(freq_y * angle + phase_y)
+                # Lissajous parametric equations with user-controlled center and size
+                pan_value = self.center_pan + self.fx_size * math.sin(freq_x * angle + phase_x)
+                tilt_value = self.center_tilt + self.fx_size * math.sin(freq_y * angle + phase_y)
                 
                 for fixture_id in fixtures:
                     self._set_pan_tilt(fixture_id, pan_value, tilt_value)
@@ -292,9 +307,9 @@ class MoveFXEngine:
                 raw_pan = math.cos(angle)
                 raw_tilt = math.sin(angle)
                 
-                # Apply power function for sharpness
-                pan_value = 0.5 + self.width * (raw_pan ** 3)
-                tilt_value = 0.5 + self.height * (raw_tilt ** 3)
+                # Apply power function for sharpness with user-controlled center and size
+                pan_value = self.center_pan + self.fx_size * (raw_pan ** 3)
+                tilt_value = self.center_tilt + self.fx_size * (raw_tilt ** 3)
                 
                 for fixture_id in fixtures:
                     self._set_pan_tilt(fixture_id, pan_value, tilt_value)

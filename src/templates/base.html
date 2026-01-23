@@ -453,21 +453,78 @@
       // Keep highlighting - server preserves current_color
     });
 
-    // Move tab - Static Position controls
-    document.getElementById('pos-front')?.addEventListener('click', async () => {
-      await post(`${apiBase}/api/move/position`, { position: 'front' });
+    // Move tab - X/Y Pad for center position control
+    const xyPad = document.getElementById('xy-pad');
+    const xyCursor = document.getElementById('xy-cursor');
+    const xyPanValue = document.getElementById('xy-pan-value');
+    const xyTiltValue = document.getElementById('xy-tilt-value');
+    
+    let isDragging = false;
+    
+    function updateXYPosition(x, y) {
+      // Convert pixel coordinates to 0-1 range
+      const rect = xyPad.getBoundingClientRect();
+      const pan = Math.max(0, Math.min(1, x / rect.width));
+      const tilt = Math.max(0, Math.min(1, 1 - (y / rect.height))); // Invert Y axis
+      
+      // Update cursor position
+      xyCursor.style.left = `${pan * 100}%`;
+      xyCursor.style.top = `${(1 - tilt) * 100}%`;
+      
+      // Update value displays
+      xyPanValue.textContent = pan.toFixed(2);
+      xyTiltValue.textContent = tilt.toFixed(2);
+      
+      // Send to backend
+      post(`${apiBase}/api/move/center`, { pan, tilt });
+    }
+    
+    xyPad?.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      const rect = xyPad.getBoundingClientRect();
+      updateXYPosition(e.clientX - rect.left, e.clientY - rect.top);
     });
-
-    document.getElementById('pos-back')?.addEventListener('click', async () => {
-      await post(`${apiBase}/api/move/position`, { position: 'back' });
+    
+    xyPad?.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      const rect = xyPad.getBoundingClientRect();
+      const touch = e.touches[0];
+      updateXYPosition(touch.clientX - rect.left, touch.clientY - rect.top);
+      e.preventDefault();
     });
-
-    document.getElementById('pos-up')?.addEventListener('click', async () => {
-      await post(`${apiBase}/api/move/position`, { position: 'up' });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging && xyPad) {
+        const rect = xyPad.getBoundingClientRect();
+        updateXYPosition(e.clientX - rect.left, e.clientY - rect.top);
+      }
     });
-
-    document.getElementById('pos-down')?.addEventListener('click', async () => {
-      await post(`${apiBase}/api/move/position`, { position: 'down' });
+    
+    document.addEventListener('touchmove', (e) => {
+      if (isDragging && xyPad) {
+        const rect = xyPad.getBoundingClientRect();
+        const touch = e.touches[0];
+        updateXYPosition(touch.clientX - rect.left, touch.clientY - rect.top);
+        e.preventDefault();
+      }
+    });
+    
+    document.addEventListener('mouseup', () => { isDragging = false; });
+    document.addEventListener('touchend', () => { isDragging = false; });
+    
+    document.getElementById('xy-center')?.addEventListener('click', () => {
+      updateXYPosition(xyPad.offsetWidth / 2, xyPad.offsetHeight / 2);
+    });
+    
+    // Move tab - FX Size slider
+    const fxSizeSlider = document.getElementById('fx-size-slider');
+    const fxSizeValue = document.getElementById('fx-size-value');
+    
+    fxSizeSlider?.addEventListener('input', async (e) => {
+      const sizePercent = parseInt(e.target.value);
+      const size = sizePercent / 100; // Convert to 0.0-0.5 range
+      fxSizeValue.textContent = sizePercent;
+      await post(`${apiBase}/api/move/fx_size`, { size });
     });
 
     // Move tab - Move FX controls

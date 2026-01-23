@@ -326,11 +326,21 @@ class HttpApiServer:
                             self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                         return
                     
-                    if path == "/api/move/position":
-                        position = payload.get("position", "front")
-                        fixture_manager.set_all_moving_positions(position)
+                    if path == "/api/move/center":
+                        pan = payload.get("pan", 0.5)
+                        tilt = payload.get("tilt", 0.5)
+                        if move_fx:
+                            move_fx.set_center(pan, tilt)
                         self._set_headers()
-                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        self.wfile.write(json.dumps({"success": True, "pan": pan, "tilt": tilt}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/move/fx_size":
+                        size = payload.get("size", 0.3)
+                        if move_fx:
+                            move_fx.set_fx_size(size)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True, "size": size}).encode("utf-8"))
                         return
                     
                     if path == "/api/move/fx":
