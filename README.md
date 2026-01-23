@@ -29,6 +29,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
 ![UI Globals](img/screenshot_globals.png)
 ![UI Faders](img/screenshot_faders.png)
 ![UI Colors](img/screenshot_colors.png)
+![UI Move](img/screenshot_move.png)
 ![UI Config](img/screenshot_config.png)
 
 ## Features
@@ -98,6 +99,36 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - Works seamlessly with both RGBW and color wheel fixtures
   - **Black beats automatically dim to 0%, color beats restore previous dimmer**
 - **Active Indication**: Visual feedback showing which color/effect is currently active
+
+**Move Tab** (for moving head fixtures):
+- **Move Position (X/Y Pad)**: Professional touchpad control for pan/tilt positioning
+  - 200x200px interactive drag surface with visual cursor
+  - Works both during effects (controls center position) and without effects (direct positioning)
+  - Real-time position updates displayed as pan/tilt values (0.00-1.00)
+  - Touch-friendly for mobile devices and tablets
+  - Reset to Center button for quick centering
+  - Settings automatically saved and restored on app restart
+- **Move FX Size**: Vertical slider controlling effect amplitude (0-100%)
+  - Defines how far movements extend from the center position
+  - 0% = no movement (static position)
+  - 100% = full range movement (±50% from center)
+  - Real-time adjustment while effects are running
+  - Automatic state persistence
+- **Movement Effects**: Professional movement patterns at adjustable BPM
+  - **Pan Sway**: Smooth horizontal oscillation around center position
+  - **Tilt Sway**: Smooth vertical oscillation around center position
+  - **Circle**: Continuous circular motion around center point
+  - **Figure-8**: Lemniscate pattern (infinity symbol)
+  - **Lissajous**: Complex mathematical curves (3:2 frequency ratio)
+  - **Diamond**: Sharp-cornered diamond shape using cubic power functions
+  - All effects use center position from X/Y pad
+  - BPM and size changes take effect immediately (no freezing)
+  - Stop button to halt all movement effects
+- **State Persistence**: All settings automatically saved
+  - Position (pan/tilt), FX Size, and BPM saved every 15 seconds
+  - Settings also saved immediately after any change
+  - Automatically restored on application startup
+  - Moving heads return to last position on restart
   - Single color highlighting for static colors and Random 1
   - Multi-color highlighting for Random 2/3/4 showing all active colors
 

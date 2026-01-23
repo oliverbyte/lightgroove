@@ -65,12 +65,21 @@ def take_screenshots():
             print("Capturing Colors tab...")
             page.screenshot(path="img/screenshot_colors.png", full_page=False)
             
+            # Click Move tab
+            print("Switching to Move tab...")
+            page.click("button[data-tab='move']")
+            time.sleep(1)  # Wait for tab transition
+            
+            # Screenshot 4: Move tab
+            print("Capturing Move tab...")
+            page.screenshot(path="img/screenshot_move.png", full_page=False)
+            
             # Click Config tab
             print("Switching to Config tab...")
             page.click("button[data-tab='config']")
             time.sleep(1)  # Wait for tab transition and config to load
             
-            # Screenshot 4: Config tab
+            # Screenshot 5: Config tab
             print("Capturing Config tab...")
             page.screenshot(path="img/screenshot_config.png", full_page=False)
             
@@ -86,6 +95,7 @@ def take_screenshots():
                 "screenshot_globals.png",
                 "screenshot_faders.png",
                 "screenshot_colors.png",
+                "screenshot_move.png",
                 "screenshot_config.png"
             ]
             

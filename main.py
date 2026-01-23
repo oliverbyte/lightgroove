@@ -75,8 +75,8 @@ def main():
         # Signal handler for clean shutdown
         def signal_handler(sig, frame):
             print("\n\nShutting down...")
-            color_fx.stop_fx()  # Stop any running effects
-            move_fx.stop_fx()   # Stop any running move effects
+            color_fx.shutdown()  # Stop effects and save state
+            move_fx.shutdown()   # Stop effects and save state
             if http:
                 http.stop()
             dmx.stop()
