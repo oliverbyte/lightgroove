@@ -157,27 +157,29 @@ class MoveFXEngine:
                 time.sleep(step_time)
     
     def _run_circle(self):
-        """Circle effect - smooth circular movement."""
+        """Circle effect - smooth continuous circular movement."""
         fixtures = self.get_moving_fixtures()
         steps_per_cycle = 80  # Smooth circular motion
         
+        angle = 0  # Start angle
         while self.running:
             interval = self.get_interval()
             step_time = interval / steps_per_cycle
+            angle_increment = (2 * math.pi) / steps_per_cycle
             
             for step in range(steps_per_cycle):
                 if not self.running:
                     break
                 
                 # Circle with radius 0.25 centered at (0.5, 0.5)
-                progress = step / steps_per_cycle
-                angle = progress * 2 * math.pi
+                # Use continuously incrementing angle for smooth motion
                 pan_value = 0.5 + 0.25 * math.cos(angle)
                 tilt_value = 0.5 + 0.25 * math.sin(angle)
                 
                 for fixture_id in fixtures:
                     self._set_pan_tilt(fixture_id, pan_value, tilt_value)
                 
+                angle += angle_increment
                 time.sleep(step_time)
     
     def _run_eight(self):
