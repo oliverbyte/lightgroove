@@ -264,11 +264,17 @@ class HttpApiServer:
                         self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
                         return
 
-                    if path == "/api/fx/bpm" and color_fx:
+                    if path == "/api/fx/bpm":
                         bpm = int(payload.get("bpm", 120))
-                        color_fx.set_bpm(bpm)
+                        if color_fx:
+                            color_fx.set_bpm(bpm)
+                        if move_fx:
+                            move_fx.set_bpm(bpm)
                         self._set_headers()
-                        self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
+                        response = {"bpm": bpm}
+                        if color_fx:
+                            response.update(color_fx.get_status())
+                        self.wfile.write(json.dumps(response).encode("utf-8"))
                         return
 
                     if path == "/api/fx/fadetime" and color_fx:
