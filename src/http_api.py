@@ -15,12 +15,13 @@ from typing import Any, Dict, Optional
 class HttpApiServer:
     """Threaded HTTP server exposing a JSON API and serving the generated UI."""
 
-    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000, color_fx=None):
+    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000, color_fx=None, move_fx=None):
         self.fixture_manager = fixture_manager
         self.ui_dir = ui_dir
         self.host = host
         self.port = port
         self.color_fx = color_fx
+        self.move_fx = move_fx
         self._server = None
         self._thread = None
         self._flash_saved_states = None  # Store states before flash
@@ -44,6 +45,7 @@ class HttpApiServer:
         fixture_manager = self.fixture_manager
         ui_dir = self.ui_dir
         color_fx = self.color_fx
+        move_fx = self.move_fx
 
         class Handler(BaseHTTPRequestHandler):
             def _set_headers(self, status: int = 200, content_type: str = "application/json"):
@@ -262,11 +264,17 @@ class HttpApiServer:
                         self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
                         return
 
-                    if path == "/api/fx/bpm" and color_fx:
+                    if path == "/api/fx/bpm":
                         bpm = int(payload.get("bpm", 120))
-                        color_fx.set_bpm(bpm)
+                        if color_fx:
+                            color_fx.set_bpm(bpm)
+                        if move_fx:
+                            move_fx.set_bpm(bpm)
                         self._set_headers()
-                        self.wfile.write(json.dumps(color_fx.get_status()).encode("utf-8"))
+                        response = {"bpm": bpm}
+                        if color_fx:
+                            response.update(color_fx.get_status())
+                        self.wfile.write(json.dumps(response).encode("utf-8"))
                         return
 
                     if path == "/api/fx/fadetime" and color_fx:
@@ -318,8 +326,39 @@ class HttpApiServer:
                             self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                         return
                     
+                    if path == "/api/move/center":
+                        pan = payload.get("pan", 0.5)
+                        tilt = payload.get("tilt", 0.5)
+                        if move_fx:
+                            move_fx.set_center(pan, tilt)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True, "pan": pan, "tilt": tilt}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/move/fx_size":
+                        size = payload.get("size", 0.3)
+                        if move_fx:
+                            move_fx.set_fx_size(size)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True, "size": size}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/move/fx":
+                        fx_type = payload.get("fx", "off")
+                        if move_fx:
+                            move_fx.start_fx(fx_type)
+                            self._set_headers()
+                            self.wfile.write(json.dumps(move_fx.get_status()).encode("utf-8"))
+                        else:
+                            # Fallback if move_fx not initialized
+                            if fx_type == "off":
+                                fixture_manager.set_all_moving_positions("front")
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+                    
                     if path == "/api/flash/on":
-                        # Pause FX engine if running
+                        # Pause color FX engine if running
                         if color_fx:
                             color_fx.flash_active = True
                         # Save current states and activate flash
@@ -330,7 +369,7 @@ class HttpApiServer:
                         return
                     
                     if path == "/api/flash/off":
-                        # Resume FX engine
+                        # Resume color FX engine
                         if color_fx:
                             color_fx.flash_active = False
                         # Restore saved states or blackout if no states were saved

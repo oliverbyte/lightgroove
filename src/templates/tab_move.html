@@ -1,0 +1,42 @@
+<div id="tab-move" class="tab-content">
+  <div class="grid">
+    <div class="card" style="width: fit-content;">
+      <h3>Move Position</h3>
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div id="xy-pad" style="width: 200px; height: 200px; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: 2px solid var(--border); border-radius: 8px; position: relative; cursor: crosshair; touch-action: none;">
+          <div id="xy-cursor" style="position: absolute; width: 16px; height: 16px; background: #10b981; border: 2px solid white; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; left: 50%; top: 50%; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);"></div>
+          <div style="position: absolute; top: 5px; left: 50%; transform: translateX(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">▲</div>
+          <div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">▼</div>
+          <div style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">◄</div>
+          <div style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); font-size: 14px; color: rgba(255,255,255,0.4);">►</div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+          <span>Pan: <span id="xy-pan-value">0.50</span></span>
+          <span>Tilt: <span id="xy-tilt-value">0.50</span></span>
+        </div>
+        <button class="color-btn secondary" id="xy-center" style="font-size: 13px;">Reset to Center</button>
+      </div>
+    </div>
+    <div class="card" style="width: fit-content;">
+      <h3>Move FX</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="color-btn" id="fx-pan-sway" style="background: linear-gradient(90deg, #8b5cf6, #ec4899); color: white;">↔ Pan Sway</button>
+        <button class="color-btn" id="fx-tilt-sway" style="background: linear-gradient(90deg, #06b6d4, #3b82f6); color: white;">↕ Tilt Sway</button>
+        <button class="color-btn" id="fx-circle" style="background: linear-gradient(135deg, #10b981, #22d3ee); color: white;">⭕ Circle</button>
+        <button class="color-btn" id="fx-eight" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white;">∞ Figure-8</button>
+        <button class="color-btn" id="fx-lissajous" style="background: linear-gradient(135deg, #a855f7, #ec4899); color: white;">〰 Lissajous</button>
+        <button class="color-btn" id="fx-diamond" style="background: linear-gradient(135deg, #0ea5e9, #8b5cf6); color: white;">◆ Diamond</button>
+        <button class="color-btn secondary" id="fx-move-off">Stop Move FX</button>
+      </div>
+    </div>
+    <div class="card" style="width: fit-content;">
+      <h3>Move FX Size</h3>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <input type="range" id="fx-size-slider" min="0" max="100" value="30" step="1" orient="vertical" style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 24px; height: 150px;" />
+        <div style="font-size: 12px; color: var(--text-muted);">
+          <span id="fx-size-value">30</span>%
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

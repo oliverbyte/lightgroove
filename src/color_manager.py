@@ -6,6 +6,7 @@ import time
 import random
 import json
 import os
+from pathlib import Path
 from typing import Dict, List, Optional
 
 
@@ -44,9 +45,9 @@ class ColorFXEngine:
     Manages color effects that run server-side independently of UI.
     """
     
-    def __init__(self, fixture_manager):
+    def __init__(self, fixture_manager, state_file: str = None):
         self.fixture_manager = fixture_manager
-        self.bpm = 120  # Default 120 BPM
+        self.bpm = 20  # Default 20 BPM
         self.fade_percentage = 0.0  # Fade time as percentage of beat interval (0.0-1.0)
         self.running = False
         self.current_fx = None
@@ -55,16 +56,34 @@ class ColorFXEngine:
         self.stop_event = threading.Event()
         self.flash_active = False  # Flag to pause FX during flash
         
+        # State persistence
+        if state_file is None:
+            state_file = os.path.join(os.path.dirname(__file__), '..', 'config', 'color_state.json')
+        self.state_file = Path(state_file)
+        self.last_save_time = 0
+        self.save_interval = 15  # Auto-save every 15 seconds
+        self.save_lock = threading.RLock()  # Reentrant lock to allow nested calls
+        
+        # Auto-save thread
+        self.autosave_running = True
+        self.autosave_thread = threading.Thread(target=self._autosave_loop, daemon=True)
+        self.autosave_thread.start()
+        
+        # Load saved state
+        self._load_state()
+        
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
         self.bpm = max(1, min(480, bpm))
         print(f"Color FX: BPM set to {self.bpm}")
+        self._save_state()
     
     def set_fade_percentage(self, percentage: float):
         """Set fade time as percentage of beat interval (0.0-1.0 range)."""
         self.fade_percentage = max(0.0, min(1.0, percentage))
         actual_time = self.fade_percentage * self.get_interval()
         print(f"Color FX: Fade set to {self.fade_percentage*100:.0f}% ({actual_time:.3f}s at {self.bpm} BPM)")
+        self._save_state()
         
     def get_interval(self) -> float:
         """Calculate interval in seconds based on BPM."""
@@ -189,6 +208,71 @@ class ColorFXEngine:
                 self.fx_thread.join(timeout=2.0)
             self.current_fx = None
             # Keep current_color to preserve highlighted state
+    
+    def _save_state(self):
+        """Save current state to file (debounced)."""
+        current_time = time.time()
+        # Debounce: only save if last save was more than 0.5 seconds ago
+        if current_time - self.last_save_time < 0.5:
+            return
+        
+        with self.save_lock:
+            try:
+                state = {
+                    'fade_percentage': self.fade_percentage,
+                    'bpm': self.bpm
+                }
+                
+                # Ensure directory exists
+                self.state_file.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Write to temp file then rename (atomic)
+                temp_file = self.state_file.with_suffix('.tmp')
+                with open(temp_file, 'w') as f:
+                    json.dump(state, f, indent=2)
+                temp_file.replace(self.state_file)
+                
+                self.last_save_time = current_time
+            except Exception as e:
+                print(f"Color FX: Error saving state: {e}")
+    
+    def _load_state(self):
+        """Load state from file."""
+        if not self.state_file.exists():
+            print("Color FX: No saved state found, using defaults")
+            return
+        
+        try:
+            with open(self.state_file, 'r') as f:
+                state = json.load(f)
+            
+            self.fade_percentage = state.get('fade_percentage', 0.0)
+            self.bpm = state.get('bpm', 20)
+            
+            print(f"Color FX: Loaded state - fade={self.fade_percentage*100:.0f}%, bpm={self.bpm}")
+        except Exception as e:
+            print(f"Color FX: Error loading state: {e}")
+    
+    def _autosave_loop(self):
+        """Background thread to periodically save state."""
+        while self.autosave_running:
+            time.sleep(self.save_interval)
+            if self.autosave_running:  # Check again after sleep
+                with self.save_lock:
+                    # Force save regardless of debounce
+                    old_last_save = self.last_save_time
+                    self.last_save_time = 0  # Reset to force save
+                    self._save_state()
+                    if self.last_save_time == 0:  # If save didn't happen, restore
+                        self.last_save_time = old_last_save
+    
+    def shutdown(self):
+        """Shutdown the color FX engine and save state."""
+        self.autosave_running = False
+        self.stop_fx()
+        self._save_state()
+        if self.autosave_thread.is_alive():
+            self.autosave_thread.join(timeout=1.0)
             
     def _run_random_fx(self):
         """Random color cycling effect - all fixtures same color."""

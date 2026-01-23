@@ -335,13 +335,14 @@ class FixtureManager:
                 self.set_fixture_channel(fixture_id, channel_name, value)
     
     def flash_all_white(self):
-        """Set all fixtures to full white for flash effect"""
+        """Set all fixtures to full white for flash effect (ignores pan/tilt)"""
         for fixture_id in self.fixtures:
             # Use set_fixture_color to handle both RGBW and color wheel fixtures
             # Full white: w=1.0, r=g=b=0
             self.set_fixture_color(fixture_id, 0.0, 0.0, 0.0, 1.0)
             # Set dimmer to full (not manual - don't save this value)
             self.set_fixture_dimmer(fixture_id, 1.0, manual=False)
+            # Note: pan and tilt channels are intentionally not modified during flash
     
     def save_current_states(self) -> Dict[str, Dict[str, float]]:
         """Save current states of all fixtures for later restoration"""
@@ -356,4 +357,47 @@ class FixtureManager:
             if fixture_id in self.fixtures:
                 for channel_name, value in state.items():
                     self.set_fixture_channel(fixture_id, channel_name, value)
+    
+    def has_pan_tilt(self, fixture_id: str) -> bool:
+        """Check if a fixture has pan and tilt channels"""
+        return self.has_channel(fixture_id, 'pan') and self.has_channel(fixture_id, 'tilt')
+    
+    def set_fixture_position(self, fixture_id: str, position: str):
+        """
+        Set fixture to a static position
+        
+        Args:
+            fixture_id: ID of the fixture
+            position: Position name ('front', 'back', 'up', 'down')
+        """
+        if not self.has_pan_tilt(fixture_id):
+            return
+        
+        # Position mappings (0.0-1.0) based on professional lighting standards
+        # Pan: 0.0=far left, 0.5=center (180°), 1.0=far right
+        # Tilt: 0.0=down, 0.5=horizontal (135°), 1.0=up
+        positions = {
+            'front': {'pan': 0.5, 'tilt': 0.6},    # Center pan, angled toward audience (108°)
+            'back': {'pan': 0.0, 'tilt': 0.6},     # Rotated 180° back, same angle
+            'up': {'pan': 0.5, 'tilt': 0.85},      # Center pan, overhead (229°)
+            'down': {'pan': 0.5, 'tilt': 0.3},     # Center pan, low angle (81°)
+            'home': {'pan': 0.5, 'tilt': 0.5},     # Center/neutral position (180°/135°)
+        }
+        
+        if position in positions:
+            pos = positions[position]
+            self.set_fixture_channel(fixture_id, 'pan', pos['pan'])
+            self.set_fixture_channel(fixture_id, 'tilt', pos['tilt'])
+            
+            # Also set fine channels if available
+            if self.has_channel(fixture_id, 'pan_fine'):
+                self.set_fixture_channel(fixture_id, 'pan_fine', 0.0)
+            if self.has_channel(fixture_id, 'tilt_fine'):
+                self.set_fixture_channel(fixture_id, 'tilt_fine', 0.0)
+    
+    def set_all_moving_positions(self, position: str):
+        """Set all moving fixtures to the same static position"""
+        for fixture_id in self.fixtures:
+            if self.has_pan_tilt(fixture_id):
+                self.set_fixture_position(fixture_id, position)
 

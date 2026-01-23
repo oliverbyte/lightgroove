@@ -94,12 +94,14 @@
       <button class="tab active" data-tab="globals">Globals</button>
       <button class="tab" data-tab="faders">Faders</button>
       <button class="tab" data-tab="colors">Colors</button>
+      <button class="tab" data-tab="move">Move</button>
       <button class="tab" data-tab="config">Config</button>
     </div>
     
     {TAB_GLOBALS}
     {TAB_FADERS}
     {TAB_COLORS}
+    {TAB_MOVE}
     {TAB_CONFIG}
   </div>
 
@@ -449,6 +451,122 @@
       // Remove FX button highlighting when stopped
       document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3, #fx-random-4').forEach(btn => btn.classList.remove('active'));
       // Keep highlighting - server preserves current_color
+    });
+
+    // Move tab - X/Y Pad for center position control
+    const xyPad = document.getElementById('xy-pad');
+    const xyCursor = document.getElementById('xy-cursor');
+    const xyPanValue = document.getElementById('xy-pan-value');
+    const xyTiltValue = document.getElementById('xy-tilt-value');
+    
+    let isDragging = false;
+    
+    function updateXYPosition(x, y) {
+      // Convert pixel coordinates to 0-1 range
+      const rect = xyPad.getBoundingClientRect();
+      const pan = Math.max(0, Math.min(1, x / rect.width));
+      const tilt = Math.max(0, Math.min(1, 1 - (y / rect.height))); // Invert Y axis
+      
+      // Update cursor position
+      xyCursor.style.left = `${pan * 100}%`;
+      xyCursor.style.top = `${(1 - tilt) * 100}%`;
+      
+      // Update value displays
+      xyPanValue.textContent = pan.toFixed(2);
+      xyTiltValue.textContent = tilt.toFixed(2);
+      
+      // Send to backend
+      post(`${apiBase}/api/move/center`, { pan, tilt });
+    }
+    
+    xyPad?.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      const rect = xyPad.getBoundingClientRect();
+      updateXYPosition(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    
+    xyPad?.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      const rect = xyPad.getBoundingClientRect();
+      const touch = e.touches[0];
+      updateXYPosition(touch.clientX - rect.left, touch.clientY - rect.top);
+      e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging && xyPad) {
+        const rect = xyPad.getBoundingClientRect();
+        updateXYPosition(e.clientX - rect.left, e.clientY - rect.top);
+      }
+    });
+    
+    document.addEventListener('touchmove', (e) => {
+      if (isDragging && xyPad) {
+        const rect = xyPad.getBoundingClientRect();
+        const touch = e.touches[0];
+        updateXYPosition(touch.clientX - rect.left, touch.clientY - rect.top);
+        e.preventDefault();
+      }
+    });
+    
+    document.addEventListener('mouseup', () => { isDragging = false; });
+    document.addEventListener('touchend', () => { isDragging = false; });
+    
+    document.getElementById('xy-center')?.addEventListener('click', () => {
+      updateXYPosition(xyPad.offsetWidth / 2, xyPad.offsetHeight / 2);
+    });
+    
+    // Move tab - FX Size slider
+    const fxSizeSlider = document.getElementById('fx-size-slider');
+    const fxSizeValue = document.getElementById('fx-size-value');
+    
+    fxSizeSlider?.addEventListener('input', async (e) => {
+      const sizePercent = parseInt(e.target.value);
+      const size = sizePercent / 100; // Convert to 0.0-1.0 range
+      fxSizeValue.textContent = sizePercent;
+      await post(`${apiBase}/api/move/fx_size`, { size });
+    });
+
+    // Move tab - Move FX controls
+    document.getElementById('fx-pan-sway')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'pan_sway' });
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight, #fx-lissajous, #fx-diamond').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-pan-sway').classList.add('active');
+    });
+
+    document.getElementById('fx-tilt-sway')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'tilt_sway' });
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight, #fx-lissajous, #fx-diamond').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-tilt-sway').classList.add('active');
+    });
+
+    document.getElementById('fx-circle')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'circle' });
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight, #fx-lissajous, #fx-diamond').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-circle').classList.add('active');
+    });
+
+    document.getElementById('fx-eight')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'eight' });
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight, #fx-lissajous, #fx-diamond').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-eight').classList.add('active');
+    });
+
+    document.getElementById('fx-lissajous')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'lissajous' });
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight, #fx-lissajous, #fx-diamond').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-lissajous').classList.add('active');
+    });
+
+    document.getElementById('fx-diamond')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'diamond' });
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight, #fx-lissajous, #fx-diamond').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-diamond').classList.add('active');
+    });
+
+    document.getElementById('fx-move-off')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'off' });
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway, #fx-circle, #fx-eight, #fx-lissajous, #fx-diamond').forEach(btn => btn.classList.remove('active'));
     });
 
     // Update active color indicator from FX status
