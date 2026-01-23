@@ -335,13 +335,14 @@ class FixtureManager:
                 self.set_fixture_channel(fixture_id, channel_name, value)
     
     def flash_all_white(self):
-        """Set all fixtures to full white for flash effect"""
+        """Set all fixtures to full white for flash effect (ignores pan/tilt)"""
         for fixture_id in self.fixtures:
             # Use set_fixture_color to handle both RGBW and color wheel fixtures
             # Full white: w=1.0, r=g=b=0
             self.set_fixture_color(fixture_id, 0.0, 0.0, 0.0, 1.0)
             # Set dimmer to full (not manual - don't save this value)
             self.set_fixture_dimmer(fixture_id, 1.0, manual=False)
+            # Note: pan and tilt channels are intentionally not modified during flash
     
     def save_current_states(self) -> Dict[str, Dict[str, float]]:
         """Save current states of all fixtures for later restoration"""

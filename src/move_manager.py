@@ -115,6 +115,12 @@ class MoveFXEngine:
         fixtures = self.get_moving_fixtures()
         steps_per_cycle = 60  # Smooth motion
         
+        # Save current tilt positions for each fixture
+        fixture_tilts = {}
+        for fixture_id in fixtures:
+            current_tilt = self.fixture_manager.get_fixture_channel(fixture_id, 'tilt')
+            fixture_tilts[fixture_id] = current_tilt if current_tilt else 0.5
+        
         while self.running:
             interval = self.get_interval()
             step_time = interval / steps_per_cycle
@@ -128,7 +134,7 @@ class MoveFXEngine:
                 pan_value = 0.5 + 0.3 * math.sin(progress * 2 * math.pi)
                 
                 for fixture_id in fixtures:
-                    self._set_pan_tilt(fixture_id, pan_value, 0.5)
+                    self._set_pan_tilt(fixture_id, pan_value, fixture_tilts[fixture_id])
                 
                 time.sleep(step_time)
     
@@ -136,6 +142,12 @@ class MoveFXEngine:
         """Tilt sway effect - smooth up-down movement."""
         fixtures = self.get_moving_fixtures()
         steps_per_cycle = 60
+        
+        # Save current pan positions for each fixture
+        fixture_pans = {}
+        for fixture_id in fixtures:
+            current_pan = self.fixture_manager.get_fixture_channel(fixture_id, 'pan')
+            fixture_pans[fixture_id] = current_pan if current_pan else 0.5
         
         while self.running:
             interval = self.get_interval()
@@ -150,7 +162,7 @@ class MoveFXEngine:
                 tilt_value = 0.5 + 0.2 * math.sin(progress * 2 * math.pi)
                 
                 for fixture_id in fixtures:
-                    self._set_pan_tilt(fixture_id, 0.5, tilt_value)
+                    self._set_pan_tilt(fixture_id, fixture_pans[fixture_id], tilt_value)
                 
                 time.sleep(step_time)
     
