@@ -94,12 +94,14 @@
       <button class="tab active" data-tab="globals">Globals</button>
       <button class="tab" data-tab="faders">Faders</button>
       <button class="tab" data-tab="colors">Colors</button>
+      <button class="tab" data-tab="move">Move</button>
       <button class="tab" data-tab="config">Config</button>
     </div>
     
     {TAB_GLOBALS}
     {TAB_FADERS}
     {TAB_COLORS}
+    {TAB_MOVE}
     {TAB_CONFIG}
   </div>
 
@@ -449,6 +451,48 @@
       // Remove FX button highlighting when stopped
       document.querySelectorAll('#fx-random-1, #fx-random-2, #fx-random-3, #fx-random-4').forEach(btn => btn.classList.remove('active'));
       // Keep highlighting - server preserves current_color
+    });
+
+    // Move tab - Static Position controls
+    document.getElementById('pos-front')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/position`, { position: 'front' });
+      showToast('Position: Front', 'success');
+    });
+
+    document.getElementById('pos-back')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/position`, { position: 'back' });
+      showToast('Position: Back', 'success');
+    });
+
+    document.getElementById('pos-up')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/position`, { position: 'up' });
+      showToast('Position: Up', 'success');
+    });
+
+    document.getElementById('pos-down')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/position`, { position: 'down' });
+      showToast('Position: Down', 'success');
+    });
+
+    // Move tab - Move FX controls
+    document.getElementById('fx-pan-sway')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'pan_sway' });
+      showToast('Move FX: Pan Sway', 'success');
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-pan-sway').classList.add('active');
+    });
+
+    document.getElementById('fx-tilt-sway')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'tilt_sway' });
+      showToast('Move FX: Tilt Sway', 'success');
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('fx-tilt-sway').classList.add('active');
+    });
+
+    document.getElementById('fx-move-off')?.addEventListener('click', async () => {
+      await post(`${apiBase}/api/move/fx`, { fx: 'off' });
+      showToast('Move FX: Off', 'info');
+      document.querySelectorAll('#fx-pan-sway, #fx-tilt-sway').forEach(btn => btn.classList.remove('active'));
     });
 
     // Update active color indicator from FX status

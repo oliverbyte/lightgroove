@@ -356,4 +356,44 @@ class FixtureManager:
             if fixture_id in self.fixtures:
                 for channel_name, value in state.items():
                     self.set_fixture_channel(fixture_id, channel_name, value)
+    
+    def has_pan_tilt(self, fixture_id: str) -> bool:
+        """Check if a fixture has pan and tilt channels"""
+        return self.has_channel(fixture_id, 'pan') and self.has_channel(fixture_id, 'tilt')
+    
+    def set_fixture_position(self, fixture_id: str, position: str):
+        """
+        Set fixture to a static position
+        
+        Args:
+            fixture_id: ID of the fixture
+            position: Position name ('front', 'back', 'up', 'down')
+        """
+        if not self.has_pan_tilt(fixture_id):
+            return
+        
+        # Position mappings (0.0-1.0)
+        positions = {
+            'front': {'pan': 0.5, 'tilt': 0.5},    # Center/front
+            'back': {'pan': 0.0, 'tilt': 0.5},     # Back
+            'up': {'pan': 0.5, 'tilt': 1.0},       # Up
+            'down': {'pan': 0.5, 'tilt': 0.0}      # Down
+        }
+        
+        if position in positions:
+            pos = positions[position]
+            self.set_fixture_channel(fixture_id, 'pan', pos['pan'])
+            self.set_fixture_channel(fixture_id, 'tilt', pos['tilt'])
+            
+            # Also set fine channels if available
+            if self.has_channel(fixture_id, 'pan_fine'):
+                self.set_fixture_channel(fixture_id, 'pan_fine', 0.0)
+            if self.has_channel(fixture_id, 'tilt_fine'):
+                self.set_fixture_channel(fixture_id, 'tilt_fine', 0.0)
+    
+    def set_all_moving_positions(self, position: str):
+        """Set all moving fixtures to the same static position"""
+        for fixture_id in self.fixtures:
+            if self.has_pan_tilt(fixture_id):
+                self.set_fixture_position(fixture_id, position)
 

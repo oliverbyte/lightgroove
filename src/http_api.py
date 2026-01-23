@@ -318,6 +318,36 @@ class HttpApiServer:
                             self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                         return
                     
+                    if path == "/api/move/position":
+                        position = payload.get("position", "front")
+                        fixture_manager.set_all_moving_positions(position)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/move/fx":
+                        fx_type = payload.get("fx", "off")
+                        # For now, we'll implement simple static position moves
+                        # A full implementation would use a separate MoveFXEngine
+                        if fx_type == "pan_sway":
+                            # Simple pan sway - alternate between left and right
+                            # This is a basic implementation; for smooth effects, use a thread
+                            for fixture_id in fixture_manager.list_fixtures():
+                                if fixture_manager.has_pan_tilt(fixture_id):
+                                    # Set to sway position (will need thread for animation)
+                                    fixture_manager.set_fixture_channel(fixture_id, 'pan', 0.3)
+                        elif fx_type == "tilt_sway":
+                            # Simple tilt sway
+                            for fixture_id in fixture_manager.list_fixtures():
+                                if fixture_manager.has_pan_tilt(fixture_id):
+                                    fixture_manager.set_fixture_channel(fixture_id, 'tilt', 0.3)
+                        elif fx_type == "off":
+                            # Stop any movement by setting to center
+                            fixture_manager.set_all_moving_positions("front")
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+                    
                     if path == "/api/flash/on":
                         # Pause FX engine if running
                         if color_fx:
