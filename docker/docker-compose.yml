@@ -7,16 +7,15 @@ services:
     container_name: lightgroove
     ports:
       - "5555:5555"
+      - "6454:6454/udp"  # ArtNet port
     volumes:
       # Persist configuration files
       - ../config:/app/config
     environment:
       - LIGHTGROOVE_HTTP_PORT=5555
     restart: unless-stopped
-    network_mode: host  # Required for ArtNet multicast/broadcast
-    # Alternative if host mode is not desired:
-    # networks:
-    #   - lightgroove-network
+    # Note: network_mode: host does not work on macOS/Windows Docker Desktop
+    # Using port mapping instead for cross-platform compatibility
 
 # Optional: Bridge network (comment out network_mode: host above to use)
 # networks:
