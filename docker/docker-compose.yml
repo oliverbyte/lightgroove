@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   lightgroove:
-    build: .
+    build: ..
     image: lightgroove:latest
     container_name: lightgroove
     ports:
       - "5555:5555"
     volumes:
       # Persist configuration files
-      - ./config:/app/config
+      - ../config:/app/config
     environment:
       - LIGHTGROOVE_HTTP_PORT=5555
     restart: unless-stopped

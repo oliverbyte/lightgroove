@@ -7,6 +7,9 @@ Run LightGroove DMX controller in a Docker container for easy deployment and iso
 ### Using Docker Compose (Recommended)
 
 ```bash
+# Navigate to docker directory
+cd docker
+
 # Build and start the container
 docker-compose up -d
 
@@ -22,8 +25,8 @@ The web UI will be available at `http://localhost:5555`
 ### Using Docker CLI
 
 ```bash
-# Build the image
-docker build -t lightgroove .
+# Build the image from project root
+docker build -f docker/Dockerfile -t lightgroove .
 
 # Run the container
 docker run -d \
@@ -113,9 +116,10 @@ git clone https://github.com/oliverbyte/lightgroove.git
 cd lightgroove
 
 # Build the image
-docker build -t lightgroove:latest .
+docker build -f docker/Dockerfile -t lightgroove:latest .
 
 # Run with docker-compose
+cd docker
 docker-compose up -d
 ```
 
@@ -150,6 +154,7 @@ Should show: `"Source": "/path/to/your/config"`
 git pull origin main
 
 # Rebuild and restart
+cd docker
 docker-compose down
 docker-compose build
 docker-compose up -d
