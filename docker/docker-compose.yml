@@ -1,6 +1,8 @@
 services:
   lightgroove:
-    build: ..
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     image: lightgroove:latest
     container_name: lightgroove
     ports:
