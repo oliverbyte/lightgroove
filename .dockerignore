@@ -1,0 +1,60 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation and website
+website/
+docs/
+*.md
+!README.md
+
+# Development files
+take_screenshots.py
+installer_script.iss
+LightGroove.spec
+Formula/
+
+# Screenshots (not needed in container)
+img/
+
+# CI/CD
+.github/
