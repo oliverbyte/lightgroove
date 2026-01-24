@@ -2,10 +2,61 @@
 
 Run LightGroove DMX controller in a Docker container for easy deployment and isolation.
 
+## Prerequisites
+
+### Docker Installation
+
+**macOS:**
+```bash
+# Install Docker Desktop from https://www.docker.com/products/docker-desktop
+# Or use Homebrew:
+brew install --cask docker
+```
+
+**Linux:**
+```bash
+# Ubuntu/Debian
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+
+**Windows:**
+Download and install Docker Desktop from https://www.docker.com/products/docker-desktop
+
+### Docker Compose
+
+Modern Docker installations (Docker Desktop, Docker Engine 20.10+) include Docker Compose as `docker compose` (no hyphen).
+
+If you have an older installation, you may need to install docker-compose separately:
+```bash
+# macOS
+brew install docker-compose
+
+# Linux
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
 ## Quick Start
 
 ### Using Docker Compose (Recommended)
 
+**Modern Docker (v20.10+):**
+```bash
+# Navigate to docker directory
+cd docker
+
+# Build and start the container
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop the container
+docker compose down
+```
+
+**Legacy docker-compose:**
 ```bash
 # Navigate to docker directory
 cd docker
@@ -153,7 +204,13 @@ Should show: `"Source": "/path/to/your/config"`
 # Pull latest changes
 git pull origin main
 
-# Rebuild and restart
+# Rebuild and restart (modern Docker)
+cd docker
+docker compose down
+docker compose build
+docker compose up -d
+
+# Or with legacy docker-compose
 cd docker
 docker-compose down
 docker-compose build
