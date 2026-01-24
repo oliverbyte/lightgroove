@@ -38,73 +38,6 @@ lightgroove</code></pre>
 
   <p>After running <code>lightgroove</code>, open your browser to <a href="http://localhost:5555" target="_blank" rel="noopener">http://localhost:5555</a>.</p>
 
-  <h2>Docker (All Platforms)</h2>
-  
-  <h3>Using Pre-built Image</h3>
-  <p>The easiest way to run LightGroove with Docker:</p>
-  
-  <p><strong>Step 1: Get configuration files</strong></p>
-  <pre><code># Create a directory for LightGroove
-mkdir -p ~/lightgroove && cd ~/lightgroove
-
-# Clone just the config files
-git clone --depth 1 --filter=blob:none --sparse https://github.com/{{ site.repository }}.git temp
-cd temp && git sparse-checkout set config && mv config .. && cd .. && rm -rf temp</code></pre>
-
-  <p>Alternatively, download the config files manually from the <a href="https://github.com/{{ site.repository }}/tree/main/config" target="_blank" rel="noopener">repository</a>.</p>
-
-  <p><strong>Step 2: Run the container</strong></p>
-  <pre><code># Pull and run the latest version
-docker run -d \
-  --name lightgroove \
-  -p 5555:5555 \
-  -p 6454:6454/udp \
-  -v $(pwd)/config:/app/config \
-  --restart unless-stopped \
-  oliverbyte/lightgroove:latest</code></pre>
-
-  <p><strong>Step 3: Access the UI</strong></p>
-  <p>Open <a href="http://localhost:5555" target="_blank" rel="noopener">http://localhost:5555</a> in your browser.</p>
-
-  <p><strong>Configuration Management:</strong></p>
-  <p>All configuration files in <code>~/lightgroove/config/</code> are persistent and can be edited:</p>
-  <ul>
-    <li><code>artnet.json</code> - ArtNet output nodes (edit via Config tab)</li>
-    <li><code>fixtures.json</code> - Fixture definitions</li>
-    <li><code>patch.json</code> - Fixture patching</li>
-    <li><code>colors.json</code> - Color definitions (edit via Config tab)</li>
-    <li><code>color_state.json</code> - Color FX state (auto-saved)</li>
-    <li><code>move_state.json</code> - Move FX state (auto-saved)</li>
-  </ul>
-  <p>Changes are immediately reflected in the running container.</p>
-
-  <h3>Using Docker Compose</h3>
-  <p>For easier management and configuration:</p>
-  <pre><code># Clone the repository
-git clone https://github.com/{{ site.repository }}.git
-cd lightgroove/docker
-
-# Start LightGroove
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop LightGroove
-docker compose down</code></pre>
-
-  <h3>Benefits of Docker</h3>
-  <ul>
-    <li><strong>No Python installation required</strong> - Everything runs in a container</li>
-    <li><strong>Isolated environment</strong> - No conflicts with other software</li>
-    <li><strong>Easy updates</strong> - Pull latest image with <code>docker pull oliverbyte/lightgroove:latest</code></li>
-    <li><strong>Cross-platform</strong> - Works identically on Windows, macOS, and Linux</li>
-    <li><strong>Automatic health checks</strong> - Container monitors application health</li>
-    <li><strong>Persistent configuration</strong> - Config files stored outside container</li>
-  </ul>
-
-  <p>For detailed Docker deployment instructions, see <a href="https://github.com/{{ site.repository }}/blob/main/docker/DOCKER.md" target="_blank" rel="noopener">docker/DOCKER.md</a>.</p>
-
   <h2>Linux</h2>
   
   <h3>From Source</h3>
@@ -224,10 +157,6 @@ python main.py</code></pre>
 
   <h3>Homebrew (macOS)</h3>
   <pre><code>brew upgrade lightgroove</code></pre>
-
-  <h3>Docker</h3>
-  <pre><code>docker pull oliverbyte/lightgroove:latest
-docker compose restart  # if using docker-compose</code></pre>
 
   <h3>From Source</h3>
   <pre><code>cd lightgroove

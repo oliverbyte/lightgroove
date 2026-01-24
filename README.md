@@ -213,66 +213,6 @@ lightgroove
 
 The web UI will open automatically at http://localhost:5555
 
-### Docker (Cross-Platform)
-Run LightGroove in a container for easy deployment and isolation:
-
-**Step 1: Get configuration files**
-```bash
-# Create a directory for LightGroove
-mkdir -p ~/lightgroove && cd ~/lightgroove
-
-# Clone just the config files
-git clone --depth 1 --filter=blob:none --sparse https://github.com/oliverbyte/lightgroove.git temp
-cd temp && git sparse-checkout set config && mv config .. && cd .. && rm -rf temp
-```
-
-**Step 2: Run the container**
-```bash
-# Pull and run the latest version
-docker run -d \
-  --name lightgroove \
-  -p 5555:5555 \
-  -p 6454:6454/udp \
-  -v $(pwd)/config:/app/config \
-  --restart unless-stopped \
-  oliverbyte/lightgroove:latest
-```
-
-**Step 3: Access the UI**  
-Open http://localhost:5555 in your browser.
-
-**Configuration:**  
-All config files in `~/lightgroove/config/` are persistent and editable:
-- `artnet.json`, `fixtures.json`, `patch.json`, `colors.json`
-- Changes are immediately reflected in the running container
-
-**Using Docker Compose:**
-```bash
-# Clone the repository
-git clone https://github.com/oliverbyte/lightgroove.git
-cd lightgroove/docker
-
-# Start LightGroove
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop LightGroove
-docker compose down
-```
-
-Then open http://localhost:5555 in your browser.
-
-**Benefits:**
-- No Python installation required
-- Isolated environment
-- Easy updates with `docker pull oliverbyte/lightgroove:latest`
-- Cross-platform compatibility (Windows, macOS, Linux)
-- Automatic health checks and restart policies
-
-See [docker/DOCKER.md](docker/DOCKER.md) for detailed Docker deployment documentation.
-
 ### Linux / From Source
 Perfect for developers, contributors, or Linux users:
 
