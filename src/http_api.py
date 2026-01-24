@@ -343,6 +343,14 @@ class HttpApiServer:
                         self.wfile.write(json.dumps({"success": True, "size": size}).encode("utf-8"))
                         return
                     
+                    if path == "/api/move/phase":
+                        phase = payload.get("phase", 0.0)
+                        if move_fx:
+                            move_fx.set_move_phase(phase)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True, "phase": phase}).encode("utf-8"))
+                        return
+                    
                     if path == "/api/move/fx":
                         fx_type = payload.get("fx", "off")
                         if move_fx:

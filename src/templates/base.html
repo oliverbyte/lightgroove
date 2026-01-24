@@ -527,6 +527,17 @@
       await post(`${apiBase}/api/move/fx_size`, { size });
     });
 
+    // Move tab - Move Phase slider
+    const movePhaseSlider = document.getElementById('move-phase-slider');
+    const movePhaseValue = document.getElementById('move-phase-value');
+    
+    movePhaseSlider?.addEventListener('input', async (e) => {
+      const phasePercent = parseInt(e.target.value);
+      const phase = phasePercent / 100; // Convert to 0.0-1.0 range
+      movePhaseValue.textContent = phasePercent;
+      await post(`${apiBase}/api/move/phase`, { phase });
+    });
+
     // Move tab - Move FX controls
     document.getElementById('fx-pan-sway')?.addEventListener('click', async () => {
       await post(`${apiBase}/api/move/fx`, { fx: 'pan_sway' });
