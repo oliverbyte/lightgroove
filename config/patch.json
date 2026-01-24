@@ -31,6 +31,18 @@
           "type": "uking_mini_moving_light",
           "start_address": 43,
           "description": "U-King Mini Moving Light"
+        },
+        {
+          "id": "moving3",
+          "type": "uking_mini_moving_light",
+          "start_address": 55,
+          "description": "U-King Mini Moving Light"
+        },
+        {
+          "id": "moving4",
+          "type": "uking_mini_moving_light",
+          "start_address": 67,
+          "description": "U-King Mini Moving Light"
         }
       ]
     }

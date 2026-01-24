@@ -114,6 +114,14 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - 100% = full range movement (±50% from center)
   - Real-time adjustment while effects are running
   - Automatic state persistence
+- **Move Phase**: Phase offset control for multi-fixture effects (0-100%)
+  - Distributes effect timing across multiple moving fixtures
+  - 0% = all fixtures move in perfect sync (synchronized)
+  - 100% = maximum phase spread (wave-like patterns)
+  - Creates professional chase and wave effects
+  - Phase offset calculated per fixture based on position in fixture list
+  - Works with all movement patterns
+  - State automatically saved and restored
 - **Movement Effects**: Professional movement patterns at adjustable BPM
   - **Pan Sway**: Smooth horizontal oscillation around center position
   - **Tilt Sway**: Smooth vertical oscillation around center position
@@ -123,9 +131,10 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - **Diamond**: Sharp-cornered diamond shape using cubic power functions
   - All effects use center position from X/Y pad
   - BPM and size changes take effect immediately (no freezing)
+  - Phase offset creates dynamic multi-fixture patterns
   - Stop button to halt all movement effects
 - **State Persistence**: All settings automatically saved
-  - Position (pan/tilt), FX Size, and BPM saved every 15 seconds
+  - Position (pan/tilt), FX Size, Move Phase, and BPM saved every 15 seconds
   - Settings also saved immediately after any change
   - Automatically restored on application startup
   - Moving heads return to last position on restart

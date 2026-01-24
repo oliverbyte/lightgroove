@@ -122,6 +122,18 @@ class HttpApiServer:
                     self.wfile.write(json.dumps({"fade_percentage": color_fx.fade_percentage}).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/move/state") and move_fx:
+                    self._set_headers()
+                    state = {
+                        "center_pan": move_fx.center_pan,
+                        "center_tilt": move_fx.center_tilt,
+                        "fx_size": move_fx.fx_size,
+                        "move_phase": move_fx.move_phase,
+                        "bpm": move_fx.bpm
+                    }
+                    self.wfile.write(json.dumps(state).encode("utf-8"))
+                    return
+
                 if self.path.startswith("/api/config/artnet"):
                     config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'artnet.json')
                     try:
@@ -341,6 +353,14 @@ class HttpApiServer:
                             move_fx.set_fx_size(size)
                         self._set_headers()
                         self.wfile.write(json.dumps({"success": True, "size": size}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/move/phase":
+                        phase = payload.get("phase", 0.0)
+                        if move_fx:
+                            move_fx.set_move_phase(phase)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True, "phase": phase}).encode("utf-8"))
                         return
                     
                     if path == "/api/move/fx":

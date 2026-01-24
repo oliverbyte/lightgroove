@@ -43,6 +43,9 @@ class MoveFXEngine:
         # Effect size/amplitude control
         self.fx_size = 0.3  # Size (0.0-1.0) defines min-max range from center
         
+        # Phase control - spreads effect across fixtures
+        self.move_phase = 0.0  # Phase offset (0.0-1.0) for multi-fixture effects
+        
         # State persistence
         if state_file is None:
             state_file = os.path.join(os.path.dirname(__file__), '..', 'config', 'move_state.json')
@@ -83,6 +86,12 @@ class MoveFXEngine:
         """Set the effect size/amplitude (0.0-1.0)."""
         self.fx_size = max(0.0, min(1.0, size))
         print(f"Move FX: Size set to {self.fx_size:.2f}")
+        self._save_state()
+    
+    def set_move_phase(self, phase: float):
+        """Set the phase offset for multi-fixture effects (0.0-1.0)."""
+        self.move_phase = max(0.0, min(1.0, phase))
+        print(f"Move FX: Phase set to {self.move_phase:.2f}")
         self._save_state()
     
     def get_interval(self) -> float:
@@ -186,9 +195,12 @@ class MoveFXEngine:
             
             # Sine wave for smooth oscillation around center position
             progress = (step % steps_per_cycle) / steps_per_cycle
-            pan_value = self.center_pan + (self.fx_size * 0.5) * math.sin(progress * 2 * math.pi)
             
-            for fixture_id in fixtures:
+            for idx, fixture_id in enumerate(fixtures):
+                # Apply phase offset per fixture
+                phase_offset = (idx / len(fixtures)) * self.move_phase if len(fixtures) > 1 else 0
+                phase_progress = (progress + phase_offset) % 1.0
+                pan_value = self.center_pan + (self.fx_size * 0.5) * math.sin(phase_progress * 2 * math.pi)
                 # Use center_tilt from X/Y pad for tilt position
                 self._set_pan_tilt(fixture_id, pan_value, self.center_tilt)
             
@@ -208,9 +220,12 @@ class MoveFXEngine:
             
             # Sine wave for smooth oscillation around center position
             progress = (step % steps_per_cycle) / steps_per_cycle
-            tilt_value = self.center_tilt + (self.fx_size * 0.5) * 0.7 * math.sin(progress * 2 * math.pi)
             
-            for fixture_id in fixtures:
+            for idx, fixture_id in enumerate(fixtures):
+                # Apply phase offset per fixture
+                phase_offset = (idx / len(fixtures)) * self.move_phase if len(fixtures) > 1 else 0
+                phase_progress = (progress + phase_offset) % 1.0
+                tilt_value = self.center_tilt + (self.fx_size * 0.5) * 0.7 * math.sin(phase_progress * 2 * math.pi)
                 # Use center_pan from X/Y pad for pan position
                 self._set_pan_tilt(fixture_id, self.center_pan, tilt_value)
             
@@ -229,12 +244,15 @@ class MoveFXEngine:
             step_time = interval / steps_per_cycle
             angle_increment = (2 * math.pi) / steps_per_cycle
             
-            # Circle with size as radius, centered at user-defined position
-            # Use continuously incrementing angle for smooth motion
-            pan_value = self.center_pan + (self.fx_size * 0.5) * math.cos(angle)
-            tilt_value = self.center_tilt + (self.fx_size * 0.5) * math.sin(angle)
-            
-            for fixture_id in fixtures:
+            for idx, fixture_id in enumerate(fixtures):
+                # Apply phase offset per fixture
+                phase_offset = (idx / len(fixtures)) * self.move_phase * 2 * math.pi if len(fixtures) > 1 else 0
+                fixture_angle = angle + phase_offset
+                
+                # Circle with size as radius, centered at user-defined position
+                pan_value = self.center_pan + (self.fx_size * 0.5) * math.cos(fixture_angle)
+                tilt_value = self.center_tilt + (self.fx_size * 0.5) * math.sin(fixture_angle)
+                
                 self._set_pan_tilt(fixture_id, pan_value, tilt_value)
             
             angle += angle_increment
@@ -253,14 +271,18 @@ class MoveFXEngine:
             
             # Parametric equations for figure-8 (lemniscate)
             progress = (step % steps_per_cycle) / steps_per_cycle
-            t = progress * 2 * math.pi
             
-            # Lemniscate formula with user-controlled size and center
-            denominator = 1 + math.sin(t) ** 2
-            pan_value = self.center_pan + (self.fx_size * 0.5) * math.cos(t) / denominator
-            tilt_value = self.center_tilt + (self.fx_size * 0.5) * math.sin(t) * math.cos(t) / denominator
-            
-            for fixture_id in fixtures:
+            for idx, fixture_id in enumerate(fixtures):
+                # Apply phase offset per fixture
+                phase_offset = (idx / len(fixtures)) * self.move_phase if len(fixtures) > 1 else 0
+                phase_progress = (progress + phase_offset) % 1.0
+                t = phase_progress * 2 * math.pi
+                
+                # Lemniscate formula with user-controlled size and center
+                denominator = 1 + math.sin(t) ** 2
+                pan_value = self.center_pan + (self.fx_size * 0.5) * math.cos(t) / denominator
+                tilt_value = self.center_tilt + (self.fx_size * 0.5) * math.sin(t) * math.cos(t) / denominator
+                
                 self._set_pan_tilt(fixture_id, pan_value, tilt_value)
             
             step += 1
@@ -291,11 +313,15 @@ class MoveFXEngine:
             step_time = interval / steps_per_cycle
             angle_increment = (2 * math.pi) / steps_per_cycle
             
-            # Lissajous parametric equations with user-controlled center and size
-            pan_value = self.center_pan + (self.fx_size * 0.5) * math.sin(freq_x * angle + phase_x)
-            tilt_value = self.center_tilt + (self.fx_size * 0.5) * math.sin(freq_y * angle + phase_y)
-            
-            for fixture_id in fixtures:
+            for idx, fixture_id in enumerate(fixtures):
+                # Apply phase offset per fixture
+                phase_offset = (idx / len(fixtures)) * self.move_phase * 2 * math.pi if len(fixtures) > 1 else 0
+                fixture_angle = angle + phase_offset
+                
+                # Lissajous parametric equations with user-controlled center and size
+                pan_value = self.center_pan + (self.fx_size * 0.5) * math.sin(freq_x * fixture_angle + phase_x)
+                tilt_value = self.center_tilt + (self.fx_size * 0.5) * math.sin(freq_y * fixture_angle + phase_y)
+                
                 self._set_pan_tilt(fixture_id, pan_value, tilt_value)
             
             angle += angle_increment
@@ -316,15 +342,19 @@ class MoveFXEngine:
             step_time = interval / steps_per_cycle
             angle_increment = (2 * math.pi) / steps_per_cycle
             
-            # Use cubic power for sharper corners
-            raw_pan = math.cos(angle)
-            raw_tilt = math.sin(angle)
-            
-            # Apply power function for sharpness with user-controlled center and size
-            pan_value = self.center_pan + (self.fx_size * 0.5) * (raw_pan ** 3)
-            tilt_value = self.center_tilt + (self.fx_size * 0.5) * (raw_tilt ** 3)
-            
-            for fixture_id in fixtures:
+            for idx, fixture_id in enumerate(fixtures):
+                # Apply phase offset per fixture
+                phase_offset = (idx / len(fixtures)) * self.move_phase * 2 * math.pi if len(fixtures) > 1 else 0
+                fixture_angle = angle + phase_offset
+                
+                # Use cubic power for sharper corners
+                raw_pan = math.cos(fixture_angle)
+                raw_tilt = math.sin(fixture_angle)
+                
+                # Apply power function for sharpness with user-controlled center and size
+                pan_value = self.center_pan + (self.fx_size * 0.5) * (raw_pan ** 3)
+                tilt_value = self.center_tilt + (self.fx_size * 0.5) * (raw_tilt ** 3)
+                
                 self._set_pan_tilt(fixture_id, pan_value, tilt_value)
             
             angle += angle_increment
@@ -343,7 +373,8 @@ class MoveFXEngine:
                     'center_pan': self.center_pan,
                     'center_tilt': self.center_tilt,
                     'fx_size': self.fx_size,
-                    'bpm': self.bpm
+                    'bpm': self.bpm,
+                    'move_phase': self.move_phase
                 }
                 
                 # Ensure directory exists
@@ -373,8 +404,9 @@ class MoveFXEngine:
             self.center_tilt = state.get('center_tilt', 0.5)
             self.fx_size = state.get('fx_size', 0.3)
             self.bpm = state.get('bpm', 20)
+            self.move_phase = state.get('move_phase', 0.0)
             
-            print(f"Move FX: Loaded state - pan={self.center_pan:.2f}, tilt={self.center_tilt:.2f}, size={self.fx_size:.2f}, bpm={self.bpm}")
+            print(f"Move FX: Loaded state - pan={self.center_pan:.2f}, tilt={self.center_tilt:.2f}, size={self.fx_size:.2f}, bpm={self.bpm}, phase={self.move_phase:.2f}")
             
             # Apply initial position to fixtures
             for fixture_id in self.get_moving_fixtures():
