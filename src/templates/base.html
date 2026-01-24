@@ -669,8 +669,44 @@
       }
     }
     
+    // Load move state (XY pad position, size, phase)
+    async function loadMoveState() {
+      try {
+        const res = await fetch(`${apiBase}/api/move/state`);
+        const data = await res.json();
+        
+        // Update XY pad position without sending to backend
+        if (xyPad && xyCursor && xyPanValue && xyTiltValue) {
+          const pan = data.center_pan;
+          const tilt = data.center_tilt;
+          
+          xyCursor.style.left = `${pan * 100}%`;
+          xyCursor.style.top = `${(1 - tilt) * 100}%`;
+          xyPanValue.textContent = pan.toFixed(2);
+          xyTiltValue.textContent = tilt.toFixed(2);
+        }
+        
+        // Update FX size slider
+        if (fxSizeSlider && fxSizeValue) {
+          const sizePercent = Math.round(data.fx_size * 100);
+          fxSizeSlider.value = sizePercent;
+          fxSizeValue.textContent = sizePercent;
+        }
+        
+        // Update move phase slider
+        if (movePhaseSlider && movePhaseValue) {
+          const phasePercent = Math.round(data.move_phase * 100);
+          movePhaseSlider.value = phasePercent;
+          movePhaseValue.textContent = phasePercent;
+        }
+      } catch (e) {
+        console.error('Failed to load move state:', e);
+      }
+    }
+    
     loadGrandmaster();
     loadBPM();
+    loadMoveState();
     setInterval(updateLiveValues, 500); // Update every 500ms
     setInterval(updateActiveColor, 500); // Update active color indicator every 500ms
   </script>
