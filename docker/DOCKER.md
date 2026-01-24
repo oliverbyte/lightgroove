@@ -39,12 +39,68 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
+### Option 1: Using Pre-built Image from Docker Hub (Easiest)
+
+**Step 1: Create config directory and get default configs**
+```bash
+# Create a directory for LightGroove
+mkdir -p ~/lightgroove
+cd ~/lightgroove
+
+# Clone just the config files from the repository
+git clone --depth 1 --filter=blob:none --sparse https://github.com/oliverbyte/lightgroove.git temp
+cd temp
+git sparse-checkout set config
+mv config ..
+cd ..
+rm -rf temp
+
+# Or download the config files manually from:
+# https://github.com/oliverbyte/lightgroove/tree/main/config
+```
+
+**Step 2: Run the container**
+```bash
+# Run LightGroove with your config directory
+docker run -d \
+  --name lightgroove \
+  -p 5555:5555 \
+  -p 6454:6454/udp \
+  -v $(pwd)/config:/app/config \
+  --restart unless-stopped \
+  oliverbyte/lightgroove:latest
+
+# View logs
+docker logs -f lightgroove
+
+# Stop container
+docker stop lightgroove
+
+# Remove container
+docker rm lightgroove
+```
+
+**Step 3: Access the UI**
+Open `http://localhost:5555` in your browser.
+
+**Step 4: Edit configurations**
+All configuration files in your `~/lightgroove/config/` directory are now persistent and can be edited:
+- `artnet.json` - ArtNet output nodes
+- `fixtures.json` - Fixture definitions  
+- `patch.json` - Fixture patching
+- `colors.json` - Color definitions
+- `color_state.json` - Color FX state (auto-saved)
+- `move_state.json` - Move FX state (auto-saved)
+
+Changes to configuration files are immediately reflected in the running container.
+
+### Option 2: Using Docker Compose (Recommended for Development)
 
 **Modern Docker (v20.10+):**
 ```bash
-# Navigate to docker directory
-cd docker
+# Clone the repository
+git clone https://github.com/oliverbyte/lightgroove.git
+cd lightgroove/docker
 
 # Build and start the container
 docker compose up -d
@@ -73,7 +129,7 @@ docker-compose down
 
 The web UI will be available at `http://localhost:5555`
 
-### Using Docker CLI
+### Option 3: Building from Source
 
 ```bash
 # Build the image from project root

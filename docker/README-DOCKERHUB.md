@@ -35,18 +35,73 @@ The GitHub Actions workflow (`.github/workflows/docker-publish.yml`) will automa
 
 Once deployed, users can run LightGroove directly from Docker Hub:
 
+### Quick Start
+
+**Step 1: Get default configuration files**
+```bash
+# Create a directory for LightGroove
+mkdir -p ~/lightgroove
+cd ~/lightgroove
+
+# Clone just the config files
+git clone --depth 1 --filter=blob:none --sparse https://github.com/oliverbyte/lightgroove.git temp
+cd temp
+git sparse-checkout set config
+mv config ..
+cd ..
+rm -rf temp
+```
+
+Alternatively, download the config files manually from: https://github.com/oliverbyte/lightgroove/tree/main/config
+
+**Step 2: Run the container**
 ```bash
 # Pull and run the latest version
 docker run -d \
   --name lightgroove \
   -p 5555:5555 \
   -p 6454:6454/udp \
-  -v ./config:/app/config \
+  -v $(pwd)/config:/app/config \
+  --restart unless-stopped \
   oliverbyte/lightgroove:latest
-
-# Or use docker-compose
-# (update docker-compose.yml to use oliverbyte/lightgroove:latest instead of building)
 ```
+
+**Step 3: Access and configure**
+- Open http://localhost:5555 in your browser
+- Edit configuration files in `~/lightgroove/config/` directory
+- All changes are persistent and immediately reflected
+
+### Configuration Files
+
+The following files in your `config/` directory can be edited:
+- `artnet.json` - ArtNet output nodes (use Config tab in UI)
+- `fixtures.json` - Fixture definitions
+- `patch.json` - Fixture patching
+- `colors.json` - Color definitions (use Config tab in UI)
+- `color_state.json` - Color FX state (auto-saved)
+- `move_state.json` - Move FX state (auto-saved)
+
+### Updating
+
+```bash
+# Pull latest image
+docker pull oliverbyte/lightgroove:latest
+
+# Stop and remove old container
+docker stop lightgroove
+docker rm lightgroove
+
+# Start new container (config is preserved)
+docker run -d \
+  --name lightgroove \
+  -p 5555:5555 \
+  -p 6454:6454/udp \
+  -v $(pwd)/config:/app/config \
+  --restart unless-stopped \
+  oliverbyte/lightgroove:latest
+```
+
+Or use docker-compose for easier management:
 
 ## Manual Testing
 

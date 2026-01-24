@@ -42,15 +42,41 @@ lightgroove</code></pre>
   
   <h3>Using Pre-built Image</h3>
   <p>The easiest way to run LightGroove with Docker:</p>
+  
+  <p><strong>Step 1: Get configuration files</strong></p>
+  <pre><code># Create a directory for LightGroove
+mkdir -p ~/lightgroove && cd ~/lightgroove
+
+# Clone just the config files
+git clone --depth 1 --filter=blob:none --sparse https://github.com/{{ site.repository }}.git temp
+cd temp && git sparse-checkout set config && mv config .. && cd .. && rm -rf temp</code></pre>
+
+  <p>Alternatively, download the config files manually from the <a href="https://github.com/{{ site.repository }}/tree/main/config" target="_blank" rel="noopener">repository</a>.</p>
+
+  <p><strong>Step 2: Run the container</strong></p>
   <pre><code># Pull and run the latest version
 docker run -d \
   --name lightgroove \
   -p 5555:5555 \
   -p 6454:6454/udp \
-  -v ./config:/app/config \
+  -v $(pwd)/config:/app/config \
+  --restart unless-stopped \
   oliverbyte/lightgroove:latest</code></pre>
 
-  <p>Then open <a href="http://localhost:5555" target="_blank" rel="noopener">http://localhost:5555</a> in your browser.</p>
+  <p><strong>Step 3: Access the UI</strong></p>
+  <p>Open <a href="http://localhost:5555" target="_blank" rel="noopener">http://localhost:5555</a> in your browser.</p>
+
+  <p><strong>Configuration Management:</strong></p>
+  <p>All configuration files in <code>~/lightgroove/config/</code> are persistent and can be edited:</p>
+  <ul>
+    <li><code>artnet.json</code> - ArtNet output nodes (edit via Config tab)</li>
+    <li><code>fixtures.json</code> - Fixture definitions</li>
+    <li><code>patch.json</code> - Fixture patching</li>
+    <li><code>colors.json</code> - Color definitions (edit via Config tab)</li>
+    <li><code>color_state.json</code> - Color FX state (auto-saved)</li>
+    <li><code>move_state.json</code> - Move FX state (auto-saved)</li>
+  </ul>
+  <p>Changes are immediately reflected in the running container.</p>
 
   <h3>Using Docker Compose</h3>
   <p>For easier management and configuration:</p>
