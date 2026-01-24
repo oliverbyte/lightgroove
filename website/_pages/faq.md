@@ -16,7 +16,7 @@ permalink: /faq/
   <p>LightGroove is a free, open-source DMX lighting controller with a web-based user interface. It allows you to control DMX lighting fixtures through an intuitive browser interface, sending DMX data via the ArtNet protocol over your network.</p>
 
   <h3>Is LightGroove free?</h3>
-  <p>Yes! LightGroove is completely free and open-source, released under the MIT License. You can use it for personal or commercial projects without any cost.</p>
+  <p>Yes! LightGroove is completely free and open-source, released under the AGPL-3.0 License. You can use it for personal or commercial projects without any cost.</p>
 
   <h3>What platforms does LightGroove support?</h3>
   <p>LightGroove runs on Windows, macOS, and Linux. Windows users can use the installer, macOS users can install via Homebrew, and all platforms can run from Python source code.</p>
@@ -206,7 +206,7 @@ permalink: /faq/
   <h2>Licensing & Support</h2>
 
   <h3>What license is LightGroove under?</h3>
-  <p>LightGroove is released under the MIT License, which allows free use, modification, and distribution for both personal and commercial purposes.</p>
+  <p>LightGroove is released under the GNU Affero General Public License v3.0 (AGPL-3.0), which allows free use, modification, and distribution for both personal and commercial purposes. If you modify and deploy LightGroove as a network service, you must make your modified source code available to users.</p>
 
   <h3>Is there commercial support available?</h3>
   <p>LightGroove is a community-driven open-source project. Support is available through GitHub Issues and Discussions, but there is no official commercial support.</p>

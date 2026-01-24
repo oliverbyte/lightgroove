@@ -19,7 +19,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
 ## Why LightGroove?
 
 - **💰 Completely Free** - No licensing fees, no subscriptions, no hidden costs
-- **📖 Open Source** - MIT licensed, full source code access, modify as you need
+- **📖 Open Source** - AGPL-3.0 licensed, full source code access, modify as you need
 - **🤝 Community Driven** - Development and support powered by the lighting community
 - **🌐 Cross-Platform** - Runs on Windows, macOS, and Linux
 - **🚀 Easy Setup** - Web-based interface accessible from any device on your network

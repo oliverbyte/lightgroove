@@ -57,4 +57,4 @@ Changes are immediately reflected in the running container.
 
 ## License
 
-MIT License - Free and open source
+AGPL-3.0 License - Free and open source with copyleft provisions

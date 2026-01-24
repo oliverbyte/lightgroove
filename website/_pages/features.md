@@ -202,7 +202,7 @@ permalink: /features/
     <li><strong>RESTful API</strong> - Complete HTTP API for integration with other software, custom controllers, or automation systems.</li>
     <li><strong>Network Accessible</strong> - Control from any device on your network. Server runs on port 5555, accessible via http://localhost:5555 or your computer's IP address.</li>
     <li><strong>Modular Architecture</strong> - Clean separation between DMX controller, fixture manager, color FX engine, and HTTP API for easy customization and extension.</li>
-    <li><strong>MIT Licensed</strong> - Completely open source with permissive licensing. Use commercially, modify, and distribute freely.</li>
+    <li><strong>AGPL-3.0 Licensed</strong> - Completely open source with strong copyleft. Use commercially, modify, and distribute freely while sharing source code of modifications.</li>
   </ul>
 
   <h2>Use Cases</h2>

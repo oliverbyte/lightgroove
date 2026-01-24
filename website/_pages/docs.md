@@ -252,5 +252,5 @@ Lighting Fixtures (daisy-chained)</code></pre>
   <p>See the <a href="https://github.com/{{ site.repository }}/issues" target="_blank" rel="noopener">Issues page</a> for ideas or report bugs.</p>
 
   <h2>License</h2>
-  <p>LightGroove is released under the MIT License. See <a href="https://github.com/{{ site.repository }}/blob/main/LICENSE" target="_blank" rel="noopener">LICENSE</a> for details.</p>
+  <p>LightGroove is released under the GNU Affero General Public License v3.0 (AGPL-3.0). See <a href="https://github.com/{{ site.repository }}/blob/main/LICENSE" target="_blank" rel="noopener">LICENSE</a> for details.</p>
 </div>
