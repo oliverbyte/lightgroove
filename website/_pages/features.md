@@ -67,6 +67,64 @@ permalink: /features/
     <li><strong>Flash Integration</strong> - Effects automatically pause when flash button is held, resuming when released</li>
   </ul>
 
+  <h3>Move Tab</h3>
+  <img src="{{ '/img/screenshot_move.png' | relative_url }}" alt="Move Interface - Moving head control with X/Y pad and effects">
+  <p>Professional moving head control with intuitive positioning and dynamic effects:</p>
+  
+  <h4>Move Position (X/Y Pad)</h4>
+  <ul>
+    <li><strong>Interactive Touchpad</strong> - 200x200px drag surface with visual cursor for pan/tilt positioning</li>
+    <li><strong>Dual Mode Operation</strong> - Works during effects (controls center position) and without effects (direct positioning)</li>
+    <li><strong>Real-Time Feedback</strong> - Live pan/tilt values displayed (0.00-1.00 range) as you drag</li>
+    <li><strong>Touch-Friendly</strong> - Fully supports touch input for mobile devices and tablets</li>
+    <li><strong>Reset to Center</strong> - Quick button to return to center position</li>
+    <li><strong>State Persistence</strong> - Position automatically saved and restored on app restart</li>
+  </ul>
+
+  <h4>Move FX Size</h4>
+  <ul>
+    <li><strong>Amplitude Control</strong> - Vertical slider controlling effect size (0-100%)</li>
+    <li><strong>0%</strong> - No movement, fixtures remain at static position</li>
+    <li><strong>100%</strong> - Full range movement (±50% from center position)</li>
+    <li><strong>Real-Time Adjustment</strong> - Change size while effects are running without interruption</li>
+    <li><strong>Automatic Persistence</strong> - Setting saved and restored automatically</li>
+  </ul>
+
+  <h4>Move Phase</h4>
+  <ul>
+    <li><strong>Multi-Fixture Phase Control</strong> - Vertical slider for phase offset (0-100%)</li>
+    <li><strong>0%</strong> - All fixtures move in perfect sync (synchronized)</li>
+    <li><strong>100%</strong> - Maximum phase spread creates wave-like patterns</li>
+    <li><strong>Professional Effects</strong> - Creates dynamic chase and wave patterns across multiple moving heads</li>
+    <li><strong>Per-Fixture Offset</strong> - Phase calculated based on fixture position in the list</li>
+    <li><strong>Universal Compatibility</strong> - Works with all movement patterns</li>
+    <li><strong>State Persistence</strong> - Automatically saved and restored</li>
+  </ul>
+
+  <h4>Movement Effects</h4>
+  <p>Six professional movement patterns synchronized to BPM:</p>
+  <ul>
+    <li><strong>Pan Sway</strong> - Smooth horizontal oscillation around center position. Perfect for sweeping side-to-side motion.</li>
+    <li><strong>Tilt Sway</strong> - Smooth vertical oscillation around center position. Creates up-and-down sweeping effects.</li>
+    <li><strong>Circle</strong> - Continuous circular motion around center point. Classic moving light effect.</li>
+    <li><strong>Figure-8</strong> - Lemniscate pattern (infinity symbol). Complex mathematical curve for visual interest.</li>
+    <li><strong>Lissajous</strong> - Advanced mathematical curves (3:2 frequency ratio). Creates sophisticated patterns.</li>
+    <li><strong>Diamond</strong> - Sharp-cornered diamond shape using cubic power functions. Geometric precision.</li>
+    <li><strong>Center-Based</strong> - All effects use center position from X/Y pad as their origin</li>
+    <li><strong>No Freezing</strong> - BPM, size, and phase changes take effect immediately without stopping motion</li>
+    <li><strong>Phase Offset Support</strong> - All patterns support multi-fixture phase distribution</li>
+    <li><strong>Stop Button</strong> - Halt all movement effects and return to center position</li>
+  </ul>
+
+  <h4>State Persistence</h4>
+  <ul>
+    <li><strong>Comprehensive Saving</strong> - Position (pan/tilt), FX Size, Move Phase, and BPM all automatically saved</li>
+    <li><strong>Auto-Save Every 15 Seconds</strong> - Regular background saves prevent data loss</li>
+    <li><strong>Immediate Save on Change</strong> - Settings also saved instantly after any adjustment</li>
+    <li><strong>Automatic Restoration</strong> - All settings restored when application starts</li>
+    <li><strong>Position Memory</strong> - Moving heads return to last known position on restart</li>
+  </ul>
+
   <h3>Config Tab</h3>
   <img src="{{ '/img/screenshot_config.png' | relative_url }}" alt="Config Interface - Complete web-based configuration">
   <p>Complete web-based configuration system - no need to manually edit JSON files:</p>
