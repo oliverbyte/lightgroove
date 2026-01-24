@@ -213,6 +213,47 @@ lightgroove
 
 The web UI will open automatically at http://localhost:5555
 
+### Docker (Cross-Platform)
+Run LightGroove in a container for easy deployment and isolation:
+
+**Quick Start:**
+```bash
+# Pull and run the latest version
+docker run -d \
+  --name lightgroove \
+  -p 5555:5555 \
+  -p 6454:6454/udp \
+  -v ./config:/app/config \
+  oliverbyte/lightgroove:latest
+```
+
+**Using Docker Compose:**
+```bash
+# Clone the repository
+git clone https://github.com/oliverbyte/lightgroove.git
+cd lightgroove/docker
+
+# Start LightGroove
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop LightGroove
+docker compose down
+```
+
+Then open http://localhost:5555 in your browser.
+
+**Benefits:**
+- No Python installation required
+- Isolated environment
+- Easy updates with `docker pull oliverbyte/lightgroove:latest`
+- Cross-platform compatibility (Windows, macOS, Linux)
+- Automatic health checks and restart policies
+
+See [docker/DOCKER.md](docker/DOCKER.md) for detailed Docker deployment documentation.
+
 ### Linux / From Source
 Perfect for developers, contributors, or Linux users:
 

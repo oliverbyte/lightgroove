@@ -38,6 +38,47 @@ lightgroove</code></pre>
 
   <p>After running <code>lightgroove</code>, open your browser to <a href="http://localhost:5555" target="_blank" rel="noopener">http://localhost:5555</a>.</p>
 
+  <h2>Docker (All Platforms)</h2>
+  
+  <h3>Using Pre-built Image</h3>
+  <p>The easiest way to run LightGroove with Docker:</p>
+  <pre><code># Pull and run the latest version
+docker run -d \
+  --name lightgroove \
+  -p 5555:5555 \
+  -p 6454:6454/udp \
+  -v ./config:/app/config \
+  oliverbyte/lightgroove:latest</code></pre>
+
+  <p>Then open <a href="http://localhost:5555" target="_blank" rel="noopener">http://localhost:5555</a> in your browser.</p>
+
+  <h3>Using Docker Compose</h3>
+  <p>For easier management and configuration:</p>
+  <pre><code># Clone the repository
+git clone https://github.com/{{ site.repository }}.git
+cd lightgroove/docker
+
+# Start LightGroove
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop LightGroove
+docker compose down</code></pre>
+
+  <h3>Benefits of Docker</h3>
+  <ul>
+    <li><strong>No Python installation required</strong> - Everything runs in a container</li>
+    <li><strong>Isolated environment</strong> - No conflicts with other software</li>
+    <li><strong>Easy updates</strong> - Pull latest image with <code>docker pull oliverbyte/lightgroove:latest</code></li>
+    <li><strong>Cross-platform</strong> - Works identically on Windows, macOS, and Linux</li>
+    <li><strong>Automatic health checks</strong> - Container monitors application health</li>
+    <li><strong>Persistent configuration</strong> - Config files stored outside container</li>
+  </ul>
+
+  <p>For detailed Docker deployment instructions, see <a href="https://github.com/{{ site.repository }}/blob/main/docker/DOCKER.md" target="_blank" rel="noopener">docker/DOCKER.md</a>.</p>
+
   <h2>Linux</h2>
   
   <h3>From Source</h3>
@@ -157,6 +198,10 @@ python main.py</code></pre>
 
   <h3>Homebrew (macOS)</h3>
   <pre><code>brew upgrade lightgroove</code></pre>
+
+  <h3>Docker</h3>
+  <pre><code>docker pull oliverbyte/lightgroove:latest
+docker compose restart  # if using docker-compose</code></pre>
 
   <h3>From Source</h3>
   <pre><code>cd lightgroove
