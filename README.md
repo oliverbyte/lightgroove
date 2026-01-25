@@ -122,6 +122,14 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - Phase offset calculated per fixture based on position in fixture list
   - Works with all movement patterns
   - State automatically saved and restored
+- **Move Speed**: Independent speed multiplier for movement effects (0-100%)
+  - Controls how fast movement effects run relative to global FX BPM
+  - 50% (default) = normal speed (uses global FX BPM)
+  - 0-49% = slower than BPM (divides speed)
+  - 51-100% = faster than BPM (multiplies speed)
+  - Allows independent control of move and color effect speeds
+  - Does not affect the global FX BPM setting
+  - State automatically saved and restored
 - **Movement Effects**: Professional movement patterns at adjustable BPM
   - **Pan Sway**: Smooth horizontal oscillation around center position
   - **Tilt Sway**: Smooth vertical oscillation around center position
@@ -134,7 +142,7 @@ Professional DMX lighting control made accessible for everyone. LightGroove is a
   - Phase offset creates dynamic multi-fixture patterns
   - Stop button to halt all movement effects
 - **State Persistence**: All settings automatically saved
-  - Position (pan/tilt), FX Size, Move Phase, and BPM saved every 15 seconds
+  - Position (pan/tilt), FX Size, Move Phase, Move Speed, and BPM saved every 15 seconds
   - Settings also saved immediately after any change
   - Automatically restored on application startup
   - Moving heads return to last position on restart

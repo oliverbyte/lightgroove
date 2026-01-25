@@ -46,6 +46,12 @@ class MoveFXEngine:
         # Phase control - spreads effect across fixtures
         self.move_phase = 0.0  # Phase offset (0.0-1.0) for multi-fixture effects
         
+        # Move speed multiplier - affects BPM for move effects
+        # At 1.0 (50% fader): no effect on BPM
+        # 0.0-1.0 (0-50% fader): divides BPM (slower)
+        # 1.0-2.0 (50-100% fader): multiplies BPM (faster)
+        self.move_speed_multiplier = 1.0
+        
         # State persistence
         if state_file is None:
             state_file = os.path.join(os.path.dirname(__file__), '..', 'config', 'move_state.json')
@@ -94,9 +100,23 @@ class MoveFXEngine:
         print(f"Move FX: Phase set to {self.move_phase:.2f}")
         self._save_state()
     
+    def set_move_speed(self, multiplier: float):
+        """Set the move speed multiplier (0.0-2.0).
+        
+        At 1.0 (50% fader): no effect on BPM
+        0.0-1.0 (0-50% fader): divides BPM (slower)
+        1.0-2.0 (50-100% fader): multiplies BPM (faster)
+        """
+        self.move_speed_multiplier = max(0.0, min(2.0, multiplier))
+        print(f"Move FX: Speed multiplier set to {self.move_speed_multiplier:.2f}")
+        self._save_state()
+    
     def get_interval(self) -> float:
-        """Calculate interval in seconds based on BPM."""
-        return 60.0 / self.bpm
+        """Calculate interval in seconds based on BPM and speed multiplier."""
+        if self.move_speed_multiplier == 0.0:
+            # Prevent division by zero - use very slow speed
+            return 60.0 / self.bpm * 100
+        return (60.0 / self.bpm) / self.move_speed_multiplier
     
     def get_moving_fixtures(self) -> List[str]:
         """Get list of fixture IDs that have pan and tilt channels."""
@@ -374,7 +394,8 @@ class MoveFXEngine:
                     'center_tilt': self.center_tilt,
                     'fx_size': self.fx_size,
                     'bpm': self.bpm,
-                    'move_phase': self.move_phase
+                    'move_phase': self.move_phase,
+                    'move_speed_multiplier': self.move_speed_multiplier
                 }
                 
                 # Ensure directory exists
@@ -405,8 +426,9 @@ class MoveFXEngine:
             self.fx_size = state.get('fx_size', 0.3)
             self.bpm = state.get('bpm', 20)
             self.move_phase = state.get('move_phase', 0.0)
+            self.move_speed_multiplier = state.get('move_speed_multiplier', 1.0)
             
-            print(f"Move FX: Loaded state - pan={self.center_pan:.2f}, tilt={self.center_tilt:.2f}, size={self.fx_size:.2f}, bpm={self.bpm}, phase={self.move_phase:.2f}")
+            print(f"Move FX: Loaded state - pan={self.center_pan:.2f}, tilt={self.center_tilt:.2f}, size={self.fx_size:.2f}, bpm={self.bpm}, phase={self.move_phase:.2f}, speed_multiplier={self.move_speed_multiplier:.2f}")
             
             # Apply initial position to fixtures
             for fixture_id in self.get_moving_fixtures():

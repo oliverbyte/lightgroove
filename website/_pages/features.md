@@ -101,6 +101,17 @@ permalink: /features/
     <li><strong>State Persistence</strong> - Automatically saved and restored</li>
   </ul>
 
+  <h4>Move Speed</h4>
+  <ul>
+    <li><strong>Independent Speed Control</strong> - Vertical slider for movement speed multiplier (0-100%)</li>
+    <li><strong>50% (Default)</strong> - Normal speed, uses global FX BPM setting</li>
+    <li><strong>0-49%</strong> - Slower than BPM, divides movement speed</li>
+    <li><strong>51-100%</strong> - Faster than BPM, multiplies movement speed</li>
+    <li><strong>Independent Control</strong> - Adjust move speed without affecting color effect speeds</li>
+    <li><strong>Real-Time Adjustment</strong> - Speed changes apply immediately while effects are running</li>
+    <li><strong>State Persistence</strong> - Setting automatically saved and restored</li>
+  </ul>
+
   <h4>Movement Effects</h4>
   <p>Six professional movement patterns synchronized to BPM:</p>
   <ul>
@@ -118,7 +129,7 @@ permalink: /features/
 
   <h4>State Persistence</h4>
   <ul>
-    <li><strong>Comprehensive Saving</strong> - Position (pan/tilt), FX Size, Move Phase, and BPM all automatically saved</li>
+    <li><strong>Comprehensive Saving</strong> - Position (pan/tilt), FX Size, Move Phase, Move Speed, and BPM all automatically saved</li>
     <li><strong>Auto-Save Every 15 Seconds</strong> - Regular background saves prevent data loss</li>
     <li><strong>Immediate Save on Change</strong> - Settings also saved instantly after any adjustment</li>
     <li><strong>Automatic Restoration</strong> - All settings restored when application starts</li>
