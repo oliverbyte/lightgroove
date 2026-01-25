@@ -129,7 +129,8 @@ class HttpApiServer:
                         "center_tilt": move_fx.center_tilt,
                         "fx_size": move_fx.fx_size,
                         "move_phase": move_fx.move_phase,
-                        "bpm": move_fx.bpm
+                        "bpm": move_fx.bpm,
+                        "move_speed_multiplier": move_fx.move_speed_multiplier
                     }
                     self.wfile.write(json.dumps(state).encode("utf-8"))
                     return
@@ -361,6 +362,14 @@ class HttpApiServer:
                             move_fx.set_move_phase(phase)
                         self._set_headers()
                         self.wfile.write(json.dumps({"success": True, "phase": phase}).encode("utf-8"))
+                        return
+                    
+                    if path == "/api/move/speed":
+                        multiplier = payload.get("multiplier", 1.0)
+                        if move_fx:
+                            move_fx.set_move_speed(multiplier)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True, "multiplier": multiplier}).encode("utf-8"))
                         return
                     
                     if path == "/api/move/fx":
