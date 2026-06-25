@@ -1,26 +1,25 @@
 {
   "nodes": [
     {
-      "id": "node1",
-      "name": "Main ArtNet Node",
-      "ip": "10.10.10.3",
+      "id": "1",
+      "name": "WLED",
+      "ip": "192.168.1.174",
       "universes": [
-        0,
         1
       ],
       "broadcast": false,
       "enabled": true,
-      "description": "Primary ArtNet node for universe 1"
+      "description": ""
     }
   ],
   "universe_mapping": {
     "1": {
-      "node_id": "node1",
-      "artnet_universe": 0,
+      "node_id": "1",
+      "artnet_universe": 1,
       "output_mode": "artnet"
     }
   },
-  "default_output_mode": "virtual",
+  "default_output_mode": "artnet",
   "fps": 44,
   "serial_port": null
 }

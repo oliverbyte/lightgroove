@@ -1,0 +1,60 @@
+<div class="section-label">Scenes</div>
+<div class="grid" style="margin-bottom: 20px;">
+  <div class="card card--flex-2">
+    <div class="row-header">
+      <h3>Scenes</h3>
+      <button class="secondary btn-sm" id="scene-save-btn">+ Save Scene</button>
+    </div>
+    <div id="scenes-grid" class="scene-grid">
+      <span id="scenes-empty" class="drop-zone-hint">No scenes saved yet</span>
+    </div>
+  </div>
+</div>
+
+<!-- Save Scene Modal -->
+<div class="modal-backdrop" id="scene-save-modal">
+  <div class="modal-content modal-content--md">
+    <h3 class="modal-title">Save Scene</h3>
+    <div class="form-stack">
+      <div>
+        <label class="form-label">Scene Name <span class="required-mark">*</span></label>
+        <input type="text" id="scene-name-input" class="form-input" style="width:100%" placeholder="e.g. Chill Blue Wash">
+      </div>
+
+      <div>
+        <label class="form-label">Fixtures</label>
+        <div class="hint-text">Select which fixtures to include in this scene.</div>
+        <div id="scene-fixture-checkboxes" class="col-stack--sm"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div>
+        <label class="form-label">Global Settings</label>
+        <div class="hint-text">Include global FX settings. Leave unchecked to not affect them on recall.</div>
+        <div class="col-stack--sm">
+          <label class="check-row"><input type="checkbox" id="scene-inc-color-cycle" class="form-checkbox"> Color Cycle</label>
+          <label class="check-row"><input type="checkbox" id="scene-inc-color-fx" class="form-checkbox"> Color FX (mode + BPM + fade)</label>
+          <label class="check-row"><input type="checkbox" id="scene-inc-move-fx" class="form-checkbox"> Move FX (mode + position + params)</label>
+          <label class="check-row"><input type="checkbox" id="scene-inc-grandmaster" class="form-checkbox"> Grandmaster</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions" style="margin-top:16px">
+      <button id="scene-save-confirm">Save</button>
+      <button class="secondary" id="scene-save-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-backdrop" id="scene-delete-modal">
+  <div class="modal-content">
+    <h3 class="modal-title">Delete Scene</h3>
+    <p id="scene-delete-msg">Delete this scene?</p>
+    <div class="form-actions">
+      <button class="btn--danger" id="scene-delete-confirm">Delete</button>
+      <button class="secondary" id="scene-delete-cancel">Cancel</button>
+    </div>
+  </div>
+</div>

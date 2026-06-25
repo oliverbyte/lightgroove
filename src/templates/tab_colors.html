@@ -1,18 +1,27 @@
 <div id="tab-colors" class="tab-content">
   <div class="grid">
-    <div class="card" style="flex: 1; min-width: 300px;">
+    <div class="card card--flex">
       <h3>Static Colors</h3>
       <div class="color-grid" id="static-colors">
         <!-- Colors will be loaded from server -->
       </div>
     </div>
-    <div class="card" style="width: fit-content;">
+
+    <div class="card card--flex-2">
+      <h3>Color Cycle</h3>
+      <div class="hint-text">Drag colors from Static Colors. FX effects use these colors only when the cycle is non-empty.</div>
+      <div id="color-cycle-drop">
+        <span id="color-cycle-empty" class="drop-zone-hint">Drop colors here</span>
+      </div>
+    </div>
+
+    <div class="card">
       <h3>Color FX</h3>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button class="color-btn" id="fx-random-1" style="background: linear-gradient(90deg, #ef4444, #22c55e, #3b82f6, #d946ef); color: white;">Random 1</button>
-        <button class="color-btn" id="fx-random-2" style="background: linear-gradient(135deg, #ef4444 0%, #ef4444 25%, #22c55e 25%, #22c55e 50%, #3b82f6 50%, #3b82f6 75%, #d946ef 75%, #d946ef 100%); color: white;">Random 2</button>
-        <button class="color-btn" id="fx-random-3" style="background: repeating-linear-gradient(90deg, #ef4444 0px, #ef4444 20px, #000 20px, #000 40px); color: white;">Random 3</button>
-        <button class="color-btn" id="fx-random-4" style="background: linear-gradient(90deg, #000 0%, #000 20%, #ef4444 20%, #ef4444 40%, #000 40%, #000 100%); color: white;">Random 4</button>
+      <div class="col-stack">
+        <button class="color-btn fx-btn--random-1" id="fx-random-1">Random 1</button>
+        <button class="color-btn fx-btn--random-2" id="fx-random-2">Random 2</button>
+        <button class="color-btn fx-btn--random-3" id="fx-random-3">Random 3</button>
+        <button class="color-btn fx-btn--random-4" id="fx-random-4">Random 4</button>
         <button class="color-btn secondary" id="fx-stop">Stop FX</button>
       </div>
     </div>

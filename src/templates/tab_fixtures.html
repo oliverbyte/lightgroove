@@ -1,0 +1,72 @@
+<div id="tab-fixtures" class="tab-content">
+  <div class="tab-header">
+    <span id="fixture-lib-summary" class="summary-text"></span>
+    <button id="add-fixture-type-btn">+ Add Fixture Type</button>
+  </div>
+  <div id="fixture-types-list"></div>
+</div>
+
+<!-- Fixture Type Add/Edit Modal -->
+<div id="fixture-type-modal" class="modal-backdrop modal-backdrop--scroll">
+  <div class="modal-content modal-content--lg">
+    <h3 id="fixture-type-modal-title" class="modal-title">Add Fixture Type</h3>
+    <input type="hidden" id="ftm-original-key">
+
+    <div class="form-stack--lg">
+
+      <!-- Identity -->
+      <div class="form-grid-2">
+        <div>
+          <label class="form-label">Type Key <span class="required-mark">*</span></label>
+          <input type="text" id="ftm-key" class="form-input" placeholder="e.g., rgbw_par" style="font-family: monospace;">
+          <div class="field-hint">Lowercase, underscores only. Used in patch.json.</div>
+          <div id="ftm-key-error" class="field-error"></div>
+        </div>
+        <div>
+          <label class="form-label">Manufacturer</label>
+          <input type="text" id="ftm-manufacturer" class="form-input" placeholder="e.g., Generic">
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label">Display Name <span class="required-mark">*</span></label>
+        <input type="text" id="ftm-name" class="form-input" placeholder="e.g., RGBW PAR Can">
+        <div id="ftm-name-error" class="field-error"></div>
+      </div>
+
+      <!-- Channels -->
+      <div>
+        <div class="row-header">
+          <label class="form-label" style="margin: 0;">Channels</label>
+          <button id="ftm-add-channel-btn" class="btn-sm">+ Add Channel</button>
+        </div>
+        <div id="ftm-channels-list" class="col-stack--sm"></div>
+        <div id="ftm-channels-empty" class="empty-msg">No channels yet — click "+ Add Channel".</div>
+      </div>
+
+      <!-- Options -->
+      <div class="check-row">
+        <input type="checkbox" id="ftm-dimmer-on-black" class="form-checkbox">
+        <label for="ftm-dimmer-on-black">Dimmer on black</label>
+        <span class="field-hint" style="margin-top: 0;">(keeps dimmer at 0 when color is black — for colour-wheel moving heads)</span>
+      </div>
+
+      <!-- Color Wheel Mapping -->
+      <div>
+        <button id="ftm-cw-toggle" class="secondary btn-full btn-sm">
+          ▶ Color Wheel Mapping <span class="field-hint" style="margin-top: 0; margin-left: 8px;">optional — for fixtures with a physical colour wheel</span>
+        </button>
+        <div id="ftm-cw-section" class="cw-section">
+          <div class="cw-hint">Maps colour names (used by the effects engine) to DMX values on the wheel.</div>
+          <div id="ftm-cw-list" class="cw-list"></div>
+          <button id="ftm-add-cw-btn" class="btn-sm">+ Add Colour</button>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="ftm-save-btn">Save Fixture Type</button>
+        <button class="secondary" id="ftm-cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

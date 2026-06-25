@@ -1,17 +1,17 @@
 <div class="card globals-card">
   <h3>Globals</h3>
   <div class="sliders">
-    <div class="slider-col">
+    <div class="slider-col" data-fixture-id="_global" data-channel-name="grandmaster">
       <label>Master</label>
       <input type="range" id="grandmaster" min="0" max="100" value="100" step="1" />
       <output id="gm-value">100%</output>
     </div>
-    <div class="slider-col">
+    <div class="slider-col" data-fixture-id="_global" data-channel-name="bpm">
       <label>FX BPM</label>
       <input type="range" id="fx-bpm" min="1" max="480" value="120" step="1" />
       <output id="bpm-value">120</output>
     </div>
-    <div class="slider-col">
+    <div class="slider-col" data-fixture-id="_global" data-channel-name="fade">
       <label>FX Fade</label>
       <input type="range" id="fx-fade" min="0" max="100" value="0" step="1" />
       <output id="fade-value">0%</output>
@@ -21,5 +21,11 @@
 
 <div class="card flash-card">
   <h3>Buttons</h3>
-  <button class="flash-btn" id="flash-btn">⚡ FLASH</button>
+  <button class="flash-btn" id="flash-btn">FLASH</button>
+  <button class="blackout-btn" id="blackout-btn">BLACKOUT</button>
+</div>
+
+<div class="card color-flash-card">
+  <h3>Color Flash</h3>
+  <div id="color-flash-btns" class="color-flash-grid"></div>
 </div>

@@ -60,5 +60,14 @@
       "b": 0,
       "w": 0
     }
-  }
+  },
+  "color_cycle": [
+    "green",
+    "cyan",
+    "yellow",
+    "yellow",
+    "purple",
+    "purple",
+    "white"
+  ]
 }

@@ -6,7 +6,9 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import threading
+import time
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -15,13 +17,15 @@ from typing import Any, Dict, Optional
 class HttpApiServer:
     """Threaded HTTP server exposing a JSON API and serving the generated UI."""
 
-    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000, color_fx=None, move_fx=None):
+    def __init__(self, fixture_manager, ui_dir: Path, host: str = "0.0.0.0", port: int = 5000, color_fx=None, move_fx=None, midi_mgr=None, scene_mgr=None):
         self.fixture_manager = fixture_manager
         self.ui_dir = ui_dir
         self.host = host
         self.port = port
         self.color_fx = color_fx
         self.move_fx = move_fx
+        self.midi_mgr = midi_mgr
+        self.scene_mgr = scene_mgr
         self._server = None
         self._thread = None
         self._flash_saved_states = None  # Store states before flash
@@ -46,6 +50,8 @@ class HttpApiServer:
         ui_dir = self.ui_dir
         color_fx = self.color_fx
         move_fx = self.move_fx
+        midi_mgr = self.midi_mgr
+        scene_mgr = self.scene_mgr
 
         class Handler(BaseHTTPRequestHandler):
             def _set_headers(self, status: int = 200, content_type: str = "application/json"):
@@ -135,6 +141,82 @@ class HttpApiServer:
                     self.wfile.write(json.dumps(state).encode("utf-8"))
                     return
 
+                if self.path.startswith("/api/scenes") and scene_mgr:
+                    self._set_headers()
+                    self.wfile.write(json.dumps({"scenes": scene_mgr.list_scenes()}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/config/fixtures"):
+                    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'fixtures.json')
+                    try:
+                        with open(config_path, 'r') as f:
+                            config = json.load(f)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(config).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/config/patch"):
+                    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'patch.json')
+                    try:
+                        with open(config_path, 'r') as f:
+                            config = json.load(f)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(config).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/artnet/discover"):
+                    try:
+                        from dmx_controller import discover_artnet_nodes
+                        nodes = discover_artnet_nodes(timeout=2.0)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"nodes": nodes}).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/midi/devices"):
+                    try:
+                        import mido
+                        inputs = mido.get_input_names()
+                        outputs = mido.get_output_names()
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"inputs": inputs, "outputs": outputs}).encode("utf-8"))
+                    except ImportError:
+                        self._set_headers(503)
+                        self.wfile.write(json.dumps({"error": "mido not installed"}).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/midi/config") and midi_mgr:
+                    self._set_headers()
+                    self.wfile.write(json.dumps(midi_mgr.get_config()).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/midi/last_event") and midi_mgr:
+                    self._set_headers()
+                    event = midi_mgr.pop_last_event()
+                    self.wfile.write(json.dumps(event or {}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/midi/mappings") and midi_mgr:
+                    self._set_headers()
+                    self.wfile.write(json.dumps(midi_mgr.get_mappings()).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/midi/paired") and midi_mgr:
+                    self._set_headers()
+                    self.wfile.write(json.dumps(midi_mgr.get_paired_devices()).encode("utf-8"))
+                    return
+
                 if self.path.startswith("/api/config/artnet"):
                     config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'artnet.json')
                     try:
@@ -142,6 +224,18 @@ class HttpApiServer:
                             config = json.load(f)
                         self._set_headers()
                         self.wfile.write(json.dumps(config).encode("utf-8"))
+                    except Exception as e:
+                        self._set_headers(500)
+                        self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                    return
+
+                if self.path.startswith("/api/config/color_cycle"):
+                    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'colors.json')
+                    try:
+                        with open(config_path, 'r') as f:
+                            config = json.load(f)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"color_cycle": config.get("color_cycle", [])}).encode("utf-8"))
                     except Exception as e:
                         self._set_headers(500)
                         self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
@@ -182,6 +276,12 @@ class HttpApiServer:
                             mime = "text/css"
                         elif requested.suffix == ".html":
                             mime = "text/html; charset=utf-8"
+                        elif requested.suffix in (".ttf", ".otf"):
+                            mime = "font/ttf"
+                        elif requested.suffix == ".woff2":
+                            mime = "font/woff2"
+                        elif requested.suffix == ".woff":
+                            mime = "font/woff"
                         data = requested.read_bytes()
                         self._set_headers(content_type=mime)
                         self.wfile.write(data)
@@ -318,20 +418,65 @@ class HttpApiServer:
                             self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
                         return
 
+                    if path == "/api/config/fixtures":
+                        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'fixtures.json')
+                        try:
+                            with open(config_path, 'w') as f:
+                                json.dump(payload, f, indent=2)
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        except Exception as e:
+                            self._set_headers(500)
+                            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                        return
+
+                    if path == "/api/config/patch":
+                        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'patch.json')
+                        try:
+                            with open(config_path, 'w') as f:
+                                json.dump(payload, f, indent=2)
+                            try:
+                                fixture_manager.reload_patch(config_path)
+                            except Exception as reload_error:
+                                print(f"Warning: Failed to reload patch: {reload_error}")
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True, "reloaded": True}).encode("utf-8"))
+                        except Exception as e:
+                            self._set_headers(500)
+                            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                        return
+
+                    if path == "/api/config/color_cycle":
+                        config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'colors.json')
+                        try:
+                            with open(config_path, 'r') as f:
+                                config = json.load(f)
+                            config["color_cycle"] = payload.get("color_cycle", [])
+                            with open(config_path, 'w') as f:
+                                json.dump(config, f, indent=2)
+                            if color_fx:
+                                color_fx.set_color_cycle(config["color_cycle"])
+                            self._set_headers()
+                            self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        except Exception as e:
+                            self._set_headers(500)
+                            self.wfile.write(json.dumps({"error": str(e)}).encode("utf-8"))
+                        return
+
                     if path == "/api/config/colors":
                         config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'colors.json')
                         try:
                             # Write the entire config
                             with open(config_path, 'w') as f:
                                 json.dump(payload, f, indent=2)
-                            
+
                             # Reload colors in the color manager
                             try:
                                 from color_manager import reload_colors
                                 reload_colors()
                             except Exception as reload_error:
                                 print(f"Warning: Failed to reload colors: {reload_error}")
-                            
+
                             self._set_headers()
                             self.wfile.write(json.dumps({"success": True, "reloaded": True}).encode("utf-8"))
                         except Exception as e:
@@ -397,6 +542,19 @@ class HttpApiServer:
                         self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
                         return
                     
+                    if path == "/api/flash/color":
+                        r = float(payload.get("r", 0))
+                        g = float(payload.get("g", 0))
+                        b = float(payload.get("b", 0))
+                        w = float(payload.get("w", 0))
+                        if color_fx:
+                            color_fx.flash_active = True
+                        self.server._flash_saved_states = fixture_manager.save_current_states()
+                        fixture_manager.flash_all_color(r, g, b, w)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+
                     if path == "/api/flash/off":
                         # Resume color FX engine
                         if color_fx:
@@ -412,6 +570,138 @@ class HttpApiServer:
                         self._set_headers()
                         self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
                         return
+
+                    if path == "/api/midi/delete_pairing" and midi_mgr:
+                        name = payload.get("name", "")
+                        direction = payload.get("direction", "")
+                        if not name or direction not in ("input", "output"):
+                            self._set_headers(400)
+                            self.wfile.write(json.dumps({"error": "name and direction required"}).encode("utf-8"))
+                            return
+                        midi_mgr.delete_pairing(name, direction)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+
+                    if path == "/api/midi/map" and midi_mgr:
+                        midi_channel = int(payload.get("midi_channel", 0))
+                        cc = int(payload.get("cc", 0))
+                        fixture_id = payload.get("fixture_id", "")
+                        channel_name = payload.get("channel_name", "")
+                        if not fixture_id or not channel_name:
+                            self._set_headers(400)
+                            self.wfile.write(json.dumps({"error": "fixture_id and channel_name required"}).encode("utf-8"))
+                            return
+                        midi_mgr.add_mapping(midi_channel, cc, fixture_id, channel_name)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+
+                    if path == "/api/midi/unmap" and midi_mgr:
+                        fixture_id = payload.get("fixture_id", "")
+                        channel_name = payload.get("channel_name", "")
+                        midi_mgr.remove_mapping(fixture_id, channel_name)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+
+                    if path == "/api/midi/activate" and midi_mgr:
+                        name = payload.get("name", "")
+                        direction = payload.get("direction", "")
+                        if not name or direction not in ("input", "output"):
+                            self._set_headers(400)
+                            self.wfile.write(json.dumps({"error": "name and direction required"}).encode("utf-8"))
+                            return
+                        midi_mgr.activate(name, direction)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(midi_mgr.get_config()).encode("utf-8"))
+                        return
+
+                    if path == "/api/midi/deactivate" and midi_mgr:
+                        name = payload.get("name", "")
+                        direction = payload.get("direction", "")
+                        if not name or direction not in ("input", "output"):
+                            self._set_headers(400)
+                            self.wfile.write(json.dumps({"error": "name and direction required"}).encode("utf-8"))
+                            return
+                        midi_mgr.deactivate(name, direction)
+                        self._set_headers()
+                        self.wfile.write(json.dumps(midi_mgr.get_config()).encode("utf-8"))
+                        return
+
+                    if path == "/api/scenes" and scene_mgr:
+                        name = payload.get("name", "Untitled")
+                        fixture_ids = payload.get("fixture_ids", None)
+                        scene = scene_mgr.create_scene(
+                            name=name,
+                            fixture_ids=fixture_ids,
+                            include_color_cycle=payload.get("include_color_cycle", False),
+                            include_color_fx=payload.get("include_color_fx", False),
+                            include_move_fx=payload.get("include_move_fx", False),
+                            include_grandmaster=payload.get("include_grandmaster", False),
+                        )
+                        self._set_headers()
+                        self.wfile.write(json.dumps(scene).encode("utf-8"))
+                        return
+
+                    if path.startswith("/api/scenes/") and path.endswith("/activate") and scene_mgr:
+                        scene_id = path.split("/")[3]
+                        ok = scene_mgr.activate_scene(scene_id)
+                        self._set_headers(200 if ok else 404)
+                        self.wfile.write(json.dumps({"success": ok}).encode("utf-8"))
+                        return
+
+                    if path.startswith("/api/scenes/") and path.endswith("/update") and scene_mgr:
+                        scene_id = path.split("/")[3]
+                        updated = scene_mgr.update_scene(
+                            scene_id,
+                            name=payload.get("name"),
+                            fixture_ids=payload.get("fixture_ids", None),
+                            include_color_cycle=payload.get("include_color_cycle", False),
+                            include_color_fx=payload.get("include_color_fx", False),
+                            include_move_fx=payload.get("include_move_fx", False),
+                            include_grandmaster=payload.get("include_grandmaster", False),
+                        )
+                        if updated:
+                            self._set_headers()
+                            self.wfile.write(json.dumps(updated).encode("utf-8"))
+                        else:
+                            self._set_headers(404)
+                            self.wfile.write(json.dumps({"error": "not found"}).encode("utf-8"))
+                        return
+
+                    if path.startswith("/api/scenes/") and path.endswith("/delete") and scene_mgr:
+                        scene_id = path.split("/")[3]
+                        ok = scene_mgr.delete_scene(scene_id)
+                        self._set_headers(200 if ok else 404)
+                        self.wfile.write(json.dumps({"success": ok}).encode("utf-8"))
+                        return
+
+                    if path == "/api/scenes/reorder" and scene_mgr:
+                        ids = payload.get("scene_ids", [])
+                        scene_mgr.reorder_scenes(ids)
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+
+                    if path == "/api/restart":
+                        def _do_restart():
+                            time.sleep(0.5)
+                            try:
+                                if getattr(sys, 'frozen', False):
+                                    # PyInstaller: sys.argv[0] is already the binary
+                                    os.execv(sys.executable, sys.argv)
+                                else:
+                                    # Regular Python: prepend interpreter so argv[0] is set correctly
+                                    os.execv(sys.executable, [sys.executable] + sys.argv)
+                            except Exception as e:
+                                print(f"Restart failed: {e}", flush=True)
+                                os._exit(1)
+                        threading.Thread(target=_do_restart, daemon=True).start()
+                        self._set_headers()
+                        self.wfile.write(json.dumps({"success": True}).encode("utf-8"))
+                        return
+
                 except Exception as exc:  # keep API resilient
                     self._set_headers(400)
                     self.wfile.write(json.dumps({"error": str(exc)}).encode("utf-8"))

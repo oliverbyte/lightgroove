@@ -69,9 +69,33 @@ class ColorFXEngine:
         self.autosave_thread = threading.Thread(target=self._autosave_loop, daemon=True)
         self.autosave_thread.start()
         
+        # Color cycle (subset of COLORS used by FX effects)
+        self.color_cycle = []
+        self._load_color_cycle()
+
         # Load saved state
         self._load_state()
-        
+
+    def _load_color_cycle(self):
+        try:
+            config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'colors.json')
+            with open(config_path) as f:
+                self.color_cycle = json.load(f).get('color_cycle', [])
+        except Exception:
+            self.color_cycle = []
+
+    def set_color_cycle(self, names: list):
+        """Set the color cycle used by FX effects."""
+        self.color_cycle = list(names)
+
+    def _get_fx_color_names(self) -> list:
+        """Return the color names to use for FX — cycle if set, otherwise all non-black colors."""
+        if self.color_cycle:
+            valid = [c for c in self.color_cycle if c in COLORS and c != 'black']
+            if valid:
+                return valid
+        return [c for c in COLORS.keys() if c != 'black']
+
     def set_bpm(self, bpm: int):
         """Set FX speed in beats per minute (1-480 range)."""
         self.bpm = max(1, min(480, bpm))
@@ -276,12 +300,10 @@ class ColorFXEngine:
             
     def _run_random_fx(self):
         """Random color cycling effect - all fixtures same color."""
-        # Exclude 'black' from random color selection
-        color_names = [c for c in COLORS.keys() if c != 'black']
-        # Map short keys to actual fixture channel names
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
-        
+
         while self.running:
+            color_names = self._get_fx_color_names()
             # Pick random color (avoid repeating the same color)
             last_color = self.current_colors[0] if self.current_colors else None
             available_colors = [c for c in color_names if c != last_color]
@@ -303,15 +325,13 @@ class ColorFXEngine:
     
     def _run_random_2_fx(self):
         """Random color cycling effect - each fixture gets different color."""
-        # Exclude 'black' from random color selection
-        color_names = [c for c in COLORS.keys() if c != 'black']
-        # Map short keys to actual fixture channel names
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
         fixture_last_colors = {}  # Track last color per fixture
-        
+
         while self.running:
+            color_names = self._get_fx_color_names()
             fixtures = self.fixture_manager.list_fixtures()
-            
+
             # Pick different random color for each fixture
             fixture_colors = {}
             for fixture_id in fixtures:
@@ -337,17 +357,15 @@ class ColorFXEngine:
     
     def _run_random_3_fx(self):
         """Random color cycling effect - alternates between even/odd patches."""
-        # Exclude 'black' from random color selection
-        color_names = [c for c in COLORS.keys() if c != 'black']
-        black_values = COLORS['black']
-        # Map short keys to actual fixture channel names
+        black_values = COLORS.get('black', {'r': 0, 'g': 0, 'b': 0, 'w': 0})
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
         last_color = None
-        even_turn = True  # Start with even patches lit
-        
+        even_turn = True
+
         while self.running:
+            color_names = self._get_fx_color_names()
             fixtures = self.fixture_manager.list_fixtures()
-            
+
             # Pick random color (avoid repeating)
             available_colors = [c for c in color_names if c != last_color]
             if not available_colors:
@@ -384,21 +402,19 @@ class ColorFXEngine:
     
     def _run_random_4_fx(self):
         """Chaser effect - one fixture at a time from left to right with random colors."""
-        # Exclude 'black' from random color selection
-        color_names = [c for c in COLORS.keys() if c != 'black']
-        black_values = COLORS['black']
-        # Map short keys to actual fixture channel names
+        black_values = COLORS.get('black', {'r': 0, 'g': 0, 'b': 0, 'w': 0})
         channel_map = {'r': 'red', 'g': 'green', 'b': 'blue', 'w': 'white'}
-        fixture_last_colors = {}  # Track last color per fixture to avoid repeating
-        
+        fixture_last_colors = {}
+
         while self.running:
+            color_names = self._get_fx_color_names()
             fixtures = self.fixture_manager.list_fixtures()
-            
+
             # Chase through each fixture
             for active_idx, active_fixture_id in enumerate(fixtures):
                 if not self.running:
                     break
-                
+
                 # Pick random color for this fixture (avoid repeating)
                 last_color = fixture_last_colors.get(active_fixture_id)
                 available_colors = [c for c in color_names if c != last_color]

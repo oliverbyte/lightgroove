@@ -1,8 +1,8 @@
 {
-  "center_pan": 0.31,
-  "center_tilt": 0.8125,
-  "fx_size": 0.24,
-  "bpm": 25,
-  "move_phase": 0.66,
-  "move_speed_multiplier": 0.22
+  "center_pan": 0.71,
+  "center_tilt": 0.19499999999999995,
+  "fx_size": 0.03,
+  "bpm": 336,
+  "move_phase": 0.2,
+  "move_speed_multiplier": 0.2
 }

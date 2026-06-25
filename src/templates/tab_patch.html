@@ -1,0 +1,63 @@
+<div id="tab-patch" class="tab-content">
+  <div class="tab-header">
+    <span id="patch-summary" class="summary-text"></span>
+    <button id="add-fixture-btn">+ Add Fixture</button>
+  </div>
+  <div id="patch-universes"></div>
+</div>
+
+<!-- Fixture Add/Edit Modal -->
+<div id="fixture-modal" class="modal-backdrop modal-backdrop--scroll">
+  <div class="modal-content modal-content--md">
+    <h3 id="fixture-modal-title" class="modal-title">Add Fixture</h3>
+    <input type="hidden" id="fixture-modal-original-id">
+    <div class="form-stack">
+
+      <div class="form-grid-2">
+        <div>
+          <label class="form-label">Fixture ID <span class="required-mark">*</span></label>
+          <input type="text" id="fixture-id" class="form-input" placeholder="e.g., par1">
+          <div id="fixture-id-error" class="field-error"></div>
+        </div>
+        <div>
+          <label class="form-label">Universe <span class="required-mark">*</span></label>
+          <input type="number" id="fixture-universe" class="form-input" min="1" placeholder="1">
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label">Fixture Type <span class="required-mark">*</span></label>
+        <select id="fixture-type" class="form-input">
+          <option value="">Select fixture type...</option>
+        </select>
+      </div>
+
+      <div class="form-grid-2">
+        <div>
+          <label class="form-label">Start Address <span class="required-mark">*</span></label>
+          <input type="number" id="fixture-start-address" class="form-input" min="1" max="512" placeholder="1">
+          <div id="fixture-addr-error" class="field-error"></div>
+        </div>
+        <div>
+          <label class="form-label">End Address</label>
+          <div id="fixture-end-address" class="computed-field">—</div>
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label">Description</label>
+        <input type="text" id="fixture-description" class="form-input" placeholder="e.g., Stage Left PAR">
+      </div>
+
+      <div id="channel-preview">
+        <label class="form-label subsection-label">Channel Layout</label>
+        <div id="channel-preview-list" class="chip-list"></div>
+      </div>
+
+      <div class="form-actions">
+        <button id="fixture-modal-save">Save Fixture</button>
+        <button class="secondary" id="fixture-modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+{
+  "active_inputs": [
+    "Mezzz:Mezzz MIDI 1 24:0"
+  ],
+  "active_outputs": [
+    "Mezzz:Mezzz MIDI 1 24:0"
+  ],
+  "mappings": [
+    {
+      "midi_channel": 0,
+      "cc": 14,
+      "fixture_id": "moving1",
+      "channel_name": "tilt"
+    },
+    {
+      "midi_channel": 0,
+      "cc": 16,
+      "fixture_id": "moving1",
+      "channel_name": "strobe"
+    },
+    {
+      "midi_channel": 0,
+      "cc": 13,
+      "fixture_id": "_global",
+      "channel_name": "bpm"
+    },
+    {
+      "midi_channel": 0,
+      "cc": 45,
+      "fixture_id": "_global",
+      "channel_name": "fade"
+    },
+    {
+      "midi_channel": 0,
+      "cc": 44,
+      "fixture_id": "_global",
+      "channel_name": "grandmaster"
+    },
+    {
+      "midi_channel": 0,
+      "cc": 44,
+      "fixture_id": "moving1",
+      "channel_name": "pan_fine"
+    },
+    {
+      "midi_channel": 0,
+      "cc": 42,
+      "fixture_id": "moving1",
+      "channel_name": "pan_tilt_speed"
+    }
+  ]
+}

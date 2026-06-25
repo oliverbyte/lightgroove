@@ -4,20 +4,106 @@ Manages DMX output via serial, ArtNet or virtual interfaces
 Author: https://github.com/oliverbyte
 """
 import json
+import socket
+import struct
 import threading
 import time
 from typing import Optional, Dict, List, Tuple
 
 
+def _decode_artnet_str(raw: bytes) -> str:
+    """Decode a null-terminated ArtNet name field.
+
+    ArtNet strings are null-terminated; bytes after the first null are padding
+    and must be ignored before decoding.  Devices may use UTF-8 or Latin-1, so
+    try UTF-8 first and fall back to Latin-1 (which maps all 256 byte values).
+    """
+    null = raw.find(b'\x00')
+    raw = raw[:null] if null != -1 else raw
+    try:
+        return raw.decode('utf-8').strip()
+    except UnicodeDecodeError:
+        return raw.decode('latin-1').strip()
+
+
+def discover_artnet_nodes(timeout: float = 2.0) -> list:
+    """Broadcast ArtPoll and collect ArtPollReply packets to find nodes on the network."""
+    ARTNET_PORT = 6454
+    ARTPOLL_REPLY_OPCODE = 0x2100
+
+    artpoll = (
+        b'Art-Net\x00'  # ID
+        b'\x00\x20'     # OpCode ArtPoll (0x2000, little-endian)
+        b'\x00\x0e'     # ProtVer 14
+        b'\x00'         # Flags
+        b'\x00'         # DiagPriority
+    )
+
+    discovered = []
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        except AttributeError:
+            pass  # Not available on Windows
+        sock.settimeout(0.1)
+        sock.bind(('', ARTNET_PORT))
+        sock.sendto(artpoll, ('255.255.255.255', ARTNET_PORT))
+
+        deadline = time.time() + timeout
+        seen_ips = set()
+
+        while time.time() < deadline:
+            try:
+                data, addr = sock.recvfrom(1024)
+                ip = addr[0]
+                if ip in seen_ips or len(data) < 194:
+                    continue
+                if data[:8] != b'Art-Net\x00':
+                    continue
+                opcode = struct.unpack_from('<H', data, 8)[0]
+                if opcode != ARTPOLL_REPLY_OPCODE:
+                    continue
+
+                short_name = _decode_artnet_str(data[26:44])
+                long_name  = _decode_artnet_str(data[44:108])
+                num_ports  = struct.unpack_from('>H', data, 172)[0]
+                sw_out     = [data[190 + i] for i in range(min(num_ports, 4))]
+
+                seen_ips.add(ip)
+                discovered.append({
+                    'ip': ip,
+                    'short_name': short_name,
+                    'long_name': long_name,
+                    'name': long_name or short_name or ip,
+                    'num_ports': num_ports,
+                    'universes': sw_out,
+                })
+            except socket.timeout:
+                continue
+    except Exception as e:
+        print(f"ArtNet discovery error: {e}")
+    finally:
+        try:
+            sock.close()
+        except Exception:
+            pass
+
+    return discovered
+
+
 class DMXUniverse:
     """Represents a single DMX universe with 512 channels"""
-    
+
     def __init__(self, universe_id: int, output_mode: str = 'virtual'):
         self.universe_id = universe_id
-        self.output_mode = output_mode  # 'serial', 'artnet', 'virtual'
+        self.output_mode = output_mode  # 'serial', 'artnet', 'sacn', 'virtual'
         self.dmx_data = [0] * 512
         self.lock = threading.Lock()
         self.artnet_sender = None
+        self.sacn_sender = None
         self.serial = None
         
     def set_channel(self, channel: int, value: int):
@@ -64,6 +150,7 @@ class DMXController:
         """
         self.universes: Dict[int, DMXUniverse] = {}
         self.artnet_senders: Dict[Tuple[str, int], any] = {}
+        self.sacn_senders: Dict[Tuple[str, int], any] = {}
         self.config = {}
         self.running = False
         self._thread = None
@@ -89,7 +176,7 @@ class DMXController:
                 
                 universe = DMXUniverse(universe_id, output_mode)
                 
-                # Configure ArtNet output for this universe
+                # Configure output for this universe
                 if output_mode == 'artnet':
                     node_id = mapping.get('node_id')
                     artnet_universe = mapping.get('artnet_universe', 0)
@@ -99,6 +186,16 @@ class DMXController:
                         universe.artnet_sender = sender
                     else:
                         print(f"DMX Controller: ArtNet node '{node_id}' not found or disabled")
+
+                elif output_mode == 'sacn':
+                    node_id = mapping.get('node_id')
+                    sacn_universe = mapping.get('artnet_universe', universe_id)
+                    node_config = self._find_node_config(node_id)
+                    if node_config and node_config.get('enabled', True):
+                        sender = self._get_or_create_sacn_sender(node_config, sacn_universe)
+                        universe.sacn_sender = sender
+                    else:
+                        print(f"DMX Controller: sACN node '{node_id}' not found or disabled")
                 
                 self.universes[universe_id] = universe
                 print(f"DMX Controller: Universe {universe_id} initialized ({output_mode})")
@@ -116,6 +213,23 @@ class DMXController:
         for node in self.config.get('nodes', []):
             if node.get('id') == node_id:
                 return node
+        return None
+
+    def _get_or_create_sacn_sender(self, node_config: dict, sacn_universe: int):
+        key = (node_config['id'], sacn_universe)
+        if key in self.sacn_senders:
+            return self.sacn_senders[key]
+        try:
+            from sacn_sender import SACNSender
+            ip = node_config.get('ip')
+            multicast = bool(node_config.get('broadcast', False))
+            sender = SACNSender(sacn_universe, target_ip=ip, multicast=multicast)
+            self.sacn_senders[key] = sender
+            mode = "multicast" if multicast else f"unicast to {ip}"
+            print(f"DMX Controller: sACN sender for node '{node_config['id']}' universe {sacn_universe} ({mode})")
+            return sender
+        except Exception as e:
+            print(f"DMX Controller: Failed to initialize sACN sender for node '{node_config['id']}': {e}")
         return None
 
     def _get_or_create_artnet_sender(self, node_config: dict, artnet_universe: int):
@@ -240,6 +354,14 @@ class DMXController:
                 print(f"DMX Controller: ArtNet sender {key} stopped")
             except Exception:
                 pass
+
+        # Stop sACN senders
+        for key, sender in self.sacn_senders.items():
+            try:
+                sender.stop()
+                print(f"DMX Controller: sACN sender {key} stopped")
+            except Exception:
+                pass
         
         # Close serial
         if hasattr(self, 'serial') and self.serial and self.serial.is_open:
@@ -276,6 +398,14 @@ class DMXController:
             except:
                 pass
         self.artnet_senders = {}
+
+        # Cleanup old sACN senders
+        for sender in self.sacn_senders.values():
+            try:
+                sender.stop()
+            except:
+                pass
+        self.sacn_senders = {}
         
         # Reload configuration
         self.universes = {}
@@ -308,6 +438,11 @@ class DMXController:
                         data = universe.get_data()
                         universe.artnet_sender.set(data)
                         universe.artnet_sender.show()
+
+                    elif universe.output_mode == 'sacn' and universe.sacn_sender:
+                        data = universe.get_data()
+                        universe.sacn_sender.set(data)
+                        universe.sacn_sender.show()
 
                     elif universe.output_mode == 'serial' and hasattr(self, 'serial') and self.serial and self.serial.is_open:
                         data = universe.get_data()

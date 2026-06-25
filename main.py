@@ -19,6 +19,8 @@ from ui_generator import generate_ui
 from http_api import HttpApiServer
 from color_manager import ColorFXEngine
 from move_manager import MoveFXEngine
+from midi_manager import MidiManager
+from scene_manager import SceneManager
 
 
 def main():
@@ -32,6 +34,8 @@ def main():
     fixtures_file = base_dir / "config" / "fixtures.json"
     patch_file = base_dir / "config" / "patch.json"
     artnet_file = base_dir / "config" / "artnet.json"
+    midi_file = base_dir / "config" / "midi.json"
+    scenes_file = base_dir / "config" / "scenes.json"
     ui_dir = base_dir / "ui_dist"
     http_port = int(os.getenv("LIGHTGROOVE_HTTP_PORT", "5555"))
     
@@ -57,10 +61,27 @@ def main():
         
         # Move FX Engine
         move_fx = MoveFXEngine(fixture_mgr)
-        
+
+        # Scene Manager
+        scene_mgr = SceneManager(str(scenes_file), fixture_mgr, color_fx=color_fx, move_fx=move_fx)
+
+        # MIDI Manager
+        midi_mgr = MidiManager(str(midi_file))
+        midi_mgr.fixture_manager = fixture_mgr
+        fixture_mgr.on_channel_changed = midi_mgr.notify_channel_changed
+        midi_mgr.global_handlers["grandmaster"] = lambda v: (
+            fixture_mgr.dmx.set_grandmaster(v),
+            fixture_mgr.reapply_all_states(),
+        )
+        midi_mgr.global_handlers["bpm"] = lambda v: (
+            color_fx.set_bpm(max(1, round(v * 479 + 1))),
+            move_fx.set_bpm(max(1, round(v * 479 + 1))),
+        )
+        midi_mgr.global_handlers["fade"] = lambda v: color_fx.set_fade_percentage(v)
+
         # Generate UI shell and start HTTP UI/API server
         generate_ui(fixture_mgr, ui_dir, api_base="")
-        http = HttpApiServer(fixture_mgr, ui_dir, host="0.0.0.0", port=http_port, color_fx=color_fx, move_fx=move_fx)
+        http = HttpApiServer(fixture_mgr, ui_dir, host="0.0.0.0", port=http_port, color_fx=color_fx, move_fx=move_fx, midi_mgr=midi_mgr, scene_mgr=scene_mgr)
         try:
             http.start()
         except OSError as e:
@@ -77,6 +98,7 @@ def main():
             print("\n\nShutting down...")
             color_fx.shutdown()  # Stop effects and save state
             move_fx.shutdown()   # Stop effects and save state
+            midi_mgr.shutdown()  # Close all open MIDI ports
             if http:
                 http.stop()
             dmx.stop()

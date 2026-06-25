@@ -51,31 +51,32 @@ async function saveColorsConfig() {
 function renderNodes() {
   const nodesList = document.getElementById('nodes-list');
   if (!nodesList) return;
-  nodesList.innerHTML = '';
-  
+  nodesList.innerHTML = artnetConfig.nodes.length
+    ? '<div class="subsection-label" style="margin-top: 12px;">Configured Nodes</div>'
+    : '';
+
   artnetConfig.nodes.forEach(node => {
     const nodeCard = document.createElement('div');
-    nodeCard.style.cssText = 'border: 1px solid #374151; padding: 10px; margin-bottom: 10px; border-radius: 8px; background: #111827;';
+    nodeCard.className = 'list-card';
     nodeCard.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: start;">
-        <div style="flex: 1;">
-          <div style="font-weight: 600; margin-bottom: 5px;">${node.name}</div>
-          <div style="font-size: 12px; color: #9ca3af;">
+      <div class="list-card__row">
+        <div class="list-card__body">
+          <div class="list-card__name">${node.name}</div>
+          <div class="list-card__meta">
             <div>ID: ${node.id}</div>
             <div>IP: ${node.ip}</div>
             <div>Universes: ${node.universes.join(', ')}</div>
             ${node.description ? `<div style="margin-top: 5px;">${node.description}</div>` : ''}
-            <div style="margin-top: 5px;">
-              <span style="padding: 2px 8px; border-radius: 999px; background: ${node.enabled ? '#065f46' : '#7f1d1d'}; font-size: 10px;">
-                ${node.enabled ? 'Enabled' : 'Disabled'}
-              </span>
-              ${node.broadcast ? '<span style="padding: 2px 8px; border-radius: 999px; background: #1e40af; font-size: 10px; margin-left: 5px;">Broadcast</span>' : ''}
+            <div class="badge-row">
+              <span class="badge ${node.enabled ? 'badge--success' : 'badge--danger'}">${node.enabled ? 'Enabled' : 'Disabled'}</span>
+              <span class="badge ${node.protocol === 'sacn' ? 'badge--purple' : 'badge--info'}">${node.protocol === 'sacn' ? 'sACN' : 'ArtNet'}</span>
+              ${node.broadcast ? `<span class="badge badge--neutral">${node.protocol === 'sacn' ? 'Multicast' : 'Broadcast'}</span>` : ''}
             </div>
           </div>
         </div>
-        <div style="display: flex; gap: 5px;">
-          <button class="color-btn secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editNode('${node.id}')">Edit</button>
-          <button class="color-btn secondary" style="padding: 6px 12px; font-size: 12px; background: #7f1d1d; border-color: #991b1b;" onclick="deleteNode('${node.id}')">Delete</button>
+        <div class="list-card__actions">
+          <button class="secondary btn-sm" onclick="editNode('${node.id}')">Edit</button>
+          <button class="btn--delete btn-sm" onclick="deleteNode('${node.id}')">Delete</button>
         </div>
       </div>
     `;
@@ -87,27 +88,25 @@ function renderMappings() {
   const mappingsList = document.getElementById('mappings-list');
   if (!mappingsList) return;
   mappingsList.innerHTML = '';
-  
+
   Object.entries(artnetConfig.universe_mapping).forEach(([dmxUniverse, mapping]) => {
     const mappingCard = document.createElement('div');
-    mappingCard.style.cssText = 'border: 1px solid #374151; padding: 10px; margin-bottom: 10px; border-radius: 8px; background: #111827;';
+    mappingCard.className = 'list-card';
     mappingCard.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: start;">
-        <div style="flex: 1;">
-          <div style="font-weight: 600; margin-bottom: 5px;">DMX Universe ${dmxUniverse}</div>
-          <div style="font-size: 12px; color: #9ca3af;">
+      <div class="list-card__row">
+        <div class="list-card__body">
+          <div class="list-card__name">DMX Universe ${dmxUniverse}</div>
+          <div class="list-card__meta">
             <div>Node: ${mapping.node_id}</div>
             <div>ArtNet Universe: ${mapping.artnet_universe}</div>
-            <div style="margin-top: 5px;">
-              <span style="padding: 2px 8px; border-radius: 999px; background: ${mapping.output_mode === 'artnet' ? '#1e40af' : '#374151'}; font-size: 10px;">
-                ${mapping.output_mode}
-              </span>
+            <div class="badge-row">
+              <span class="badge ${mapping.output_mode === 'artnet' ? 'badge--info' : mapping.output_mode === 'sacn' ? 'badge--purple' : 'badge--neutral'}">${mapping.output_mode === 'sacn' ? 'sACN' : mapping.output_mode}</span>
             </div>
           </div>
         </div>
-        <div style="display: flex; gap: 5px;">
-          <button class="color-btn secondary" style="padding: 6px 12px; font-size: 12px;" onclick="editMapping('${dmxUniverse}')">Edit</button>
-          <button class="color-btn secondary" style="padding: 6px 12px; font-size: 12px; background: #7f1d1d; border-color: #991b1b;" onclick="deleteMapping('${dmxUniverse}')">Delete</button>
+        <div class="list-card__actions">
+          <button class="secondary btn-sm" onclick="editMapping('${dmxUniverse}')">Edit</button>
+          <button class="btn--delete btn-sm" onclick="deleteMapping('${dmxUniverse}')">Delete</button>
         </div>
       </div>
     `;
@@ -123,21 +122,35 @@ function renderGlobalSettings() {
 }
 
 // Node CRUD
+function updateNodeBroadcastLabel() {
+  const proto = document.getElementById('node-protocol').value;
+  document.getElementById('node-broadcast-label').textContent =
+    proto === 'sacn' ? 'Multicast Mode' : 'Broadcast Mode';
+}
+
+function updateMappingUniverseLabel() {
+  const mode = document.getElementById('mapping-output-mode').value;
+  document.getElementById('mapping-universe-label').textContent =
+    mode === 'sacn' ? 'sACN Universe (1-63999)' : 'ArtNet Universe';
+}
+
 window.editNode = function(nodeId) {
   const node = artnetConfig.nodes.find(n => n.id === nodeId);
   if (!node) return;
-  
+
   document.getElementById('node-modal-title').textContent = 'Edit Node';
   document.getElementById('node-modal-id').value = nodeId;
   document.getElementById('node-id').value = node.id;
   document.getElementById('node-id').disabled = true;
+  document.getElementById('node-protocol').value = node.protocol || 'artnet';
   document.getElementById('node-name').value = node.name;
   document.getElementById('node-ip').value = node.ip;
   document.getElementById('node-universes').value = node.universes.join(', ');
   document.getElementById('node-description').value = node.description || '';
   document.getElementById('node-broadcast').checked = node.broadcast;
   document.getElementById('node-enabled').checked = node.enabled;
-  
+  updateNodeBroadcastLabel();
+
   document.getElementById('node-modal').style.display = 'flex';
 };
 
@@ -166,6 +179,7 @@ window.editMapping = function(dmxUniverse) {
   document.getElementById('mapping-universe').disabled = true;
   document.getElementById('mapping-artnet-universe').value = mapping.artnet_universe;
   document.getElementById('mapping-output-mode').value = mapping.output_mode;
+  updateMappingUniverseLabel();
   
   updateNodeOptions();
   // Set node value AFTER updating options so the option exists
@@ -196,35 +210,30 @@ function updateNodeOptions() {
 function renderColors() {
   const container = document.getElementById('colors-list');
   if (!container || !colorsConfig) return;
-  
+
   container.innerHTML = '';
   const colors = colorsConfig.colors || {};
-  
+
   Object.keys(colors).forEach(colorName => {
     const color = colors[colorName];
     const colorCard = document.createElement('div');
-    colorCard.style.cssText = 'border: 1px solid #374151; padding: 10px; margin-bottom: 10px; border-radius: 8px; background: #111827;';
-    
-    // Convert RGBW to RGB for preview
+    colorCard.className = 'list-card';
+
     const r = Math.round(color.r * 255);
     const g = Math.round(color.g * 255);
     const b = Math.round(color.b * 255);
     const rgbColor = `rgb(${r}, ${g}, ${b})`;
-    
+
     colorCard.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="flex: 1;">
-          <div style="font-weight: 600; margin-bottom: 5px;">${colorName}</div>
-          <div style="font-size: 12px; color: #9ca3af;">
-            <div>R: ${color.r.toFixed(2)}, G: ${color.g.toFixed(2)}, B: ${color.b.toFixed(2)}, W: ${color.w.toFixed(2)}</div>
-          </div>
+      <div class="list-card__row list-card--row">
+        <div class="list-card__body">
+          <div class="list-card__name">${colorName}</div>
+          <div class="list-card__meta">R: ${color.r.toFixed(2)}, G: ${color.g.toFixed(2)}, B: ${color.b.toFixed(2)}, W: ${color.w.toFixed(2)}</div>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="width: 40px; height: 40px; border-radius: 4px; border: 1px solid #374151; background: ${rgbColor};"></div>
-          <div>
-            <button class="small" onclick="editColor('${colorName}')">Edit</button>
-            <button class="small danger" onclick="deleteColor('${colorName}')">Delete</button>
-          </div>
+        <div class="list-card__actions">
+          <div class="color-swatch" style="background: ${rgbColor};"></div>
+          <button class="secondary btn-sm" onclick="editColor('${colorName}')">Edit</button>
+          <button class="btn--delete btn-sm" onclick="deleteColor('${colorName}')">Delete</button>
         </div>
       </div>
     `;
@@ -285,6 +294,259 @@ function updateColorPreview() {
   }
 }
 
+// ArtNet Network Discovery
+async function scanForNodes() {
+  const btn = document.getElementById('scan-network-btn');
+  const status = document.getElementById('discovery-status');
+  const list = document.getElementById('discovered-nodes-list');
+
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+  status.style.display = 'block';
+  status.textContent = 'Scanning network for ArtNet nodes (2 seconds)...';
+  list.innerHTML = '';
+
+  try {
+    const res = await fetch(`${apiBase}/api/artnet/discover`);
+    const data = await res.json();
+
+    btn.disabled = false;
+    btn.textContent = 'Scan Network';
+
+    if (data.error) {
+      status.textContent = 'Scan failed: ' + data.error;
+      return;
+    }
+
+    if (data.nodes && data.nodes.length > 0) {
+      status.textContent = `Found ${data.nodes.length} node(s) on the network.`;
+      renderDiscoveredNodes(data.nodes);
+    } else {
+      status.textContent = 'No ArtNet nodes found on the network.';
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Scan Network';
+    status.textContent = 'Scan failed: ' + e.message;
+  }
+}
+
+function renderDiscoveredNodes(nodes) {
+  const list = document.getElementById('discovered-nodes-list');
+  list.innerHTML = '<div class="subsection-label">Discovered on Network</div>';
+
+  nodes.forEach(node => {
+    const alreadyAdded = artnetConfig && artnetConfig.nodes.some(n => n.ip === node.ip);
+    const card = document.createElement('div');
+    card.className = 'list-card';
+
+    const universesText = node.universes && node.universes.length
+      ? node.universes.join(', ')
+      : '—';
+
+    const addBtn = alreadyAdded
+      ? '<span class="badge badge--success" style="font-size: 12px; padding: 4px 10px; border-radius: 4px;">Added</span>'
+      : `<button class="secondary btn-sm" onclick='addDiscoveredNode(${JSON.stringify(node)})'>Add</button>`;
+
+    card.innerHTML = `
+      <div class="list-card__row">
+        <div class="list-card__body">
+          <div class="list-card__name">${node.name || node.ip}</div>
+          <div class="list-card__meta">
+            <div>IP: ${node.ip}</div>
+            ${node.short_name && node.short_name !== node.name ? `<div>Short name: ${node.short_name}</div>` : ''}
+            <div>Ports: ${node.num_ports} &nbsp;&bull;&nbsp; Universes: ${universesText}</div>
+          </div>
+        </div>
+        <div class="list-card__actions">${addBtn}</div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+window.addDiscoveredNode = function(node) {
+  document.getElementById('node-modal-title').textContent = 'Add Discovered Node';
+  document.getElementById('node-modal-id').value = '';
+  document.getElementById('node-id').value = node.ip.replace(/\./g, '-');
+  document.getElementById('node-id').disabled = false;
+  document.getElementById('node-protocol').value = 'artnet';
+  document.getElementById('node-name').value = node.name || node.ip;
+  document.getElementById('node-ip').value = node.ip;
+  document.getElementById('node-universes').value = node.universes && node.universes.length
+    ? node.universes.join(', ')
+    : '0';
+  document.getElementById('node-description').value = node.long_name || '';
+  document.getElementById('node-broadcast').checked = false;
+  document.getElementById('node-enabled').checked = true;
+  updateNodeBroadcastLabel();
+
+  document.getElementById('node-modal').style.display = 'flex';
+};
+
+// MIDI Paired Devices
+async function loadPairedDevices() {
+  try {
+    const res = await fetch(`${apiBase}/api/midi/paired`);
+    const data = await res.json();
+    renderPairedDevices(data);
+  } catch (e) {
+    console.error('Failed to load paired MIDI devices:', e);
+  }
+}
+
+function renderPairedDevices(data) {
+  const list = document.getElementById('midi-paired-list');
+  if (!list) return;
+  const all = [
+    ...data.inputs.map(d => ({ ...d, direction: 'input' })),
+    ...data.outputs.map(d => ({ ...d, direction: 'output' })),
+  ];
+  if (all.length === 0) {
+    list.innerHTML = '<div class="summary-text">No paired devices.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  all.forEach(({ name, connected, direction }) => {
+    const dir = direction === 'input' ? 'IN' : 'OUT';
+    const row = document.createElement('div');
+    row.className = 'list-card list-card--row';
+    row.innerHTML = `
+      <div class="list-card__body">
+        <div class="list-card__title">${name}</div>
+        <div class="badge-row">
+          <span class="badge ${dir === 'IN' ? 'badge--info' : 'badge--purple'}">${dir}</span>
+          <span class="badge ${connected ? 'badge--success' : 'badge--neutral'}">${connected ? 'Connected' : 'Not connected'}</span>
+        </div>
+      </div>
+      <button class="btn--delete btn-sm" style="flex-shrink: 0;"
+        data-paired-name="${name}" data-paired-dir="${direction}">Delete</button>
+    `;
+    row.querySelector('button').addEventListener('click', deletePairing);
+    list.appendChild(row);
+  });
+}
+
+async function deletePairing(e) {
+  const btn = e.currentTarget;
+  const name = btn.dataset.pairedName;
+  const direction = btn.dataset.pairedDir;
+  if (!confirm(`Delete pairing for "${name}"?\n\nThis will disconnect the device and clear all learned MIDI mappings.`)) return;
+  btn.disabled = true;
+  try {
+    await post(`${apiBase}/api/midi/delete_pairing`, { name, direction });
+    showToast(`Pairing deleted and MIDI mappings cleared.`, 'success');
+    loadPairedDevices();
+    // Refresh scan list active state if visible
+    midiActiveConfig = { active_inputs: [], active_outputs: [] };
+    renderMidiDevices();
+  } catch (err) {
+    showToast('Failed to delete pairing: ' + err.message, 'error');
+    btn.disabled = false;
+  }
+}
+
+// MIDI Device Discovery
+let midiActiveConfig = { active_inputs: [], active_outputs: [] };
+let midiDiscoveredDevices = { inputs: [], outputs: [] };
+
+async function scanMidiDevices() {
+  const btn = document.getElementById('scan-midi-btn');
+  const status = document.getElementById('midi-status');
+
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+  status.style.display = 'block';
+  status.textContent = 'Scanning for MIDI devices...';
+
+  try {
+    const [devRes, cfgRes] = await Promise.all([
+      fetch(`${apiBase}/api/midi/devices`),
+      fetch(`${apiBase}/api/midi/config`),
+    ]);
+    const devData = await devRes.json();
+    const cfgData = cfgRes.ok ? await cfgRes.json() : { active_inputs: [], active_outputs: [] };
+
+    btn.disabled = false;
+    btn.textContent = 'Scan MIDI Devices';
+
+    if (devData.error) {
+      status.textContent = 'Scan failed: ' + devData.error;
+      return;
+    }
+
+    midiDiscoveredDevices = devData;
+    midiActiveConfig = cfgData;
+
+    const total = devData.inputs.length + devData.outputs.length;
+    status.textContent = total ? `Found ${total} MIDI port(s).` : 'No MIDI devices found.';
+    renderMidiDevices();
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Scan MIDI Devices';
+    status.textContent = 'Scan failed: ' + e.message;
+  }
+}
+
+function renderMidiDevices() {
+  const list = document.getElementById('midi-devices-list');
+  list.innerHTML = '';
+
+  const makeRow = (name, direction) => {
+    const dir = direction === 'input' ? 'IN' : 'OUT';
+    const isActive = direction === 'input'
+      ? midiActiveConfig.active_inputs.includes(name)
+      : midiActiveConfig.active_outputs.includes(name);
+
+    const row = document.createElement('div');
+    row.className = 'list-card list-card--row';
+
+    const activeBadge = isActive
+      ? '<span class="badge badge--success" style="margin-left: 8px;">Active</span>'
+      : '';
+
+    row.innerHTML = `
+      <div class="list-card__body">
+        <div class="list-card__title">${name}${activeBadge}</div>
+      </div>
+      <div class="list-card__actions">
+        <span class="badge ${dir === 'IN' ? 'badge--info' : 'badge--purple'}">${dir}</span>
+        <button class="secondary btn-sm" data-midi-name="${name}" data-midi-dir="${direction}" data-midi-active="${isActive}">
+          ${isActive ? 'Deactivate' : 'Activate'}
+        </button>
+      </div>
+    `;
+
+    row.querySelector('button').addEventListener('click', toggleMidiDevice);
+    return row;
+  };
+
+  midiDiscoveredDevices.inputs.forEach(name => list.appendChild(makeRow(name, 'input')));
+  midiDiscoveredDevices.outputs.forEach(name => list.appendChild(makeRow(name, 'output')));
+}
+
+async function toggleMidiDevice(e) {
+  const btn = e.currentTarget;
+  const name = btn.dataset.midiName;
+  const direction = btn.dataset.midiDir;
+  const isActive = btn.dataset.midiActive === 'true';
+  const endpoint = isActive ? '/api/midi/deactivate' : '/api/midi/activate';
+
+  btn.disabled = true;
+  try {
+    const res = await post(`${apiBase}${endpoint}`, { name, direction });
+    if (res) {
+      midiActiveConfig = res;
+      renderMidiDevices();
+      loadPairedDevices();
+    }
+  } catch (e) {
+    showToast('MIDI toggle failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 // Event listeners
 let eventListenersInitialized = false;
 
@@ -293,6 +555,16 @@ function initConfigEventListeners() {
   if (eventListenersInitialized) return;
   eventListenersInitialized = true;
   
+  const scanBtn = document.getElementById('scan-network-btn');
+  if (scanBtn) {
+    scanBtn.addEventListener('click', scanForNodes);
+  }
+
+  const scanMidiBtn = document.getElementById('scan-midi-btn');
+  if (scanMidiBtn) {
+    scanMidiBtn.addEventListener('click', scanMidiDevices);
+  }
+
   const addNodeBtn = document.getElementById('add-node-btn');
   if (addNodeBtn) {
     addNodeBtn.addEventListener('click', () => {
@@ -300,15 +572,22 @@ function initConfigEventListeners() {
       document.getElementById('node-modal-id').value = '';
       document.getElementById('node-id').value = '';
       document.getElementById('node-id').disabled = false;
+      document.getElementById('node-protocol').value = 'artnet';
       document.getElementById('node-name').value = '';
       document.getElementById('node-ip').value = '';
       document.getElementById('node-universes').value = '';
       document.getElementById('node-description').value = '';
       document.getElementById('node-broadcast').checked = false;
       document.getElementById('node-enabled').checked = true;
-      
+      updateNodeBroadcastLabel();
+
       document.getElementById('node-modal').style.display = 'flex';
     });
+  }
+
+  const nodeProtocolSel = document.getElementById('node-protocol');
+  if (nodeProtocolSel) {
+    nodeProtocolSel.addEventListener('change', updateNodeBroadcastLabel);
   }
 
   const nodeSaveBtn = document.getElementById('node-modal-save');
@@ -324,6 +603,7 @@ function initConfigEventListeners() {
       
       const node = {
         id: nodeId,
+        protocol: document.getElementById('node-protocol').value,
         name: document.getElementById('node-name').value.trim() || nodeId,
         ip: document.getElementById('node-ip').value.trim(),
         universes: document.getElementById('node-universes').value.split(',').map(u => parseInt(u.trim())).filter(u => !isNaN(u)),
@@ -370,8 +650,14 @@ function initConfigEventListeners() {
       document.getElementById('mapping-output-mode').value = 'artnet';
       
       updateNodeOptions();
+      updateMappingUniverseLabel();
       document.getElementById('mapping-modal').style.display = 'flex';
     });
+  }
+
+  const mappingOutputMode = document.getElementById('mapping-output-mode');
+  if (mappingOutputMode) {
+    mappingOutputMode.addEventListener('change', updateMappingUniverseLabel);
   }
 
   const mappingSaveBtn = document.getElementById('mapping-modal-save');
@@ -489,6 +775,34 @@ function initConfigEventListeners() {
     });
   }
 
+  const restartBtn = document.getElementById('restart-btn');
+  if (restartBtn) {
+    restartBtn.addEventListener('click', async () => {
+      if (!confirm('Restart LightGroove?\n\nThe server will be unavailable for a few seconds.')) return;
+      restartBtn.disabled = true;
+      restartBtn.textContent = 'Restarting…';
+      try {
+        await fetch(`${apiBase}/api/restart`, { method: 'POST' });
+      } catch (_) {
+        // Expected — connection drops as the process restarts
+      }
+      showToast('LightGroove is restarting…', 'info', 8000);
+      // Connection monitor will detect the drop and reconnect automatically.
+      // Re-enable the button once the server is back.
+      const poll = setInterval(async () => {
+        try {
+          const r = await fetch(`${apiBase}/api/grandmaster`);
+          if (r.ok) {
+            clearInterval(poll);
+            restartBtn.disabled = false;
+            restartBtn.textContent = 'Restart LightGroove';
+            showToast('LightGroove is back online', 'success');
+          }
+        } catch (_) {}
+      }, 1000);
+    });
+  }
+
   // Load config when Config tab is activated
   const tabs = document.querySelectorAll('.tab');
   tabs.forEach(tab => {
@@ -500,9 +814,13 @@ function initConfigEventListeners() {
         }
         // Always reload colors to pick up manual changes
         loadColorsConfig();
+        loadPairedDevices();
       }
     });
   });
+
+  // Load paired devices on initial page load
+  loadPairedDevices();
 }
 
 // Initialize on page load
