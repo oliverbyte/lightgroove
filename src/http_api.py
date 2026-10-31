@@ -78,6 +78,7 @@ class HttpApiServer:
                         fixtures.append(
                             {
                                 "id": fid,
+                                "description": data["description"],
                                 "type": data["type"],
                                 "universe": data["universe"],
                                 "start_address": data["start_address"],

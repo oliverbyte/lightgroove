@@ -44,16 +44,18 @@ class FixtureManager:
                 fixture_id = fixture_data['id']
                 fixture_type = fixture_data['type']
                 start_address = fixture_data['start_address']
+                description = fixture_data.get('description', "") # description is optional
                 
                 if fixture_type in self.fixtures_config:
                     self.fixtures[fixture_id] = {
                         'type': fixture_type,
                         'universe': universe_id,
                         'start_address': start_address,
+                        'description': description,
                         'config': self.fixtures_config[fixture_type],
                         'state': {}
                     }
-                    print(f"Initialized fixture '{fixture_id}' ({fixture_type}) at Universe {universe_id}, Address {start_address}")
+                    print(f"Initialized fixture '{fixture_id}: {description}' ({fixture_type}) at Universe {universe_id}, Address {start_address}")
                 else:
                     print(f"Warning: Fixture type '{fixture_type}' not found in fixtures.json")
     

@@ -235,6 +235,9 @@
         const h3 = document.createElement('h3');
         h3.innerHTML = `${fx.id} <span class="pill">${fx.type}</span> <span class="pill">U${fx.universe} @ ${fx.start_address}</span>`;
         card.appendChild(h3);
+        desc = document.createElement("p");
+        desc.innerHTML = `${fx.description}`;
+        card.appendChild(desc);
 
         const channels = fx.channels || [];
         const ordered = [...channels].sort((a, b) => (a.index ?? 0) - (b.index ?? 0) || a.name.localeCompare(b.name));
